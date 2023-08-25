@@ -38,7 +38,7 @@ import (
 
 const (
 	// clientIdentifier to advertise over the network.
-	clientIdentifier = "go-opera"
+	clientIdentifier = "go-x1"
 )
 
 var (
@@ -46,7 +46,7 @@ var (
 	gitCommit = ""
 	gitDate   = ""
 	// The app that holds all commands and flags.
-	app = flags.NewApp(gitCommit, gitDate, "the go-opera command line interface")
+	app = flags.NewApp(gitCommit, gitDate, "the go-x1 command line interface")
 
 	nodeFlags        []cli.Flag
 	testFlags        []cli.Flag
@@ -65,6 +65,7 @@ func initFlags() {
 	// Flags for testing purpose.
 	testFlags = []cli.Flag{
 		FakeNetFlag,
+		TestnetFlag,
 	}
 
 	// Flags that configure the node.
