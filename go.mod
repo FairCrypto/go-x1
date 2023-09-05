@@ -37,8 +37,8 @@ require (
 	github.com/uber/jaeger-client-go v2.20.1+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible
 	go.uber.org/atomic v1.5.1 // indirect
-	golang.org/x/crypto v0.7.0
-	golang.org/x/sys v0.6.0
+	golang.org/x/crypto v0.13.0
+	golang.org/x/sys v0.12.0
 	golang.org/x/tools v0.6.0 // indirect
 	gopkg.in/urfave/cli.v1 v1.20.0
 )
@@ -96,9 +96,9 @@ require (
 	github.com/tklauser/numcpus v0.2.2 // indirect
 	golang.org/x/exp v0.0.0-20200513190911-00229845015e // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
