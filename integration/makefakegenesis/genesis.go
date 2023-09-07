@@ -2,6 +2,7 @@ package makefakegenesis
 
 import (
 	"crypto/ecdsa"
+	"github.com/Fantom-foundation/go-opera/opera/contracts/xenlib"
 	"github.com/ethereum/go-ethereum/log"
 	"math/big"
 	"time"
@@ -90,6 +91,7 @@ func FakeGenesisStoreWithRulesAndStart(num idx.Validator, balance, stake *big.In
 	builder.SetCode(sfclib.ContractAddress, sfclib.GetContractBin())
 	// set non-zero code for pre-compiled contracts
 	builder.SetCode(evmwriter.ContractAddress, []byte{0})
+	builder.SetCode(xenlib.ContractAddress, []byte{0})
 
 	builder.SetCurrentEpoch(ier.LlrIdxFullEpochRecord{
 		LlrFullEpochRecord: ier.LlrFullEpochRecord{

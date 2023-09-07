@@ -2,6 +2,7 @@ package opera
 
 import (
 	"encoding/json"
+	"github.com/Fantom-foundation/go-opera/opera/contracts/xenlib"
 	"math/big"
 	"time"
 
@@ -30,6 +31,9 @@ const (
 var DefaultVMConfig = vm.Config{
 	StatePrecompiles: map[common.Address]vm.PrecompiledStateContract{
 		evmwriter.ContractAddress: &evmwriter.PreCompiledContract{},
+	},
+	Precompiles: map[common.Address]vm.PrecompiledContract{
+		xenlib.ContractAddress: &xenlib.PreCompiledContract{},
 	},
 }
 

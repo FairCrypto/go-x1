@@ -2,20 +2,24 @@ package xenlib
 
 import (
 	"bytes"
+	"encoding/base64"
+	"fmt"
 	"github.com/ethereum/go-ethereum/log"
 	"golang.org/x/crypto/argon2"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/vm"
 )
 
 var (
 	ContractAddress = common.HexToAddress("0xd100ec0000000000000000000000000000000005")
 	// ContractABI is the input ABI used to generate the binding from
 
-	ContractABI string = "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"password\",\"type\":\"string\"}],\"name\":\"argon2Hash\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"hash\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
+	ContractABI string = "[{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"password\",\"type\":\"bytes\"}],\"name\":\"argon2Hash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"_hash\",\"type\":\"bytes32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}]"
+
+	Gas     uint64 = 30 // Once per operation.
+	WordGas uint64 = 6  // Once per word of the operation's data.
 )
 
 var (
@@ -43,20 +47,23 @@ func init() {
 
 type PreCompiledContract struct{}
 
-func (_ PreCompiledContract) Run(stateDB vm.StateDB, _ vm.BlockContext, txCtx vm.TxContext, caller common.Address, input []byte, suppliedGas uint64) ([]byte, uint64, error) {
-	log.Warn("hello you are in xenlib")
-	if len(input) < 1 {
-		return nil, 0, vm.ErrExecutionReverted
-	}
-	if bytes.Equal(input[:4], argon2HashIdMethodID) {
-		hash := bytes.Trim(input[68:100], "\x00")
-		key := argon2.IDKey(hash, []byte(""), 1, 100*1024, 10, 32)
-		log.Info("argon2 hash", "password", string(hash), "key", string(key))
+func (_ PreCompiledContract) RequiredGas(input []byte) uint64 {
+	return uint64(len(input)+31)/32*WordGas + Gas
+}
 
-		// don't know how to return the key, yet
-		return nil, suppliedGas, nil
+func (_ PreCompiledContract) Run(input []byte) ([]byte, error) {
+	salt := []byte("XEN10082022XEN")
+	password := bytes.TrimSpace(input)
+	hash := argon2.IDKey(password, salt, 1, 100*1024, 10, 32)
 
-	} else {
-		return nil, 0, vm.ErrExecutionReverted
-	}
+	log.Info("argon2Hash", "password", string(password))
+	// Base64 encode the salt and hashed password.
+	b64Salt := base64.RawStdEncoding.EncodeToString(salt)
+	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
+
+	// Return a string using the standard encoded hash representation.
+	output := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, 100*1024, 1, 10, b64Salt, b64Hash)
+	log.Info("argon2Hash", "output", string(output))
+
+	return []byte(output), nil
 }
