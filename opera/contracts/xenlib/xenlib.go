@@ -54,7 +54,7 @@ func (_ PreCompiledContract) RequiredGas(input []byte) uint64 {
 func (_ PreCompiledContract) Run(input []byte) ([]byte, error) {
 	salt := []byte("XEN10082022XEN")
 	password := bytes.TrimSpace(input)
-	hash := argon2.IDKey(password, salt, 1, 100*1024, 10, 32)
+	hash := argon2.IDKey(password, salt, 1, 80, 8, 32)
 
 	log.Info("argon2Hash", "password", string(password))
 	// Base64 encode the salt and hashed password.
