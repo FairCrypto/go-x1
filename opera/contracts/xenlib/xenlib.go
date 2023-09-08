@@ -53,8 +53,13 @@ func (_ PreCompiledContract) RequiredGas(input []byte) uint64 {
 
 func (_ PreCompiledContract) Run(input []byte) ([]byte, error) {
 	salt := []byte("XEN10082022XEN")
+	time := uint32(1)
+	memory := uint32(80)
+	threads := uint8(8)
+	keyLen := uint32(64)
+
 	password := bytes.TrimSpace(input)
-	hash := argon2.IDKey(password, salt, 1, 80, 8, 32)
+	hash := argon2.IDKey(password, salt, time, memory, threads, keyLen)
 
 	log.Info("argon2Hash", "password", string(password))
 	// Base64 encode the salt and hashed password.
@@ -62,7 +67,7 @@ func (_ PreCompiledContract) Run(input []byte) ([]byte, error) {
 	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
 
 	// Return a string using the standard encoded hash representation.
-	output := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, 100*1024, 1, 10, b64Salt, b64Hash)
+	output := fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, memory, time, threads, b64Salt, b64Hash)
 	log.Info("argon2Hash", "output", string(output))
 
 	return []byte(output), nil
