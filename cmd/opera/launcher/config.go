@@ -4,7 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	maketestnetgenesis "github.com/Fantom-foundation/go-opera/integration/maketestnetgenesis"
+	"math/big"
+	"os"
+	"path"
+	"path/filepath"
+	"reflect"
+	"strings"
+
+	"github.com/Fantom-foundation/go-opera/integration/maketestnetgenesis"
 	"github.com/Fantom-foundation/lachesis-base/abft"
 	"github.com/Fantom-foundation/lachesis-base/utils/cachescale"
 	"github.com/ethereum/go-ethereum/cmd/utils"
@@ -16,11 +23,6 @@ import (
 	"github.com/naoina/toml"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"gopkg.in/urfave/cli.v1"
-	"os"
-	"path"
-	"path/filepath"
-	"reflect"
-	"strings"
 
 	"github.com/Fantom-foundation/go-opera/evmcore"
 	"github.com/Fantom-foundation/go-opera/gossip"
@@ -106,7 +108,7 @@ var (
 	SyncModeFlag = cli.StringFlag{
 		Name:  "syncmode",
 		Usage: `Blockchain sync mode ("full" or "snap")`,
-		Value: "full",
+		Value: "snap",
 	}
 
 	GCModeFlag = cli.StringFlag{
@@ -131,6 +133,7 @@ var (
 	DBPresetFlag = cli.StringFlag{
 		Name:  "db.preset",
 		Usage: "DBs layout preset ('pbl-1' or 'ldb-1' or 'legacy-ldb' or 'legacy-pbl')",
+		Value: "pbl-1",
 	}
 )
 
@@ -542,6 +545,13 @@ func mayMakeAllConfigs(ctx *cli.Context) (*config, error) {
 
 	// Process DBs defaults in the end because they are applied only in absence of config or flags
 	cfg = setDBConfigDefault(cfg, cacheRatio)
+	// Sanitize GPO config
+	if cfg.Opera.GPO.MinGasTip == nil || cfg.Opera.GPO.MinGasTip.Sign() == 0 {
+		cfg.Opera.GPO.MinGasTip = new(big.Int).SetUint64(cfg.TxPool.PriceLimit)
+	}
+	if cfg.Opera.GPO.MinGasTip.Cmp(new(big.Int).SetUint64(cfg.TxPool.PriceLimit)) < 0 {
+		log.Warn(fmt.Sprintf("GPO minimum gas tip (Opera.GPO.MinGasTip=%s) is lower than txpool minimum gas tip (TxPool.PriceLimit=%d)", cfg.Opera.GPO.MinGasTip.String(), cfg.TxPool.PriceLimit))
+	}
 
 	if err := cfg.Opera.Validate(); err != nil {
 		return nil, err
