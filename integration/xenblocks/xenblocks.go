@@ -66,7 +66,7 @@ func (x *Xenblocks) sendDataOverWebSocket(peerID string, blockID string, hash st
 	}
 
 	// Send the JSON response through the WebSocket
-	log.Info("Sending data to XenBlocks", "data", responseData)
+	log.Debug("Sending data to XenBlocks", "data", responseData)
 	if err := x.ws.WriteMessage(websocket.TextMessage, jsonData); err != nil {
 		log.Error("Failed to send peer info to xenblocks", "err", err)
 	}
