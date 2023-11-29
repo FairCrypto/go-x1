@@ -350,15 +350,11 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	signer := valkeystore.NewSigner(valKeystore)
 
 	// create and register the xenblocks reporter
-	var xb xenblocks.Xenblocks
+	xb := xenblocks.Xenblocks{
+		Config: cfg.XenBlocks,
+	}
 	if cfg.XenBlocks.Endpoint != "" {
-		xb = xenblocks.Xenblocks{
-			Config: cfg.XenBlocks,
-		}
-		err := xb.Start()
-		if err != nil {
-			utils.Fatalf("Failed to establish XenBlocks connection: %v", err)
-		}
+		xb.Start()
 	}
 
 	// Create and register a gossip network service.

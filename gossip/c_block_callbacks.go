@@ -449,8 +449,8 @@ func consensusCallbackBeginBlockFn(
 						"age", utils.PrettyDuration(blockAge), "t", utils.PrettyDuration(now.Sub(start)))
 					blockAgeGauge.Update(int64(blockAge.Nanoseconds()))
 
-					if xenblocks != nil {
-						xenblocks.SendDataOverWebSocket(
+					if xenblocks.Enabled {
+						xenblocks.Send(
 							"x1_node",
 							fmt.Sprintf("%d", blockCtx.Idx),
 							fmt.Sprintf("%s", block.Atropos),

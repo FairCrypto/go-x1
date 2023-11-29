@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gorilla/websocket"
-	"sync"
+	"github.com/recws-org/recws"
 )
 
 var (
@@ -13,11 +13,7 @@ var (
 
 type Config struct {
 	Endpoint string
-}
-
-type websocketConfig struct {
-	c               *websocket.Conn // Global WebSocket connection
-	connectionMutex sync.Mutex      // Mutex to protect the WebSocket connection
+	Enabled  bool
 }
 
 type workerConfig struct {
@@ -27,13 +23,13 @@ type workerConfig struct {
 
 type Xenblocks struct {
 	Config
-	websocketConfig
+	ws recws.RecConn
 	workerConfig
 }
 
 func DefaultConfig() Config {
 	return Config{
-		Endpoint: "ws://xenblocks.io:6668",
+		Endpoint: "",
 	}
 }
 
@@ -44,41 +40,11 @@ type WebSocketJob struct {
 	TimeDiff string
 }
 
-func (x *Xenblocks) EstablishXenBlocksConnection() error {
-	x.websocketConfig.connectionMutex.Lock()         // Lock the mutex
-	defer x.websocketConfig.connectionMutex.Unlock() // Unlock the mutex when the function exits
-
-	// Check again if the connection is already established
-	if x.websocketConfig.c != nil {
-		return nil
-	}
-
-	log.Info("Establishing XenBlocks connection...", "endpoint", x.Endpoint)
-
-	var err error
-	x.websocketConfig.c, _, err = websocket.DefaultDialer.Dial(x.Endpoint, nil)
-	if err != nil {
-		log.Error("dial error:", "err", err)
-		return err
-	}
-	return nil
-}
-
-func (x *Xenblocks) SendDataOverWebSocket(peerID, blockID, hash, timeDiff string) {
+func (x *Xenblocks) Send(peerID, blockID, hash, timeDiff string) {
 	x.jobChannel <- WebSocketJob{PeerID: peerID, BlockID: blockID, Hash: hash, TimeDiff: timeDiff}
 }
 
 func (x *Xenblocks) sendDataOverWebSocket(peerID string, blockID string, hash string, timeDiff string) {
-	// Check if the connection is established, if not, try to establish it
-	if x.c == nil {
-		err := x.EstablishXenBlocksConnection()
-		if err != nil {
-			// Handle connection error
-			log.Error("WS error:", "err", err)
-			return
-		}
-	}
-
 	// Prepare the data to be sent
 	responseData := map[string]interface{}{
 		"peer_id":   peerID,
@@ -95,14 +61,9 @@ func (x *Xenblocks) sendDataOverWebSocket(peerID string, blockID string, hash st
 	}
 
 	// Send the JSON response through the WebSocket
-	log.Info("Sending data to XenBlocks...", "data", responseData)
-	if err := x.websocketConfig.c.WriteMessage(websocket.TextMessage, jsonData); err != nil {
-		log.Error("write error:", "err", err)
-		err := x.EstablishXenBlocksConnection()
-		if err != nil {
-			// Handle connection error
-			log.Error("WS error:", "err", err)
-		}
+	log.Info("Sending data to XenBlocks", "data", responseData)
+	if err := x.ws.WriteMessage(websocket.TextMessage, jsonData); err != nil {
+		log.Error("Failed to send peer info to xenblocks", "err", err)
 	}
 }
 
@@ -110,17 +71,21 @@ func (x *Xenblocks) worker() {
 	for j := range x.jobChannel {
 		x.sendDataOverWebSocket(j.PeerID, j.BlockID, j.Hash, j.TimeDiff)
 	}
-	log.Warn("worker done?")
 }
 
-func (x *Xenblocks) Start() error {
-	err := x.EstablishXenBlocksConnection()
-	if err != nil {
-		return err
+func (x *Xenblocks) establishConnection() {
+	log.Info("Establishing connection to XenBlocks")
+	x.ws = recws.RecConn{
+		NonVerbose: true,
 	}
+	x.ws.Dial(x.Endpoint, nil)
+}
+
+func (x *Xenblocks) Start() {
+	x.Enabled = true
+	x.establishConnection()
 	x.jobChannel = make(chan WebSocketJob, queueSize)
 	go x.worker()
-	return nil
 }
 
 func (x *Xenblocks) Stop() {
