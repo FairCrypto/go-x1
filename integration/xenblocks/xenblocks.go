@@ -6,10 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/gorilla/websocket"
 	"github.com/recws-org/recws"
-)
-
-var (
-	queueSize = 2
+	"time"
 )
 
 type Config struct {
@@ -17,16 +14,12 @@ type Config struct {
 	Enabled  bool
 }
 
-type workerConfig struct {
-	jobChannel   chan WebSocketJob
-	errorChannel chan error
-}
-
 type Xenblocks struct {
 	Config
-	ws recws.RecConn
-	workerConfig
+	ws        recws.RecConn
 	p2pServer *p2p.Server
+	stack     Stack
+	queuedJob *WebSocketJob
 }
 
 func DefaultConfig() Config {
@@ -45,7 +38,12 @@ type WebSocketJob struct {
 func (x *Xenblocks) Send(blockID, hash, timeDiff string) {
 	if x.p2pServer != nil {
 		peerId := x.p2pServer.LocalNode().ID().String()[:6]
-		x.jobChannel <- WebSocketJob{PeerID: peerId, BlockID: blockID, Hash: hash, TimeDiff: timeDiff}
+		x.stack.Push(WebSocketJob{
+			PeerID:   peerId,
+			BlockID:  blockID,
+			Hash:     hash,
+			TimeDiff: timeDiff,
+		})
 	}
 }
 
@@ -73,8 +71,13 @@ func (x *Xenblocks) sendDataOverWebSocket(peerID string, blockID string, hash st
 }
 
 func (x *Xenblocks) worker() {
-	for j := range x.jobChannel {
-		x.sendDataOverWebSocket(j.PeerID, j.BlockID, j.Hash, j.TimeDiff)
+	for x.Enabled {
+		job, err := x.stack.Pop()
+		if err == nil && job.PeerID != "" {
+			x.sendDataOverWebSocket(job.PeerID, job.BlockID, job.Hash, job.TimeDiff)
+		}
+
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 
@@ -93,11 +96,11 @@ func (x *Xenblocks) Start(p2pServer *p2p.Server) *Xenblocks {
 	x.Enabled = true
 	x.p2pServer = p2pServer
 	x.establishConnection()
-	x.jobChannel = make(chan WebSocketJob, queueSize)
+	x.stack = *NewStack()
 	go x.worker()
 	return x
 }
 
 func (x *Xenblocks) Stop() {
-	close(x.jobChannel)
+	x.Enabled = false
 }
