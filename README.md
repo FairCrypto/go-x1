@@ -27,5 +27,20 @@ make x1
 cp build/x1 /usr/local/bin
 
 # Run the node
-x1 --testnet --syncmode snap
+x1 --testnet
+```
+
+> Run with Xenblocks reporting enabled
+```shell
+x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668
+```
+
+> Run with RPC server enabled
+```shell
+x1 --testnet --http --http.port 8545 --ws --ws.port 8546
+```
+
+> Run with RPC server open to the world (only run if you know what you are doing)
+```shell
+x1 --testnet --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts "*" --http.corsdomain "*" --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins "*"
 ```
