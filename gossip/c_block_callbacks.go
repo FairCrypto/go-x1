@@ -451,7 +451,6 @@ func consensusCallbackBeginBlockFn(
 
 					if xenblocks.Enabled {
 						xenblocks.Send(
-							"x1_node",
 							fmt.Sprintf("%d", blockCtx.Idx),
 							fmt.Sprintf("%s", block.Atropos),
 							fmt.Sprintf("%s", utils.PrettyDuration(now.Sub(start))))

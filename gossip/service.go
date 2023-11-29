@@ -182,7 +182,8 @@ func NewService(stack *node.Node, config Config, store *Store, blockProc BlockPr
 	// Create the net API service
 	svc.netRPCService = ethapi.NewPublicNetAPI(svc.p2pServer, store.GetRules().NetworkID)
 	svc.haltCheck = haltCheck
-	svc.xenblocks = xenblocks
+	svc.xenblocks = xenblocks.Start(svc.p2pServer)
+
 	return svc, nil
 }
 

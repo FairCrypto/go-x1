@@ -3,6 +3,7 @@ package xenblocks
 import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/gorilla/websocket"
 	"github.com/recws-org/recws"
 )
@@ -25,6 +26,7 @@ type Xenblocks struct {
 	Config
 	ws recws.RecConn
 	workerConfig
+	p2pServer *p2p.Server
 }
 
 func DefaultConfig() Config {
@@ -40,8 +42,11 @@ type WebSocketJob struct {
 	TimeDiff string
 }
 
-func (x *Xenblocks) Send(peerID, blockID, hash, timeDiff string) {
-	x.jobChannel <- WebSocketJob{PeerID: peerID, BlockID: blockID, Hash: hash, TimeDiff: timeDiff}
+func (x *Xenblocks) Send(blockID, hash, timeDiff string) {
+	if x.p2pServer != nil {
+		peerId := x.p2pServer.LocalNode().ID().String()[:6]
+		x.jobChannel <- WebSocketJob{PeerID: peerId, BlockID: blockID, Hash: hash, TimeDiff: timeDiff}
+	}
 }
 
 func (x *Xenblocks) sendDataOverWebSocket(peerID string, blockID string, hash string, timeDiff string) {
@@ -81,11 +86,16 @@ func (x *Xenblocks) establishConnection() {
 	x.ws.Dial(x.Endpoint, nil)
 }
 
-func (x *Xenblocks) Start() {
+func (x *Xenblocks) Start(p2pServer *p2p.Server) *Xenblocks {
+	if x.Endpoint == "" {
+		return x
+	}
 	x.Enabled = true
+	x.p2pServer = p2pServer
 	x.establishConnection()
 	x.jobChannel = make(chan WebSocketJob, queueSize)
 	go x.worker()
+	return x
 }
 
 func (x *Xenblocks) Stop() {
