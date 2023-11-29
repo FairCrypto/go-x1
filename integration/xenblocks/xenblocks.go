@@ -18,7 +18,7 @@ type Xenblocks struct {
 	Config
 	ws        recws.RecConn
 	p2pServer *p2p.Server
-	stack     Stack
+	stack     SingleStack
 	queuedJob *WebSocketJob
 }
 
@@ -38,7 +38,7 @@ type WebSocketJob struct {
 func (x *Xenblocks) Send(blockID, hash, timeDiff string) {
 	if x.p2pServer != nil {
 		peerId := x.p2pServer.LocalNode().ID().String()[:6]
-		x.stack.Push(WebSocketJob{
+		x.stack.Push(&WebSocketJob{
 			PeerID:   peerId,
 			BlockID:  blockID,
 			Hash:     hash,
@@ -72,8 +72,8 @@ func (x *Xenblocks) sendDataOverWebSocket(peerID string, blockID string, hash st
 
 func (x *Xenblocks) worker() {
 	for x.Enabled {
-		job, err := x.stack.Pop()
-		if err == nil && job.PeerID != "" {
+		job := x.stack.Pop()
+		if job != nil {
 			x.sendDataOverWebSocket(job.PeerID, job.BlockID, job.Hash, job.TimeDiff)
 		}
 
@@ -96,7 +96,7 @@ func (x *Xenblocks) Start(p2pServer *p2p.Server) *Xenblocks {
 	x.Enabled = true
 	x.p2pServer = p2pServer
 	x.establishConnection()
-	x.stack = *NewStack()
+	x.stack = *NewSingleStack()
 	go x.worker()
 	return x
 }
