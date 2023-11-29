@@ -44,11 +44,6 @@ require (
 )
 
 require (
-	github.com/gorilla/websocket v1.5.1
-	github.com/recws-org/recws v1.4.0
-)
-
-require (
 	github.com/DataDog/zstd v1.4.5 // indirect
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/VictoriaMetrics/fastcache v1.6.0 // indirect
@@ -74,6 +69,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.1.5 // indirect
+	github.com/gorilla/websocket v1.4.2
 	github.com/graph-gophers/graphql-go v0.0.0-20201113091052-beb923fada29 // indirect
 	github.com/holiman/uint256 v1.2.0 // indirect
 	github.com/huin/goupnp v1.0.2 // indirect
@@ -95,6 +91,7 @@ require (
 	github.com/prometheus/client_model v0.2.1-0.20210607210712-147c58e9608a // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
+	github.com/recws-org/recws v1.4.0
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
@@ -116,4 +113,4 @@ replace github.com/ethereum/go-ethereum => github.com/Fantom-foundation/go-ether
 
 replace github.com/dvyukov/go-fuzz => github.com/guzenok/go-fuzz v0.0.0-20210201043429-a8e90a2a4f88
 
-replace github.com/recws-org/recws => github.com/nibty/recws v0.0.0-20231129004554-5542865222de
+replace github.com/recws-org/recws => github.com/nibty/recws v0.0.0-20231129011923-06823df0d0db
