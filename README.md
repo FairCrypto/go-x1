@@ -23,7 +23,7 @@ apt update -y
 apt install -y golang wget git make
 
 # Install Libargon2 (required to run a validator node)
-apt install -y libargon2-dev
+apt install -y argon2
 
 # Clone and build the X1 binary
 git clone --branch x1 https://github.com/FairCrypto/go-x1
@@ -60,12 +60,13 @@ Run a full node as described above and allow to fully sync, then follow the inst
 > Install libargon2 (required to run a validator node)
 ```shell
 # ubuntu/debian
-apt install -y libargon2
+apt install -y argon2
 
 # MacOS
 brew install argon2
 
 # Redhat based distros
+yum install -y epel-release
 yum install -y libargon2
 ```
 
