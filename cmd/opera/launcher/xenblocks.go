@@ -11,6 +11,11 @@ var XenBlocksEndpointFlag = cli.StringFlag{
 	Usage: "Sets the Xenblocks reporter endpoint.",
 }
 
+var XenBlocksVerifierEnabledFlag = cli.BoolFlag{
+	Name:  "xenblocks-verifier-enabled",
+	Usage: "Enables the Xenblocks verifier.",
+}
+
 func parseXenBlocksEndpoint(s string) (url string, err error) {
 	if !strings.HasPrefix(s, "ws://") && !strings.HasPrefix(s, "wss://") {
 		err = fmt.Errorf("use ws:// or wss:// prefix")

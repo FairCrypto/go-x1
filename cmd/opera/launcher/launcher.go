@@ -3,6 +3,7 @@ package launcher
 import (
 	"fmt"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/verifier"
 	"path"
 	"sort"
 	"strings"
@@ -185,6 +186,7 @@ func initFlags() {
 
 	xenblocksFlags = []cli.Flag{
 		XenBlocksEndpointFlag,
+		XenBlocksVerifierEnabledFlag,
 	}
 
 	nodeFlags = []cli.Flag{}
@@ -348,6 +350,11 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 		}
 	}
 	signer := valkeystore.NewSigner(valKeystore)
+
+	// Config the XenBlocks verifier
+	if cfg.XenBlocks.Verifier {
+		go verifier.Worker(cfg.Node)
+	}
 
 	// Config the XenBlocks reporter
 	xenblocksReporter := reporter.NewReporter(cfg.XenBlocks)
