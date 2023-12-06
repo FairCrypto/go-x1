@@ -1,44 +1,67 @@
 package verifier
 
 import (
-	"encoding/base64"
-	"encoding/hex"
+	"crypto/sha256"
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/Fantom-foundation/go-opera/gossip/contract/sfc100"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
+	"github.com/Fantom-foundation/go-opera/opera/contracts/sfc"
+	"github.com/Fantom-foundation/lachesis-base/inter/idx"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/tvdburgt/go-argon2"
+	"math"
 	"math/big"
 	"os"
-	"regexp"
-	"strings"
 	"time"
 )
 
 var (
-	hashId  []*big.Int
-	epoch   []*big.Int
-	account []common.Address
-
-	ctx = &argon2.Context{
-		HashLen: 64,
-		Mode:    argon2.ModeArgon2id,
-		Version: argon2.Version13,
-	}
+	numOfWorkers     = 3
+	backlog          = 5
+	hashLen          = 64
+	validatorsFactor = 0.2
+	pattern1Salt     = "WEVOMTAwODIwMjJYRU4"
+	blockStorageAddr = "0x23213196F7d13153a906c456f5a1008E23EA94bA"
 )
 
-func Worker(cfg node.Config) {
+type Verifier struct {
+	enabled      bool
+	numOfWorkers int
+	backlog      int
+	ipcPath      string
+	validatorId  uint32
+	bs           *block_storage.BlockStorage
+	sfc          *sfc100.ContractCaller
+	eventChannel chan *block_storage.BlockStorageNewHash
+	conn         *ethclient.Client
+	sub          event.Subscription
+}
+
+func NewVerifier(nodeCfg node.Config, validatorId idx.ValidatorID) *Verifier {
+	ipcPath := fmt.Sprintf("%s/%s", nodeCfg.DataDir, nodeCfg.IPCPath)
+
+	return &Verifier{
+		enabled:      false,
+		ipcPath:      ipcPath,
+		numOfWorkers: numOfWorkers,
+		backlog:      backlog,
+		validatorId:  uint32(validatorId),
+	}
+}
+
+func (x *Verifier) Start() {
 	log.Info("Starting Block storage watcher")
-
-	// check if file exists
-	time.Sleep(10 * time.Second)
-	ipcPath := fmt.Sprintf("%s/%s", cfg.DataDir, cfg.IPCPath)
-
+	time.Sleep(5 * time.Second)
+	x.enabled = true
 	for {
-		if _, err := os.Stat(ipcPath); errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Stat(x.ipcPath); errors.Is(err, os.ErrNotExist) {
 			log.Warn("IPC file not found, waiting 10 seconds")
 			time.Sleep(10 * time.Second)
 		} else {
@@ -46,115 +69,127 @@ func Worker(cfg node.Config) {
 		}
 	}
 
-	conn, err := ethclient.Dial(ipcPath)
+	var err error
+	x.conn, err = ethclient.Dial(x.ipcPath)
 	if err != nil {
 		panic(err)
 	}
 
-	bs, err := block_storage.NewBlockStorage(common.HexToAddress("0x23213196F7d13153a906c456f5a1008E23EA94bA"), conn)
+	x.bs, err = block_storage.NewBlockStorage(common.HexToAddress(blockStorageAddr), x.conn)
 	if err != nil {
 		panic(err)
 	}
 
-	channel := make(chan *block_storage.BlockStorageNewHash, 5)
+	x.sfc, err = sfc100.NewContractCaller(sfc.ContractAddress, x.conn)
+	if err != nil {
+		panic(err)
+	}
+
+	x.eventChannel = make(chan *block_storage.BlockStorageNewHash, backlog)
+	for w := 1; w <= numOfWorkers; w++ {
+		go x.worker(x.eventChannel)
+	}
 
 	// Start a goroutine which watches new events
 	go func() {
-		sub, err := bs.WatchNewHash(nil, channel, hashId, epoch, account)
+		x.sub, err = x.bs.WatchNewHash(nil, x.eventChannel, nil, nil, nil)
 		if err != nil {
 			panic(err)
 		}
 
 		for {
 			select {
-			case err := <-sub.Err():
-				panic(err)
-			case t := <-channel:
-				log.Trace("NewHash event received", "hashId", t.HashId, "epoch", t.Epoch, "account", t.Account)
-				dr, err := bs.DecodeRecordBytes0(nil, t.HashId)
-				if err != nil {
-					return
-				}
-
-				ctx.Parallelism = int(dr.C)
-				ctx.Memory = int(dr.M)
-				ctx.Iterations = int(dr.T)
-				hashToVerify, err := argon2.HashEncoded(ctx, dr.K[:], dr.S)
-				if err != nil {
-					panic(err)
-				}
-
-				if validateHash(hashToVerify) {
-					log.Info("Hash verified", "hash", hashToVerify)
-				} else {
-					log.Warn("Hash verification failed", "hash", hashToVerify)
-				}
-
-				// then I can call a vote function
-
-				default:
-					log.Warn("Channel is full")
-				}
+			case err := <-x.sub.Err():
+				log.Error("Error in BlockStorage watcher", "err", err)
+				break
 			}
+			time.Sleep(time.Second)
 		}
 	}()
 }
 
-func restoreEIP55Address(addr string) bool {
-	re := regexp.MustCompile("^(0x|)[0-9a-fA-F]{40}$")
-	return re.MatchString(addr)
+func (x *Verifier) worker(events <-chan *block_storage.BlockStorageNewHash) {
+	for e := range events {
+		x.handleEvent(e)
+	}
 }
 
-func extractSaltFromHash(hashToVerify string) string {
-	parts := strings.Split(hashToVerify, "$")
-	if len(parts) != 6 {
-		log.Warn("less than 6 parts")
-		return ""
-	}
-	return parts[4]
-}
+func (x *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
+	log.Debug("NewHash event received", "hashId", event.HashId, "epoch", event.Epoch, "account", event.Account)
 
-func validatePattern1(salt string) bool {
-	return salt == "WEVOMTAwODIwMjJYRU4"
-}
-
-func validatePattern2(salt string) bool {
-	r := regexp.MustCompile(`^[A-Za-z0-9+/]{27}$`)
-
-	if !r.MatchString(salt) {
-		log.Warn("pattern 2 match failed")
-		return false
+	if !x.shouldVote(event.Raw.BlockNumber) {
+		log.Debug("Not voting for this hash", "hash", event.Raw.BlockHash)
+		return
 	}
 
-	missingPadding := len(salt) % 4
-	if missingPadding != 0 {
-		salt += strings.Repeat("=", 4-missingPadding)
-	}
-
-	rawDecodedText, err := base64.StdEncoding.DecodeString(salt)
+	dr, err := x.bs.DecodeRecordBytes0(nil, event.HashId)
 	if err != nil {
-		log.Warn("base64 decode error", "err", err, "salt", salt)
-		return false
+		return
 	}
 
-	decodedStr := hex.EncodeToString(rawDecodedText)
-	if !restoreEIP55Address(decodedStr) {
-		log.Warn("decoded string is not a valid hash", "decodedStr", decodedStr)
-		return false
+	hashToVerify, err := argon2Hash(dr.C, dr.M, dr.T, dr.S, dr.K)
+	if err != nil {
+		panic(err)
 	}
 
-	return true
+	if validateHash(hashToVerify) {
+		log.Info("Hash verified", "hash", hashToVerify)
+	} else {
+		log.Warn("Hash verification failed", "hash", hashToVerify)
+	}
+
+	// TODO: parse XNM, XUNI or XNM+X.BLK
+	// TODO: vote for each hash
 }
 
-func validateHash(hash string) bool {
-	salt := extractSaltFromHash(hash)
-	if salt == "" {
+func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte, key [32]byte) (string, error) {
+	ctx := &argon2.Context{
+		Iterations:  int(iterations),
+		Memory:      int(memory),
+		Parallelism: int(parallelism),
+		HashLen:     hashLen,
+		Mode:        argon2.ModeArgon2i,
+		Version:     argon2.Version13,
+	}
+
+	return argon2.HashEncoded(ctx, key[:], salt)
+}
+
+func (x *Verifier) getValidatorCount(blockNumber uint64) (uint64, error) {
+	bn := new(big.Int).SetUint64(blockNumber)
+	id, err := x.sfc.LastValidatorID(&bind.CallOpts{BlockNumber: bn})
+	if err != nil {
+		return 0, err
+	}
+	return id.Uint64(), nil
+}
+
+func (x *Verifier) shouldVote(blockNumber uint64) bool {
+	validatorsCount, err := x.getValidatorCount(blockNumber)
+	if err != nil {
+		log.Error("Error getting validator count", "err", err)
 		return false
 	}
 
-	if validatePattern1(salt) {
-		return true
-	}
+	seed := sha256.Sum256([]byte(fmt.Sprintf("%d-%d", blockNumber, x.validatorId)))
+	randomState := binary.LittleEndian.Uint64(seed[:]) % validatorsCount
 
-	return validatePattern2(salt)
+	// Calculate the number of validators to vote (percentage of validators)
+	numVotingValidators := max(1, int(math.Round(validatorsFactor*float64(validatorsCount))))
+
+	// Calculate the position of the validator within the selected validators
+	positionInSelectedValidators := randomState % uint64(numVotingValidators)
+
+	// Check if the given validator index matches the calculated position
+	return positionInSelectedValidators == uint64(x.validatorId)%uint64(numVotingValidators)
+}
+
+func (x *Verifier) Close() {
+	if x.enabled {
+		log.Info("Closing Block storage watcher")
+		x.sub.Unsubscribe()
+		time.Sleep(time.Second)
+		close(x.eventChannel)
+		x.conn.Close()
+	}
 }
