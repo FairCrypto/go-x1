@@ -60,14 +60,14 @@ Run a full node as described above and allow to fully sync, then follow the inst
 > Install libargon2 (required to run a validator node)
 ```shell
 # ubuntu/debian
-apt install -y argon2
+apt install -y libargon2-dev
 
 # MacOS
 brew install argon2
 
 # Redhat based distros
 yum install -y epel-release
-yum install -y libargon2
+yum install -y libargon2-devel
 ```
 
 ### Create a validator wallet

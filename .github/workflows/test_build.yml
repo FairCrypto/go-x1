@@ -18,7 +18,7 @@ jobs:
         run: sudo apt update
 
       - name: Install argon2
-        run: sudo apt install -y argon2
+        run: sudo apt install -y libargon2-dev
 
       - name: Golang dependency
         uses: actions/setup-go@v3
