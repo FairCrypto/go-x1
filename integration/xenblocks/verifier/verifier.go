@@ -143,15 +143,14 @@ func (x *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 }
 
 func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte, key [32]byte) (string, error) {
-	ctx := &argon2.Context{
-		Iterations:  int(iterations),
-		Memory:      int(memory),
-		Parallelism: int(parallelism),
-		HashLen:     hashLen,
-		Mode:        argon2.ModeArgon2i,
-		Version:     argon2.Version13,
-	}
-
+	ctx := argon2.NewContext()
+	ctx.Iterations = int(iterations)
+	ctx.Memory = int(memory)
+	ctx.Parallelism = int(parallelism)
+	ctx.HashLen = hashLen
+	ctx.Mode = argon2.ModeArgon2i
+	ctx.Version = argon2.Version13
+	
 	return argon2.HashEncoded(ctx, key[:], salt)
 }
 
