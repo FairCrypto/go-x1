@@ -79,7 +79,8 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		return
 	}
 
-	argon2Result, err := argon2Hash(dr.C, dr.M, dr.T, dr.S, dr.K)
+	key := []byte(common.Bytes2Hex(dr.K[:]))
+	argon2Result, err := argon2Hash(dr.C, dr.M, dr.T, dr.S, key)
 	if err != nil {
 		panic(err)
 	}
@@ -109,16 +110,16 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 	// TODO: vote for each hash
 }
 
-func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte, key [32]byte) (string, error) {
+func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte, key []byte) (string, error) {
 	ctx := argon2.NewContext()
 	ctx.Iterations = int(iterations)
 	ctx.Memory = int(memory)
 	ctx.Parallelism = int(parallelism)
 	ctx.HashLen = hashLen
-	ctx.Mode = argon2.ModeArgon2i
+	ctx.Mode = argon2.ModeArgon2id
 	ctx.Version = argon2.Version13
 
-	return argon2.HashEncoded(ctx, key[:], salt)
+	return argon2.HashEncoded(ctx, key, salt)
 }
 
 func (v *Verifier) getValidatorCount(blockNumber uint64) (int, error) {
