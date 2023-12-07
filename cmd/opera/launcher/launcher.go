@@ -352,9 +352,9 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	signer := valkeystore.NewSigner(valKeystore)
 
 	// Config the XenBlocks verifier
-	xenblocksVerifier := verifier.NewVerifier(cfg.Node, cfg.Emitter.Validator.ID)
+	xbEventListener := verifier.NewEventListener(cfg.Node, cfg.Emitter.Validator.ID)
 	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
-		go xenblocksVerifier.Start()
+		go xbEventListener.Start()
 	}
 
 	// Config the XenBlocks reporter

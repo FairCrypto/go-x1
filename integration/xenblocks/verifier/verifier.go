@@ -2,30 +2,27 @@ package verifier
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/binary"
-	"errors"
+	"encoding/hex"
 	"fmt"
 	"github.com/Fantom-foundation/go-opera/gossip/contract/sfclib100"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
 	"github.com/Fantom-foundation/go-opera/opera/contracts/sfc"
-	"github.com/Fantom-foundation/lachesis-base/inter/idx"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/node"
 	"github.com/hashicorp/golang-lru"
 	"github.com/tvdburgt/go-argon2"
 	"math"
 	"math/big"
-	"os"
-	"time"
+	"regexp"
+	"strings"
 )
 
 var (
-	numOfWorkers     = 3
-	backlog          = 5
 	hashLen          = 64
 	validatorsFactor = 0.2
 	pattern1Salt     = "WEVOMTAwODIwMjJYRU4"
@@ -46,88 +43,38 @@ type Verifier struct {
 	validatorCountLRU *lru.Cache
 }
 
-func NewVerifier(nodeCfg node.Config, validatorId idx.ValidatorID) *Verifier {
-	ipcPath := fmt.Sprintf("%s/%s", nodeCfg.DataDir, nodeCfg.IPCPath)
+func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.BlockStorage) *Verifier {
+	validatorCountLRU, err := lru.New(100)
+	if err != nil {
+		panic(err)
+	}
+
+	sfcLib, err := sfclib100.NewContractCaller(sfc.ContractAddress, conn)
+	if err != nil {
+		panic(err)
+	}
 
 	return &Verifier{
-		enabled:      false,
-		ipcPath:      ipcPath,
-		numOfWorkers: numOfWorkers,
-		backlog:      backlog,
-		validatorId:  uint32(validatorId),
+		enabled:           false,
+		numOfWorkers:      numOfWorkers,
+		backlog:           backlog,
+		validatorId:       validatorId,
+		conn:              conn,
+		validatorCountLRU: validatorCountLRU,
+		sfcLib:            sfcLib,
+		bs:                bs,
 	}
 }
 
-func (x *Verifier) Start() {
-	log.Info("Starting Block storage watcher")
-	time.Sleep(5 * time.Second)
-	x.enabled = true
-	for {
-		if _, err := os.Stat(x.ipcPath); errors.Is(err, os.ErrNotExist) {
-			log.Warn("IPC file not found, waiting 10 seconds")
-			time.Sleep(10 * time.Second)
-		} else {
-			break
-		}
-	}
-
-	var err error
-
-	x.validatorCountLRU, err = lru.New(100)
-
-	x.conn, err = ethclient.Dial(x.ipcPath)
-	if err != nil {
-		panic(err)
-	}
-
-	x.bs, err = block_storage.NewBlockStorage(common.HexToAddress(blockStorageAddr), x.conn)
-	if err != nil {
-		panic(err)
-	}
-
-	x.sfcLib, err = sfclib100.NewContractCaller(sfc.ContractAddress, x.conn)
-	if err != nil {
-		panic(err)
-	}
-
-	x.eventChannel = make(chan *block_storage.BlockStorageNewHash, backlog)
-	for w := 1; w <= numOfWorkers; w++ {
-		go x.worker(x.eventChannel)
-	}
-
-	// Start a goroutine which watches new events
-	go func() {
-		x.sub, err = x.bs.WatchNewHash(nil, x.eventChannel, nil, nil, nil)
-		if err != nil {
-			panic(err)
-		}
-
-		for {
-			select {
-			case err := <-x.sub.Err():
-				log.Error("Error in BlockStorage watcher", "err", err)
-				break
-			}
-			time.Sleep(time.Second)
-		}
-	}()
-}
-
-func (x *Verifier) worker(events <-chan *block_storage.BlockStorageNewHash) {
-	for e := range events {
-		x.handleEvent(e)
-	}
-}
-
-func (x *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
+func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 	log.Debug("NewHash event received", "hashId", event.HashId, "epoch", event.Epoch, "account", event.Account)
 
-	if !x.shouldVote(event.Raw.BlockNumber) {
+	if !v.shouldVote(event.Raw.BlockNumber) {
 		log.Debug("Not voting for this hash", "hash", event.Raw.BlockHash)
 		return
 	}
 
-	dr, err := x.bs.DecodeRecordBytes0(nil, event.HashId)
+	dr, err := v.bs.DecodeRecordBytes0(nil, event.HashId)
 	if err != nil {
 		return
 	}
@@ -137,13 +84,27 @@ func (x *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		panic(err)
 	}
 
-	if validateSalt(dr.S) {
-		log.Info("Hash verified", "hash", hashToVerify)
-	} else {
-		log.Warn("Hash verification failed", "hash", hashToVerify)
+	if len(hashToVerify) > 150 {
+		log.Warn("Hash too long", "hash", hashToVerify)
+		return
 	}
 
-	// TODO: parse XNM, XUNI or XNM+X.BLK
+	if !validateSalt(dr.S) {
+		log.Warn("Salt fails verification", "hash", hashToVerify)
+		return
+	}
+
+	if !v.verifyDifficultly(hashToVerify) {
+		log.Warn("Difficulty too low", "hash", hashToVerify)
+		return
+	}
+
+	isXuniPresent := xuniPresent(hashToVerify)
+	isXenPresent := xenPresent(hashToVerify)
+	superBlock := isSuperBlock(hashToVerify, isXenPresent)
+
+	log.Info("hash verified", "hash", hashToVerify, "isXuniPresent",
+		isXuniPresent, "isXenPresent", isXenPresent, "superBlock", superBlock)
 	// TODO: vote for each hash
 }
 
@@ -159,37 +120,37 @@ func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte,
 	return argon2.HashEncoded(ctx, key[:], salt)
 }
 
-func (x *Verifier) getValidatorCount(blockNumber uint64) (int, error) {
+func (v *Verifier) getValidatorCount(blockNumber uint64) (int, error) {
 	bn := new(big.Int).SetUint64(blockNumber)
-	epoch, err := x.sfcLib.CurrentSealedEpoch(&bind.CallOpts{BlockNumber: bn})
+	epoch, err := v.sfcLib.CurrentSealedEpoch(&bind.CallOpts{BlockNumber: bn})
 	log.Trace("CurrentSealedEpoch", "epoch", epoch)
 	if err != nil {
 		return 0, err
 	}
 
 	// store the validator count in cache
-	r, ok := x.validatorCountLRU.Get(epoch.Int64())
+	r, ok := v.validatorCountLRU.Get(epoch.Int64())
 	if ok {
 		return r.(int), nil
 	}
 
-	validators, err := x.sfcLib.GetEpochValidatorIDs(&bind.CallOpts{BlockNumber: bn}, epoch)
+	validators, err := v.sfcLib.GetEpochValidatorIDs(&bind.CallOpts{BlockNumber: bn}, epoch)
 	log.Trace("GetEpochValidatorIDs", "validators", validators)
 
 	count := len(validators)
-	x.validatorCountLRU.Add(epoch.Int64(), count)
+	v.validatorCountLRU.Add(epoch.Int64(), count)
 
 	return count, err
 }
 
-func (x *Verifier) shouldVote(blockNumber uint64) bool {
-	validatorsCount, err := x.getValidatorCount(blockNumber)
+func (v *Verifier) shouldVote(blockNumber uint64) bool {
+	validatorsCount, err := v.getValidatorCount(blockNumber)
 	if err != nil {
 		log.Error("Error getting validator count", "err", err)
 		return false
 	}
 
-	seed := sha256.Sum256([]byte(fmt.Sprintf("%d-%d", blockNumber, x.validatorId)))
+	seed := sha256.Sum256([]byte(fmt.Sprintf("%d-%d", blockNumber, v.validatorId)))
 	randomState := int(binary.LittleEndian.Uint64(seed[:])) % validatorsCount
 
 	// Calculate the number of validators to vote (percentage of validators)
@@ -199,15 +160,75 @@ func (x *Verifier) shouldVote(blockNumber uint64) bool {
 	positionInSelectedValidators := randomState % numVotingValidators
 
 	// Check if the given validator index matches the calculated position
-	return positionInSelectedValidators == int(x.validatorId)%numVotingValidators
+	return positionInSelectedValidators == int(v.validatorId)%numVotingValidators
 }
 
-func (x *Verifier) Close() {
-	if x.enabled {
-		log.Info("Closing Block storage watcher")
-		x.sub.Unsubscribe()
-		time.Sleep(time.Second)
-		close(x.eventChannel)
-		x.conn.Close()
+func (v *Verifier) verifyDifficultly(hashToVerify string) bool {
+	// TODO: verify difficulty
+	return true
+}
+
+func validatePattern1(salt string) bool {
+	return salt == pattern1Salt
+}
+
+func validatePattern2(salt string) bool {
+	r := regexp.MustCompile(`^[A-Za-z0-9+/]{27}$`)
+
+	if !r.MatchString(salt) {
+		log.Warn("pattern 2 match failed")
+		return false
 	}
+
+	missingPadding := len(salt) % 4
+	if missingPadding != 0 {
+		salt += strings.Repeat("=", 4-missingPadding)
+	}
+
+	rawDecodedText, err := base64.StdEncoding.DecodeString(salt)
+	if err != nil {
+		log.Warn("base64 decode error", "err", err, "salt", salt)
+		return false
+	}
+
+	decodedStr := hex.EncodeToString(rawDecodedText)
+	if !common.IsHexAddress(decodedStr) {
+		log.Warn("decoded string is not a valid hash", "decodedStr", decodedStr)
+		return false
+	}
+
+	return true
+}
+
+func validateSalt(s []byte) bool {
+	salt := base64.RawStdEncoding.EncodeToString(s)
+	if validatePattern1(salt) {
+		return true
+	}
+
+	return validatePattern2(salt)
+}
+
+func xuniPresent(hashToVerify string) bool {
+	if len(hashToVerify) < 87 {
+		return false
+	}
+	substringToSearch := hashToVerify[len(hashToVerify)-87:]
+	match := regexp.MustCompile(`XUNI[0-9]`).MatchString(substringToSearch)
+	return match
+}
+
+func xenPresent(hashToVerify string) bool {
+	// Assuming hash_to_verify is not empty
+	substringToSearch := hashToVerify[len(hashToVerify)-87:]
+	return strings.Contains(substringToSearch, "XEN11")
+}
+
+func isSuperBlock(hashToVerify string, isXenPresent bool) bool {
+	if !isXenPresent {
+		return false
+	}
+	splits := strings.Split(hashToVerify, "$")
+	parts := len(splits)
+	return countUppercase(splits[parts-1]) > 50
 }
