@@ -1,6 +1,7 @@
 package verifier
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
@@ -20,6 +21,7 @@ import (
 	"math/big"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var (
@@ -74,6 +76,8 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		return
 	}
 
+	blockTime := v.getBlockTime(event.Raw.BlockHash)
+
 	dr, err := v.bs.DecodeRecordBytes0(nil, event.HashId)
 	if err != nil {
 		return
@@ -95,7 +99,7 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		return
 	}
 
-	if !v.verifyDifficultly(argon2Result) {
+	if !v.verifyDifficultly(dr.M, event.Raw.BlockNumber) {
 		log.Warn("Difficulty too low", "hash", argon2Result)
 		return
 	}
@@ -103,7 +107,7 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 	hash := getHashPortion(argon2Result)
 	isXuniPresent := xuniPresent(hash)
 	isXenPresent := xenPresent(hash)
-	superBlock := isSuperBlock(hash, isXenPresent)
+	superBlock := isSuperBlock(hash, isXenPresent, blockTime)
 
 	log.Info("hash verified", "hash", argon2Result, "isXuniPresent",
 		isXuniPresent, "isXenPresent", isXenPresent, "superBlock", superBlock)
@@ -165,9 +169,24 @@ func (v *Verifier) shouldVote(blockNumber uint64) bool {
 	return positionInSelectedValidators == int(v.validatorId)%numVotingValidators
 }
 
-func (v *Verifier) verifyDifficultly(hashToVerify string) bool {
-	// TODO: verify difficulty
-	return true
+func (v *Verifier) verifyDifficultly(difficulty uint32, blockNumber uint64) bool {
+	bn := new(big.Int).SetUint64(blockNumber)
+	d, err := v.bs.Difficulty(&bind.CallOpts{BlockNumber: bn})
+	if err != nil {
+		panic(err)
+	}
+
+	log.Trace("Difficulty", "difficulty", d.Uint64(), "d", d.Uint64())
+	return d.Uint64() > uint64(difficulty)
+}
+
+func (v *Verifier) getBlockTime(blockHash common.Hash) time.Time {
+	header, err := v.conn.HeaderByHash(context.TODO(), blockHash)
+	if err != nil {
+		panic(err)
+	}
+
+	return time.Unix(int64(header.Time), 0)
 }
 
 func validatePattern1(salt string) bool {
@@ -220,11 +239,13 @@ func xenPresent(hash string) bool {
 	return strings.Contains(hash, "XEN11")
 }
 
-func isSuperBlock(hash string, isXenPresent bool) bool {
+func isSuperBlock(hash string, isXenPresent bool, blockTime time.Time) bool {
 	if !isXenPresent {
 		return false
 	}
-	return countUppercase(hash) > 50
+
+	minutes := blockTime.Minute()
+	return (0 <= minutes && minutes < 5) || (55 <= minutes && minutes < 60) && countUppercase(hash) > 50
 }
 
 func getHashPortion(hashToVerify string) string {

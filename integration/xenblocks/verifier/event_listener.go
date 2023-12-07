@@ -103,6 +103,7 @@ func (e *EventListener) worker(events <-chan *block_storage.BlockStorageNewHash)
 func (e *EventListener) Close() {
 	if e.enabled {
 		log.Info("Closing Block storage watcher")
+		e.verifier.Stop()
 		e.sub.Unsubscribe()
 		time.Sleep(time.Second)
 		close(e.eventChannel)
