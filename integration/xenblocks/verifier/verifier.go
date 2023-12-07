@@ -137,6 +137,8 @@ func (x *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		panic(err)
 	}
 
+	log.Info("salt: %s", dr.S)
+
 	if validateHash(hashToVerify) {
 		log.Info("Hash verified", "hash", hashToVerify)
 	} else {
