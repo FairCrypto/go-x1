@@ -10,9 +10,9 @@ import (
 )
 
 type Config struct {
-	Endpoint string
-	Enabled  bool
-	Verifier bool
+	Endpoint      string
+	Enabled       bool
+	ForceVerifier bool
 }
 
 type Reporter struct {
@@ -25,9 +25,9 @@ type Reporter struct {
 
 func DefaultConfig() Config {
 	return Config{
-		Endpoint: "",
-		Enabled:  false,
-		Verifier: false,
+		Endpoint:      "",
+		Enabled:       false,
+		ForceVerifier: false,
 	}
 }
 

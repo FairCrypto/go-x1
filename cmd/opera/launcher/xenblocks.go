@@ -12,8 +12,8 @@ var XenBlocksEndpointFlag = cli.StringFlag{
 }
 
 var XenBlocksVerifierEnabledFlag = cli.BoolFlag{
-	Name:  "xenblocks-verifier-enabled",
-	Usage: "Enables the Xenblocks verifier.",
+	Name:  "xenblocks-force-verifier",
+	Usage: "Force enable the Xenblocks verifier even if not a validator.",
 }
 
 func parseXenBlocksEndpoint(s string) (url string, err error) {

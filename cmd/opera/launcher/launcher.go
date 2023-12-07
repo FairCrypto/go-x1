@@ -353,7 +353,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 
 	// Config the XenBlocks verifier
 	xenblocksVerifier := verifier.NewVerifier(cfg.Node, cfg.Emitter.Validator.ID)
-	if cfg.XenBlocks.Verifier {
+	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
 		go xenblocksVerifier.Start()
 	}
 

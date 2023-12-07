@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/Fantom-foundation/go-opera/gossip/contract/sfc100"
+	"github.com/Fantom-foundation/go-opera/gossip/contract/sfclib100"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
 	"github.com/Fantom-foundation/go-opera/opera/contracts/sfc"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
+	"github.com/hashicorp/golang-lru"
 	"github.com/tvdburgt/go-argon2"
 	"math"
 	"math/big"
@@ -32,16 +33,17 @@ var (
 )
 
 type Verifier struct {
-	enabled      bool
-	numOfWorkers int
-	backlog      int
-	ipcPath      string
-	validatorId  uint32
-	bs           *block_storage.BlockStorage
-	sfc          *sfc100.ContractCaller
-	eventChannel chan *block_storage.BlockStorageNewHash
-	conn         *ethclient.Client
-	sub          event.Subscription
+	enabled           bool
+	numOfWorkers      int
+	backlog           int
+	ipcPath           string
+	validatorId       uint32
+	bs                *block_storage.BlockStorage
+	sfcLib            *sfclib100.ContractCaller
+	eventChannel      chan *block_storage.BlockStorageNewHash
+	conn              *ethclient.Client
+	sub               event.Subscription
+	validatorCountLRU *lru.Cache
 }
 
 func NewVerifier(nodeCfg node.Config, validatorId idx.ValidatorID) *Verifier {
@@ -70,6 +72,9 @@ func (x *Verifier) Start() {
 	}
 
 	var err error
+
+	x.validatorCountLRU, err = lru.New(100)
+
 	x.conn, err = ethclient.Dial(x.ipcPath)
 	if err != nil {
 		panic(err)
@@ -80,7 +85,7 @@ func (x *Verifier) Start() {
 		panic(err)
 	}
 
-	x.sfc, err = sfc100.NewContractCaller(sfc.ContractAddress, x.conn)
+	x.sfcLib, err = sfclib100.NewContractCaller(sfc.ContractAddress, x.conn)
 	if err != nil {
 		panic(err)
 	}
@@ -150,17 +155,31 @@ func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte,
 	ctx.HashLen = hashLen
 	ctx.Mode = argon2.ModeArgon2i
 	ctx.Version = argon2.Version13
-	
+
 	return argon2.HashEncoded(ctx, key[:], salt)
 }
 
-func (x *Verifier) getValidatorCount(blockNumber uint64) (uint64, error) {
+func (x *Verifier) getValidatorCount(blockNumber uint64) (int, error) {
 	bn := new(big.Int).SetUint64(blockNumber)
-	id, err := x.sfc.LastValidatorID(&bind.CallOpts{BlockNumber: bn})
+	epoch, err := x.sfcLib.CurrentSealedEpoch(&bind.CallOpts{BlockNumber: bn})
+	log.Trace("CurrentSealedEpoch", "epoch", epoch)
 	if err != nil {
 		return 0, err
 	}
-	return id.Uint64(), nil
+
+	// store the validator count in cache
+	r, ok := x.validatorCountLRU.Get(epoch.Int64())
+	if ok {
+		return r.(int), nil
+	}
+
+	validators, err := x.sfcLib.GetEpochValidatorIDs(&bind.CallOpts{BlockNumber: bn}, epoch)
+	log.Trace("GetEpochValidatorIDs", "validators", validators)
+
+	count := len(validators)
+	x.validatorCountLRU.Add(epoch.Int64(), count)
+
+	return count, err
 }
 
 func (x *Verifier) shouldVote(blockNumber uint64) bool {
@@ -171,16 +190,16 @@ func (x *Verifier) shouldVote(blockNumber uint64) bool {
 	}
 
 	seed := sha256.Sum256([]byte(fmt.Sprintf("%d-%d", blockNumber, x.validatorId)))
-	randomState := binary.LittleEndian.Uint64(seed[:]) % validatorsCount
+	randomState := int(binary.LittleEndian.Uint64(seed[:])) % validatorsCount
 
 	// Calculate the number of validators to vote (percentage of validators)
 	numVotingValidators := max(1, int(math.Round(validatorsFactor*float64(validatorsCount))))
 
 	// Calculate the position of the validator within the selected validators
-	positionInSelectedValidators := randomState % uint64(numVotingValidators)
+	positionInSelectedValidators := randomState % numVotingValidators
 
 	// Check if the given validator index matches the calculated position
-	return positionInSelectedValidators == uint64(x.validatorId)%uint64(numVotingValidators)
+	return positionInSelectedValidators == int(x.validatorId)%numVotingValidators
 }
 
 func (x *Verifier) Close() {
