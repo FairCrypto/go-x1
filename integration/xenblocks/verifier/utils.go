@@ -16,15 +16,6 @@ func max(a, b int) int {
 	return b
 }
 
-func extractSaltFromHash(hashToVerify string) string {
-	parts := strings.Split(hashToVerify, "$")
-	if len(parts) != 6 {
-		log.Warn("less than 6 parts")
-		return ""
-	}
-	return parts[4]
-}
-
 func validatePattern1(salt string) bool {
 	return salt == pattern1Salt
 }
@@ -57,12 +48,8 @@ func validatePattern2(salt string) bool {
 	return true
 }
 
-func validateHash(hash string) bool {
-	salt := extractSaltFromHash(hash)
-	if salt == "" {
-		return false
-	}
-
+func validateSalt(s []byte) bool {
+	salt := base64.RawStdEncoding.EncodeToString(s)
 	if validatePattern1(salt) {
 		return true
 	}
