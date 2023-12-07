@@ -79,31 +79,32 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		return
 	}
 
-	hashToVerify, err := argon2Hash(dr.C, dr.M, dr.T, dr.S, dr.K)
+	argon2Result, err := argon2Hash(dr.C, dr.M, dr.T, dr.S, dr.K)
 	if err != nil {
 		panic(err)
 	}
 
-	if len(hashToVerify) > 150 {
-		log.Warn("Hash too long", "hash", hashToVerify)
+	if len(argon2Result) > 150 {
+		log.Warn("Hash too long", "hash", argon2Result)
 		return
 	}
 
 	if !validateSalt(dr.S) {
-		log.Warn("Salt fails verification", "hash", hashToVerify)
+		log.Warn("Salt fails verification", "hash", argon2Result)
 		return
 	}
 
-	if !v.verifyDifficultly(hashToVerify) {
-		log.Warn("Difficulty too low", "hash", hashToVerify)
+	if !v.verifyDifficultly(argon2Result) {
+		log.Warn("Difficulty too low", "hash", argon2Result)
 		return
 	}
 
-	isXuniPresent := xuniPresent(hashToVerify)
-	isXenPresent := xenPresent(hashToVerify)
-	superBlock := isSuperBlock(hashToVerify, isXenPresent)
+	hash := getHashPortion(argon2Result)
+	isXuniPresent := xuniPresent(hash)
+	isXenPresent := xenPresent(hash)
+	superBlock := isSuperBlock(hash, isXenPresent)
 
-	log.Info("hash verified", "hash", hashToVerify, "isXuniPresent",
+	log.Info("hash verified", "hash", argon2Result, "isXuniPresent",
 		isXuniPresent, "isXenPresent", isXenPresent, "superBlock", superBlock)
 	// TODO: vote for each hash
 }
@@ -209,26 +210,23 @@ func validateSalt(s []byte) bool {
 	return validatePattern2(salt)
 }
 
-func xuniPresent(hashToVerify string) bool {
-	if len(hashToVerify) < 87 {
-		return false
-	}
-	substringToSearch := hashToVerify[len(hashToVerify)-87:]
-	match := regexp.MustCompile(`XUNI[0-9]`).MatchString(substringToSearch)
+func xuniPresent(hash string) bool {
+	match := regexp.MustCompile(`XUNI[0-9]`).MatchString(hash)
 	return match
 }
 
-func xenPresent(hashToVerify string) bool {
-	// Assuming hash_to_verify is not empty
-	substringToSearch := hashToVerify[len(hashToVerify)-87:]
-	return strings.Contains(substringToSearch, "XEN11")
+func xenPresent(hash string) bool {
+	return strings.Contains(hash, "XEN11")
 }
 
-func isSuperBlock(hashToVerify string, isXenPresent bool) bool {
+func isSuperBlock(hash string, isXenPresent bool) bool {
 	if !isXenPresent {
 		return false
 	}
+	return countUppercase(hash) > 50
+}
+
+func getHashPortion(hashToVerify string) string {
 	splits := strings.Split(hashToVerify, "$")
-	parts := len(splits)
-	return countUppercase(splits[parts-1]) > 50
+	return splits[len(splits)-1]
 }
