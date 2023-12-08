@@ -1,8 +1,6 @@
 package verifier
 
 import (
-	"errors"
-	"fmt"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
 	"github.com/ethereum/go-ethereum/common"
@@ -11,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"io"
-	"os"
 	"time"
 )
 
@@ -24,7 +21,7 @@ type EventListener struct {
 	enabled      bool
 	numOfWorkers int
 	backlog      int
-	ipcPath      string
+	stack        *node.Node
 	validatorId  uint32
 	bs           *block_storage.BlockStorage
 	eventChannel chan *block_storage.BlockStorageNewHash
@@ -33,12 +30,10 @@ type EventListener struct {
 	verifier     *Verifier
 }
 
-func NewEventListener(nodeCfg node.Config, validatorId idx.ValidatorID) *EventListener {
-	ipcPath := fmt.Sprintf("%s/%s", nodeCfg.DataDir, nodeCfg.IPCPath)
-
+func NewEventListener(stack *node.Node, validatorId idx.ValidatorID) *EventListener {
 	return &EventListener{
 		enabled:      false,
-		ipcPath:      ipcPath,
+		stack:        stack,
 		numOfWorkers: numOfWorkers,
 		backlog:      backlog,
 		validatorId:  uint32(validatorId),
@@ -49,18 +44,15 @@ func (e *EventListener) Start() {
 	log.Info("Starting Block storage watcher")
 	time.Sleep(5 * time.Second)
 	e.enabled = true
-	for {
-		if _, err := os.Stat(e.ipcPath); errors.Is(err, os.ErrNotExist) {
-			log.Warn("IPC file not found, waiting 10 seconds")
-			time.Sleep(10 * time.Second)
-		} else {
-			break
-		}
-	}
 
 	var err error
 
-	e.conn, err = ethclient.Dial(e.ipcPath)
+	rpc, err := e.stack.Attach()
+	if err != nil {
+		panic(err)
+	}
+	e.conn = ethclient.NewClient(rpc)
+
 	if err != nil {
 		panic(err)
 	}

@@ -352,7 +352,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	signer := valkeystore.NewSigner(valKeystore)
 
 	// Config the XenBlocks verifier
-	xbEventListener := verifier.NewEventListener(cfg.Node, cfg.Emitter.Validator.ID)
+	xbEventListener := verifier.NewEventListener(stack, cfg.Emitter.Validator.ID)
 	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
 		go xbEventListener.Start()
 	}
@@ -397,6 +397,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	stack.RegisterLifecycle(svc)
 
 	return stack, svc, func() {
+		xbEventListener.Close()
 		_ = stack.Close()
 		gdb.Close()
 		_ = cdb.Close()
@@ -404,7 +405,6 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 			_ = closeDBs()
 		}
 		xenblocksReporter.Close()
-		xbEventListener.Close()
 	}
 }
 
