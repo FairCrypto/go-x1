@@ -90,27 +90,27 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 	}
 
 	if len(argon2Result) > 150 {
-		log.Warn("Hash too long", "hash", argon2Result)
+		log.Warn("Hash too long", "hash", argon2Result, "hashId", event.HashId)
 		return
 	}
 
 	if !validateSalt(dr.S) {
-		log.Warn("Salt fails verification", "hash", argon2Result)
+		log.Warn("Salt fails verification", "hash", argon2Result, "hashId", event.HashId)
 		return
 	}
 
 	if !v.verifyDifficultly(dr.M, event.Raw.BlockNumber) {
-		log.Warn("Difficulty too low", "hash", argon2Result)
+		log.Warn("Difficulty too low", "hash", argon2Result, "hashId", event.HashId)
 		return
 	}
 
 	tokens := FindTokensFromHash(argon2Result, blockTime)
 	if len(tokens) == 0 {
-		log.Warn("No tokens found", "hash", argon2Result)
+		log.Warn("No tokens found", "hash", argon2Result, "hashId", event.HashId)
 		return
 	}
 
-	log.Info("hash verified", "hash", argon2Result, "tokens", tokens)
+	log.Info("hash verified", "hash", argon2Result, "tokens", tokens, "hashId", event.HashId)
 
 	// TODO: vote for each hash
 }
