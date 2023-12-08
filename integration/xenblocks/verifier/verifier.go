@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-var (
+const (
 	hashLen          = 64
 	validatorsFactor = 0.2
 	pattern1Salt     = "WEVOMTAwODIwMjJYRU4"
@@ -104,13 +104,14 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		return
 	}
 
-	hash := getHashPortion(argon2Result)
-	isXuniPresent := xuniPresent(hash)
-	isXenPresent := xenPresent(hash)
-	superBlock := isSuperBlock(hash, isXenPresent, blockTime)
+	tokens := FindTokensFromHash(argon2Result, blockTime)
+	if len(tokens) == 0 {
+		log.Warn("No tokens found", "hash", argon2Result)
+		return
+	}
 
-	log.Info("hash verified", "hash", argon2Result, "isXuniPresent",
-		isXuniPresent, "isXenPresent", isXenPresent, "superBlock", superBlock)
+	log.Info("hash verified", "hash", argon2Result, "tokens", tokens)
+
 	// TODO: vote for each hash
 }
 
@@ -228,27 +229,4 @@ func validateSalt(s []byte) bool {
 	}
 
 	return validatePattern2(salt)
-}
-
-func xuniPresent(hash string) bool {
-	match := regexp.MustCompile(`XUNI[0-9]`).MatchString(hash)
-	return match
-}
-
-func xenPresent(hash string) bool {
-	return strings.Contains(hash, "XEN11")
-}
-
-func isSuperBlock(hash string, isXenPresent bool, blockTime time.Time) bool {
-	if !isXenPresent {
-		return false
-	}
-
-	minutes := blockTime.Minute()
-	return (0 <= minutes && minutes < 5) || (55 <= minutes && minutes < 60) && countUppercase(hash) > 50
-}
-
-func getHashPortion(hashToVerify string) string {
-	splits := strings.Split(hashToVerify, "$")
-	return splits[len(splits)-1]
 }

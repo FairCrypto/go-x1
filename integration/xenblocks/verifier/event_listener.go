@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var (
+const (
 	numOfWorkers = 3
 	backlog      = 5
 )
