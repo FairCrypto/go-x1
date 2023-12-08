@@ -404,6 +404,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 			_ = closeDBs()
 		}
 		xenblocksReporter.Close()
+		xbEventListener.Close()
 	}
 }
 

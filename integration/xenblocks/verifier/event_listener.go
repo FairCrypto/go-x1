@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
+	"io"
 	"os"
 	"time"
 )
@@ -86,7 +87,9 @@ func (e *EventListener) Start() {
 		for {
 			select {
 			case err := <-e.sub.Err():
-				log.Error("Error in BlockStorage watcher", "err", err)
+				if err != nil && err != io.EOF {
+					log.Error("Error in BlockStorage watcher", "err", err)
+				}
 				break
 			}
 			time.Sleep(time.Second)
