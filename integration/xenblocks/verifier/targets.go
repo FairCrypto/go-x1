@@ -33,8 +33,8 @@ var Tokens = map[string]Token{
 		currencyCode: 2,
 		value:        1,
 	},
-	"SB": {
-		name:         "SB",
+	"XBLK": {
+		name:         "XBLK",
 		currencyCode: 3,
 		value:        1,
 	},
@@ -58,7 +58,7 @@ var TokenFilters = []TokenFilter{
 		exclusive: false,
 	},
 	{
-		token:     "SB",
+		token:     "XBLK",
 		pattern:   ".*XEN11.*",
 		exclusive: false,
 		hashCheck: func(hash string) bool {
