@@ -16,8 +16,8 @@ import (
 
 var (
 	voteManagerAddr = common.HexToAddress("0x84B3519B57E8017324F082d2e0F0C95051687aE2")
-	BATCH_SIZE      = 50
-	GAS_LIMIT       = uint64(8000000)
+	BatchSize       = 50
+	GasLimit        = uint64(8000000)
 )
 
 type Voter struct {
@@ -62,10 +62,11 @@ func (v *Voter) waitTxConfirmed(hash common.Hash) <-chan *types.Transaction {
 	return ch
 }
 
-func (v *Voter) AddToQueue(hashId *big.Int, currencyType *big.Int) {
-	v.queue = append(v.queue, votemanager.VoteManagerPayload{HashId: hashId, CurrencyType: currencyType})
+func (v *Voter) AddToQueue(hashId *big.Int, currencyType uint8) {
+	cc := big.NewInt(int64(currencyType))
+	v.queue = append(v.queue, votemanager.VoteManagerPayload{HashId: hashId, CurrencyType: cc})
 
-	if len(v.queue) >= BATCH_SIZE {
+	if len(v.queue) >= BatchSize {
 		_ = v.Vote()
 		v.queue = []votemanager.VoteManagerPayload{}
 	}
@@ -82,7 +83,7 @@ func (v *Voter) Vote() error {
 
 	auth.GasTipCap, _ = v.conn.SuggestGasTipCap(context.TODO())
 	auth.GasFeeCap, _ = v.conn.SuggestGasPrice(context.TODO())
-	auth.GasLimit = GAS_LIMIT
+	auth.GasLimit = GasLimit
 
 	tx, err := v.vm.VoteBatch(auth, v.queue)
 	if err != nil {

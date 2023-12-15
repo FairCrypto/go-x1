@@ -35,6 +35,7 @@ type EventListener struct {
 	ks           *keystore.KeyStore
 	account      accounts.Account
 	chainId      uint64
+	voter        *Voter
 }
 
 func NewEventListener(stack *node.Node, validatorId idx.ValidatorID, ks *keystore.KeyStore, account accounts.Account, chainId uint64) *EventListener {
@@ -81,7 +82,8 @@ func (e *EventListener) Start() {
 		go e.worker(e.eventChannel)
 	}
 
-	e.verifier = NewVerifier(e.validatorId, e.conn, e.bs, e.ks, e.account, e.chainId)
+	e.verifier = NewVerifier(e.validatorId, e.conn, e.bs)
+	e.voter = NewVoter(e.conn, e.ks, e.account, e.chainId)
 
 	// Start a goroutine which watches new events
 	go func() {
@@ -105,7 +107,10 @@ func (e *EventListener) Start() {
 
 func (e *EventListener) worker(events <-chan *block_storage.BlockStorageNewHash) {
 	for evt := range events {
-		e.verifier.handleEvent(evt)
+		tokens := e.verifier.validateHashEvent(evt)
+		for _, token := range tokens {
+			e.voter.AddToQueue(evt.HashId, token.currencyCode)
+		}
 	}
 }
 
