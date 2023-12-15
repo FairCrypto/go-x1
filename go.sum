@@ -56,8 +56,6 @@ github.com/CloudyKit/jet v2.1.3-0.20180809161101-62edd43e4f88+incompatible/go.mo
 github.com/DATA-DOG/go-sqlmock v1.3.3/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/DataDog/zstd v1.4.5 h1:EndNeuB0l9syBZhut0wns3gV1hL8zX8LIu6ZiVHWLIQ=
 github.com/DataDog/zstd v1.4.5/go.mod h1:1jcaCB/ufaK+sKp1NBhlGmpz41jOoPQ35bpF36t7BBo=
-github.com/Fantom-foundation/go-ethereum v1.10.8-ftm-rc12 h1:SyXrKgZNRBIQN1XZXOH1WZZoPft2qm0jC7pZC9nRCw4=
-github.com/Fantom-foundation/go-ethereum v1.10.8-ftm-rc12/go.mod h1:IeQDjWCNBj/QiWIPosfF6/kRC6pHPNs7W7LfBzjj+P4=
 github.com/Fantom-foundation/lachesis-base v0.0.0-20230817040848-1326ba9aa59b h1:/9+Cau3cWaKy9fQk/NWq3RJKrwEjgrhME6ACy4RjLns=
 github.com/Fantom-foundation/lachesis-base v0.0.0-20230817040848-1326ba9aa59b/go.mod h1:Ogv5etzSmM2rQ4eN3OfmyitwWaaPjd4EIDiW/NAbYGk=
 github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXYg9BVp4O+o5f6V/ehm6Oo=
@@ -490,6 +488,8 @@ github.com/naoina/toml v0.1.2-0.20170918210437-9fafd6967416/go.mod h1:NBIhNtsFMo
 github.com/nats-io/nats.go v1.8.1/go.mod h1:BrFz9vVn0fU3AcH9Vn4Kd7W0NpJ651tD5omQ3M8LwxM=
 github.com/nats-io/nkeys v0.0.2/go.mod h1:dab7URMsZm6Z/jp9Z5UGa87Uutgc2mVpXLC4B7TDb/4=
 github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OSON2c=
+github.com/nibty/go-ethereum v1.10.8-ftm-rc12-x1-2 h1:q1Filh2L9v2MjaadUGZhk8v3uo0yNiOidVqV21KPZsk=
+github.com/nibty/go-ethereum v1.10.8-ftm-rc12-x1-2/go.mod h1:IeQDjWCNBj/QiWIPosfF6/kRC6pHPNs7W7LfBzjj+P4=
 github.com/nibty/recws v0.0.0-20231129011923-06823df0d0db h1:5NSkB+3RDcKx0fWRPCsNiyORrCzYLzoCip6q83SKdn4=
 github.com/nibty/recws v0.0.0-20231129011923-06823df0d0db/go.mod h1:i6EuUq15zzNHzljFI2bM6FdxOTRlvw6vthcDaOQjenU=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=

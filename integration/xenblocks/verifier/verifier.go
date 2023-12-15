@@ -10,7 +10,9 @@ import (
 	"github.com/Fantom-foundation/go-opera/gossip/contract/sfclib100"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
 	"github.com/Fantom-foundation/go-opera/opera/contracts/sfc"
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/event"
@@ -28,7 +30,6 @@ const (
 	hashLen          = 64
 	validatorsFactor = 0.2
 	pattern1Salt     = "WEVOMTAwODIwMjJYRU4"
-	blockStorageAddr = "0x23213196F7d13153a906c456f5a1008E23EA94bA"
 )
 
 type Verifier struct {
@@ -43,9 +44,11 @@ type Verifier struct {
 	conn              *ethclient.Client
 	sub               event.Subscription
 	validatorCountLRU *lru.Cache
+	voter             *Voter
+	chainId           uint64
 }
 
-func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.BlockStorage) *Verifier {
+func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.BlockStorage, ks *keystore.KeyStore, account accounts.Account, chainId uint64) *Verifier {
 	validatorCountLRU, err := lru.New(100)
 	if err != nil {
 		panic(err)
@@ -56,6 +59,8 @@ func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.B
 		panic(err)
 	}
 
+	voter := NewVoter(conn, ks, account, chainId)
+
 	return &Verifier{
 		enabled:           false,
 		numOfWorkers:      numOfWorkers,
@@ -65,6 +70,8 @@ func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.B
 		validatorCountLRU: validatorCountLRU,
 		sfcLib:            sfcLib,
 		bs:                bs,
+		voter:             voter,
+		chainId:           chainId,
 	}
 }
 
@@ -99,10 +106,10 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 		return
 	}
 
-	if !v.verifyDifficultly(dr.M, event.Raw.BlockNumber) {
-		log.Warn("Difficulty too low", "hash", argon2Result, "hashId", event.HashId)
-		return
-	}
+	//if !v.verifyDifficultly(dr.M, event.Raw.BlockNumber) {
+	//	log.Warn("Difficulty too low", "hash", argon2Result, "hashId", event.HashId)
+	//	return
+	//}
 
 	tokens := FindTokensFromHash(argon2Result, blockTime)
 	if len(tokens) == 0 {
@@ -113,6 +120,10 @@ func (v *Verifier) handleEvent(event *block_storage.BlockStorageNewHash) {
 	log.Info("hash verified", "hash", argon2Result, "tokens", tokens, "hashId", event.HashId)
 
 	// TODO: vote for each hash
+	for _, token := range tokens {
+		cc := big.NewInt(int64(token.currencyCode))
+		v.voter.AddToQueue(event.HashId, cc)
+	}
 }
 
 func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte, key []byte) (string, error) {

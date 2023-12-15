@@ -9,7 +9,7 @@ import (
 
 type Token struct {
 	name         string
-	currencyCode int
+	currencyCode uint8
 	value        int
 }
 

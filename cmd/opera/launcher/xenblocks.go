@@ -16,6 +16,11 @@ var XenBlocksVerifierEnabledFlag = cli.BoolFlag{
 	Usage: "Force enable the Xenblocks verifier even if not a validator.",
 }
 
+var XenBlocksVerifierAddressFlag = cli.StringFlag{
+	Name:  "xenblocks-verifier-addr",
+	Usage: "The account to sign verifier tx with",
+}
+
 func parseXenBlocksEndpoint(s string) (url string, err error) {
 	if !strings.HasPrefix(s, "ws://") && !strings.HasPrefix(s, "wss://") {
 		err = fmt.Errorf("use ws:// or wss:// prefix")

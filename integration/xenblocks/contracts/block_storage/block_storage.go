@@ -26,7 +26,6 @@ var (
 	_ = common.Big1
 	_ = types.BloomLookup
 	_ = event.NewSubscription
-	_ = abi.ConvertType
 )
 
 // BlockStorageHashRecord is an auto generated low-level Go binding around an user-defined struct.
@@ -41,7 +40,7 @@ type BlockStorageHashRecord struct {
 
 // BlockStorageMetaData contains all meta data concerning the BlockStorage contract.
 var BlockStorageMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_currentEpoch\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_difficulty\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"duration\",\"type\":\"uint256\"}],\"name\":\"EpochDurationSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"difficulty\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"ts\",\"type\":\"uint256\"}],\"name\":\"NewEpoch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"_bytes\",\"type\":\"bytes\"}],\"name\":\"NewHash\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"difficulty\",\"type\":\"uint256\"}],\"name\":\"TargetDifficultySet\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"TARGET_BLOCK_TIME_S\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"addressesByHashId\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentEpoch\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentEpochTs\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentHashId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"difficulty\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"epochDurationSec\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"epochHashCounter\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"hashIdsByAddress\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"hashRecords\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"recordCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"targetDifficulty\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_epochDurationSec\",\"type\":\"uint256\"}],\"name\":\"setEpochDurationSec\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_targetDifficulty\",\"type\":\"uint256\"}],\"name\":\"setTargetDifficulty\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"doHousekeeping\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord\",\"name\":\"r\",\"type\":\"tuple\"}],\"name\":\"storeNewRecord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"name\":\"storeNewRecordData\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_bytes\",\"type\":\"bytes\"}],\"name\":\"storeNewRecordBytes\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord[]\",\"name\":\"hh\",\"type\":\"tuple[]\"}],\"name\":\"bulkStoreRecordsInc\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"bytes[]\",\"name\":\"bb\",\"type\":\"bytes[]\"}],\"name\":\"bulkStoreRecordBytesInc\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"_hasIds\",\"type\":\"uint256[]\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord[]\",\"name\":\"hh\",\"type\":\"tuple[]\"}],\"name\":\"bulkStoreRecords\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"_hasIds\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"bb\",\"type\":\"bytes[]\"}],\"name\":\"bulkStoreRecordBytes\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getBytesLen\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"len\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_idx\",\"type\":\"uint256\"}],\"name\":\"decodeRecordBytes\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"}],\"name\":\"decodeRecordBytes\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"getHashIdsByAddress\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"getRecordsByAddress\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord[]\",\"name\":\"recs\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_currentEpoch\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_difficulty\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_variance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"duration\",\"type\":\"uint256\"}],\"name\":\"EpochDurationSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"difficulty\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"ts\",\"type\":\"uint256\"}],\"name\":\"NewEpoch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"ts\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"_bytes\",\"type\":\"bytes\"}],\"name\":\"NewHash\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"epoch\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"difficulty\",\"type\":\"uint256\"}],\"name\":\"TargetDifficultySet\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"DIFFICULTY_ADJUSTMENT\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"TARGET_BLOCK_TIME_S\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"addressesByHashId\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"addressesByKey\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentEpoch\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentEpochTs\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentHashId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"difficulty\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"epochDurationSec\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"epochHashCounter\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"hashIdsByAddress\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"hashRecords\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"recordCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"targetDifficulty\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"variance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_epochDurationSec\",\"type\":\"uint256\"}],\"name\":\"setEpochDurationSec\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_targetDifficulty\",\"type\":\"uint256\"}],\"name\":\"setTargetDifficulty\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"doHousekeeping\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord\",\"name\":\"r\",\"type\":\"tuple\"}],\"name\":\"storeNewRecord\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"name\":\"storeNewRecordData\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_bytes\",\"type\":\"bytes\"}],\"name\":\"storeNewRecordBytes\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord[]\",\"name\":\"hh\",\"type\":\"tuple[]\"}],\"name\":\"bulkStoreRecordsInc\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"addresses\",\"type\":\"address[]\"},{\"internalType\":\"bytes[]\",\"name\":\"bb\",\"type\":\"bytes[]\"}],\"name\":\"bulkStoreFullRecordsInc\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"bytes[]\",\"name\":\"bb\",\"type\":\"bytes[]\"}],\"name\":\"bulkStoreRecordBytesInc\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"_hasIds\",\"type\":\"uint256[]\"},{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord[]\",\"name\":\"hh\",\"type\":\"tuple[]\"}],\"name\":\"bulkStoreRecords\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"_hasIds\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"bb\",\"type\":\"bytes[]\"}],\"name\":\"bulkStoreRecordBytes\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getBytesLen\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"len\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_idx\",\"type\":\"uint256\"}],\"name\":\"decodeRecordBytes\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"}],\"name\":\"decodeRecordBytes\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"}],\"name\":\"decodeRecordBytes\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"getHashIdsByAddress\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"getRecordsByAddress\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"c\",\"type\":\"uint8\"},{\"internalType\":\"uint32\",\"name\":\"m\",\"type\":\"uint32\"},{\"internalType\":\"uint8\",\"name\":\"t\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"k\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"s\",\"type\":\"bytes\"}],\"internalType\":\"structBlockStorage.HashRecord[]\",\"name\":\"recs\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // BlockStorageABI is the input ABI used to generate the binding from.
@@ -145,11 +144,11 @@ func NewBlockStorageFilterer(address common.Address, filterer bind.ContractFilte
 
 // bindBlockStorage binds a generic wrapper to an already deployed contract.
 func bindBlockStorage(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
-	parsed, err := BlockStorageMetaData.GetAbi()
+	parsed, err := abi.JSON(strings.NewReader(BlockStorageABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, *parsed, caller, transactor, filterer), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -188,6 +187,37 @@ func (_BlockStorage *BlockStorageTransactorRaw) Transfer(opts *bind.TransactOpts
 // Transact invokes the (paid) contract method with params as input values.
 func (_BlockStorage *BlockStorageTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
 	return _BlockStorage.Contract.contract.Transact(opts, method, params...)
+}
+
+// DIFFICULTYADJUSTMENT is a free data retrieval call binding the contract method 0x0927ea0c.
+//
+// Solidity: function DIFFICULTY_ADJUSTMENT() view returns(uint256)
+func (_BlockStorage *BlockStorageCaller) DIFFICULTYADJUSTMENT(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _BlockStorage.contract.Call(opts, &out, "DIFFICULTY_ADJUSTMENT")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// DIFFICULTYADJUSTMENT is a free data retrieval call binding the contract method 0x0927ea0c.
+//
+// Solidity: function DIFFICULTY_ADJUSTMENT() view returns(uint256)
+func (_BlockStorage *BlockStorageSession) DIFFICULTYADJUSTMENT() (*big.Int, error) {
+	return _BlockStorage.Contract.DIFFICULTYADJUSTMENT(&_BlockStorage.CallOpts)
+}
+
+// DIFFICULTYADJUSTMENT is a free data retrieval call binding the contract method 0x0927ea0c.
+//
+// Solidity: function DIFFICULTY_ADJUSTMENT() view returns(uint256)
+func (_BlockStorage *BlockStorageCallerSession) DIFFICULTYADJUSTMENT() (*big.Int, error) {
+	return _BlockStorage.Contract.DIFFICULTYADJUSTMENT(&_BlockStorage.CallOpts)
 }
 
 // TARGETBLOCKTIMES is a free data retrieval call binding the contract method 0x0ff99d59.
@@ -250,6 +280,37 @@ func (_BlockStorage *BlockStorageSession) AddressesByHashId(arg0 *big.Int) (comm
 // Solidity: function addressesByHashId(uint256 ) view returns(address)
 func (_BlockStorage *BlockStorageCallerSession) AddressesByHashId(arg0 *big.Int) (common.Address, error) {
 	return _BlockStorage.Contract.AddressesByHashId(&_BlockStorage.CallOpts, arg0)
+}
+
+// AddressesByKey is a free data retrieval call binding the contract method 0x69685c36.
+//
+// Solidity: function addressesByKey(bytes32 ) view returns(address)
+func (_BlockStorage *BlockStorageCaller) AddressesByKey(opts *bind.CallOpts, arg0 [32]byte) (common.Address, error) {
+	var out []interface{}
+	err := _BlockStorage.contract.Call(opts, &out, "addressesByKey", arg0)
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// AddressesByKey is a free data retrieval call binding the contract method 0x69685c36.
+//
+// Solidity: function addressesByKey(bytes32 ) view returns(address)
+func (_BlockStorage *BlockStorageSession) AddressesByKey(arg0 [32]byte) (common.Address, error) {
+	return _BlockStorage.Contract.AddressesByKey(&_BlockStorage.CallOpts, arg0)
+}
+
+// AddressesByKey is a free data retrieval call binding the contract method 0x69685c36.
+//
+// Solidity: function addressesByKey(bytes32 ) view returns(address)
+func (_BlockStorage *BlockStorageCallerSession) AddressesByKey(arg0 [32]byte) (common.Address, error) {
+	return _BlockStorage.Contract.AddressesByKey(&_BlockStorage.CallOpts, arg0)
 }
 
 // CurrentEpoch is a free data retrieval call binding the contract method 0x76671808.
@@ -473,6 +534,71 @@ func (_BlockStorage *BlockStorageCallerSession) DecodeRecordBytes0(_hashId *big.
 	S []byte
 }, error) {
 	return _BlockStorage.Contract.DecodeRecordBytes0(&_BlockStorage.CallOpts, _hashId)
+}
+
+// DecodeRecordBytes1 is a free data retrieval call binding the contract method 0xd7580ce9.
+//
+// Solidity: function decodeRecordBytes(bytes _data) pure returns(uint8 c, uint32 m, uint8 t, uint8 v, bytes32 k, bytes s)
+func (_BlockStorage *BlockStorageCaller) DecodeRecordBytes1(opts *bind.CallOpts, _data []byte) (struct {
+	C uint8
+	M uint32
+	T uint8
+	V uint8
+	K [32]byte
+	S []byte
+}, error) {
+	var out []interface{}
+	err := _BlockStorage.contract.Call(opts, &out, "decodeRecordBytes1", _data)
+
+	outstruct := new(struct {
+		C uint8
+		M uint32
+		T uint8
+		V uint8
+		K [32]byte
+		S []byte
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.C = *abi.ConvertType(out[0], new(uint8)).(*uint8)
+	outstruct.M = *abi.ConvertType(out[1], new(uint32)).(*uint32)
+	outstruct.T = *abi.ConvertType(out[2], new(uint8)).(*uint8)
+	outstruct.V = *abi.ConvertType(out[3], new(uint8)).(*uint8)
+	outstruct.K = *abi.ConvertType(out[4], new([32]byte)).(*[32]byte)
+	outstruct.S = *abi.ConvertType(out[5], new([]byte)).(*[]byte)
+
+	return *outstruct, err
+
+}
+
+// DecodeRecordBytes1 is a free data retrieval call binding the contract method 0xd7580ce9.
+//
+// Solidity: function decodeRecordBytes(bytes _data) pure returns(uint8 c, uint32 m, uint8 t, uint8 v, bytes32 k, bytes s)
+func (_BlockStorage *BlockStorageSession) DecodeRecordBytes1(_data []byte) (struct {
+	C uint8
+	M uint32
+	T uint8
+	V uint8
+	K [32]byte
+	S []byte
+}, error) {
+	return _BlockStorage.Contract.DecodeRecordBytes1(&_BlockStorage.CallOpts, _data)
+}
+
+// DecodeRecordBytes1 is a free data retrieval call binding the contract method 0xd7580ce9.
+//
+// Solidity: function decodeRecordBytes(bytes _data) pure returns(uint8 c, uint32 m, uint8 t, uint8 v, bytes32 k, bytes s)
+func (_BlockStorage *BlockStorageCallerSession) DecodeRecordBytes1(_data []byte) (struct {
+	C uint8
+	M uint32
+	T uint8
+	V uint8
+	K [32]byte
+	S []byte
+}, error) {
+	return _BlockStorage.Contract.DecodeRecordBytes1(&_BlockStorage.CallOpts, _data)
 }
 
 // Difficulty is a free data retrieval call binding the contract method 0x19cae462.
@@ -814,6 +940,58 @@ func (_BlockStorage *BlockStorageSession) TargetDifficulty() (*big.Int, error) {
 // Solidity: function targetDifficulty() view returns(uint256)
 func (_BlockStorage *BlockStorageCallerSession) TargetDifficulty() (*big.Int, error) {
 	return _BlockStorage.Contract.TargetDifficulty(&_BlockStorage.CallOpts)
+}
+
+// Variance is a free data retrieval call binding the contract method 0xf1d46f37.
+//
+// Solidity: function variance() view returns(uint256)
+func (_BlockStorage *BlockStorageCaller) Variance(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _BlockStorage.contract.Call(opts, &out, "variance")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// Variance is a free data retrieval call binding the contract method 0xf1d46f37.
+//
+// Solidity: function variance() view returns(uint256)
+func (_BlockStorage *BlockStorageSession) Variance() (*big.Int, error) {
+	return _BlockStorage.Contract.Variance(&_BlockStorage.CallOpts)
+}
+
+// Variance is a free data retrieval call binding the contract method 0xf1d46f37.
+//
+// Solidity: function variance() view returns(uint256)
+func (_BlockStorage *BlockStorageCallerSession) Variance() (*big.Int, error) {
+	return _BlockStorage.Contract.Variance(&_BlockStorage.CallOpts)
+}
+
+// BulkStoreFullRecordsInc is a paid mutator transaction binding the contract method 0x9c83a9da.
+//
+// Solidity: function bulkStoreFullRecordsInc(address[] addresses, bytes[] bb) returns()
+func (_BlockStorage *BlockStorageTransactor) BulkStoreFullRecordsInc(opts *bind.TransactOpts, addresses []common.Address, bb [][]byte) (*types.Transaction, error) {
+	return _BlockStorage.contract.Transact(opts, "bulkStoreFullRecordsInc", addresses, bb)
+}
+
+// BulkStoreFullRecordsInc is a paid mutator transaction binding the contract method 0x9c83a9da.
+//
+// Solidity: function bulkStoreFullRecordsInc(address[] addresses, bytes[] bb) returns()
+func (_BlockStorage *BlockStorageSession) BulkStoreFullRecordsInc(addresses []common.Address, bb [][]byte) (*types.Transaction, error) {
+	return _BlockStorage.Contract.BulkStoreFullRecordsInc(&_BlockStorage.TransactOpts, addresses, bb)
+}
+
+// BulkStoreFullRecordsInc is a paid mutator transaction binding the contract method 0x9c83a9da.
+//
+// Solidity: function bulkStoreFullRecordsInc(address[] addresses, bytes[] bb) returns()
+func (_BlockStorage *BlockStorageTransactorSession) BulkStoreFullRecordsInc(addresses []common.Address, bb [][]byte) (*types.Transaction, error) {
+	return _BlockStorage.Contract.BulkStoreFullRecordsInc(&_BlockStorage.TransactOpts, addresses, bb)
 }
 
 // BulkStoreRecordBytes is a paid mutator transaction binding the contract method 0xee5f8832.
@@ -1439,13 +1617,14 @@ type BlockStorageNewHash struct {
 	HashId  *big.Int
 	Epoch   *big.Int
 	Account common.Address
+	Ts      *big.Int
 	Bytes   []byte
 	Raw     types.Log // Blockchain specific contextual infos
 }
 
-// FilterNewHash is a free log retrieval operation binding the contract event 0x30e5fb28e00aab05ae396f77b088b8627fa5f78c42fbd55fdb593caa2e3f2a2e.
+// FilterNewHash is a free log retrieval operation binding the contract event 0xdf1fb391c3157eb3593a71fda03f806f05c81bd9d74426918a759f34fd9117a3.
 //
-// Solidity: event NewHash(uint256 indexed hashId, uint256 indexed epoch, address indexed account, bytes _bytes)
+// Solidity: event NewHash(uint256 indexed hashId, uint256 indexed epoch, address indexed account, uint256 ts, bytes _bytes)
 func (_BlockStorage *BlockStorageFilterer) FilterNewHash(opts *bind.FilterOpts, hashId []*big.Int, epoch []*big.Int, account []common.Address) (*BlockStorageNewHashIterator, error) {
 
 	var hashIdRule []interface{}
@@ -1468,9 +1647,9 @@ func (_BlockStorage *BlockStorageFilterer) FilterNewHash(opts *bind.FilterOpts, 
 	return &BlockStorageNewHashIterator{contract: _BlockStorage.contract, event: "NewHash", logs: logs, sub: sub}, nil
 }
 
-// WatchNewHash is a free log subscription operation binding the contract event 0x30e5fb28e00aab05ae396f77b088b8627fa5f78c42fbd55fdb593caa2e3f2a2e.
+// WatchNewHash is a free log subscription operation binding the contract event 0xdf1fb391c3157eb3593a71fda03f806f05c81bd9d74426918a759f34fd9117a3.
 //
-// Solidity: event NewHash(uint256 indexed hashId, uint256 indexed epoch, address indexed account, bytes _bytes)
+// Solidity: event NewHash(uint256 indexed hashId, uint256 indexed epoch, address indexed account, uint256 ts, bytes _bytes)
 func (_BlockStorage *BlockStorageFilterer) WatchNewHash(opts *bind.WatchOpts, sink chan<- *BlockStorageNewHash, hashId []*big.Int, epoch []*big.Int, account []common.Address) (event.Subscription, error) {
 
 	var hashIdRule []interface{}
@@ -1518,9 +1697,9 @@ func (_BlockStorage *BlockStorageFilterer) WatchNewHash(opts *bind.WatchOpts, si
 	}), nil
 }
 
-// ParseNewHash is a log parse operation binding the contract event 0x30e5fb28e00aab05ae396f77b088b8627fa5f78c42fbd55fdb593caa2e3f2a2e.
+// ParseNewHash is a log parse operation binding the contract event 0xdf1fb391c3157eb3593a71fda03f806f05c81bd9d74426918a759f34fd9117a3.
 //
-// Solidity: event NewHash(uint256 indexed hashId, uint256 indexed epoch, address indexed account, bytes _bytes)
+// Solidity: event NewHash(uint256 indexed hashId, uint256 indexed epoch, address indexed account, uint256 ts, bytes _bytes)
 func (_BlockStorage *BlockStorageFilterer) ParseNewHash(log types.Log) (*BlockStorageNewHash, error) {
 	event := new(BlockStorageNewHash)
 	if err := _BlockStorage.contract.UnpackLog(event, "NewHash", log); err != nil {
@@ -1835,3 +2014,4 @@ func (_BlockStorage *BlockStorageFilterer) ParseTargetDifficultySet(log types.Lo
 	event.Raw = log
 	return event, nil
 }
+

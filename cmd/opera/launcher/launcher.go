@@ -187,6 +187,7 @@ func initFlags() {
 	xenblocksFlags = []cli.Flag{
 		XenBlocksEndpointFlag,
 		XenBlocksVerifierEnabledFlag,
+		XenBlocksVerifierAddressFlag,
 	}
 
 	nodeFlags = []cli.Flag{}
@@ -352,7 +353,10 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	signer := valkeystore.NewSigner(valKeystore)
 
 	// Config the XenBlocks verifier
-	xbEventListener := verifier.NewEventListener(stack, cfg.Emitter.Validator.ID)
+	ks := stack.AccountManager().Backends(keystore.KeyStoreType)[0].(*keystore.KeyStore)
+	passwords := utils.MakePasswordList(ctx)
+	account, _ := unlockAccount(ks, cfg.XenBlocks.VerifierAddress.Hex(), 0, passwords)
+	xbEventListener := verifier.NewEventListener(stack, cfg.Emitter.Validator.ID, ks, account, gdb.GetRules().NetworkID)
 	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
 		go xbEventListener.Start()
 	}
