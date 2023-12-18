@@ -18,7 +18,7 @@ const (
 	numOfWorkers = 1
 	backlog      = 5
 
-	blockStorageAddr = "0x41B88573aD2A3245f7AD01e68dEb051BCC3dd73E"
+	blockStorageAddr = "0xb3753e9F40DD0Dfd039e8c4B12895e2f636693a2"
 )
 
 type EventListener struct {
@@ -56,23 +56,7 @@ func (e *EventListener) Start() {
 	time.Sleep(5 * time.Second)
 	e.enabled = true
 
-	var err error
-
-	if err != nil {
-		panic(err)
-	}
-
-	rpc, err := e.stack.Attach()
-	if err != nil {
-		panic(err)
-	}
-	e.conn = ethclient.NewClient(rpc)
-
-	if err != nil {
-		panic(err)
-	}
-
-	e.bs, err = block_storage.NewBlockStorage(common.HexToAddress(blockStorageAddr), e.conn)
+	err := e.initializeEventSystem()
 	if err != nil {
 		panic(err)
 	}
@@ -81,9 +65,6 @@ func (e *EventListener) Start() {
 	for w := 1; w <= numOfWorkers; w++ {
 		go e.worker(e.eventChannel)
 	}
-
-	e.verifier = NewVerifier(e.validatorId, e.conn, e.bs)
-	e.voter = NewVoter(e.conn, e.ks, e.account, e.chainId)
 
 	// Start a goroutine which watches new events
 	go func() {
@@ -103,6 +84,21 @@ func (e *EventListener) Start() {
 			time.Sleep(time.Second)
 		}
 	}()
+}
+
+func (e *EventListener) initializeEventSystem() error {
+	rpc, err := e.stack.Attach()
+	if err != nil {
+		return err
+	}
+
+	e.conn = ethclient.NewClient(rpc)
+	e.bs, err = block_storage.NewBlockStorage(common.HexToAddress(blockStorageAddr), e.conn)
+
+	e.verifier = NewVerifier(e.validatorId, e.conn, e.bs)
+	e.voter = NewVoter(e.conn, e.ks, e.account, e.chainId)
+
+	return err
 }
 
 func (e *EventListener) worker(events <-chan *block_storage.BlockStorageNewHash) {

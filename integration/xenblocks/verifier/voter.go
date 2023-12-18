@@ -11,11 +11,12 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
 	"math/big"
+	"sync"
 	"time"
 )
 
 var (
-	voteManagerAddr = common.HexToAddress("0x84B3519B57E8017324F082d2e0F0C95051687aE2")
+	voteManagerAddr = common.HexToAddress("0x9224c3121c050546Ba76960c00c8B7e26C1E7b33")
 	BatchSize       = 50
 	GasLimit        = uint64(8000000)
 )
@@ -27,6 +28,7 @@ type Voter struct {
 	ks      *keystore.KeyStore
 	account accounts.Account
 	chainId uint64
+	mu      sync.Mutex
 }
 
 func NewVoter(conn *ethclient.Client, ks *keystore.KeyStore, account accounts.Account, chainId uint64) *Voter {
@@ -66,6 +68,8 @@ func (v *Voter) AddToQueue(hashId *big.Int, currencyType uint8) {
 	cc := big.NewInt(int64(currencyType))
 	v.queue = append(v.queue, votemanager.VoteManagerPayload{HashId: hashId, CurrencyType: cc})
 
+	v.mu.Lock()
+	defer v.mu.Unlock()
 	if len(v.queue) >= BatchSize {
 		_ = v.Vote()
 		v.queue = []votemanager.VoteManagerPayload{}
