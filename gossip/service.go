@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/verifier"
 	"math/big"
 	"math/rand"
 	"sync"
@@ -158,14 +159,14 @@ type Service struct {
 
 	bootstrapping bool
 
-	reporter *reporter.Reporter
-
+	reporter      *reporter.Reporter
+	eventListener *verifier.EventListener
 	logger.Instance
 }
 
 func NewService(stack *node.Node, config Config, store *Store, blockProc BlockProc,
 	engine lachesis.Consensus, dagIndexer *vecmt.Index, newTxPool func(evmcore.StateReader) TxPool,
-	haltCheck func(oldEpoch, newEpoch idx.Epoch, age time.Time) bool, reporter *reporter.Reporter) (*Service, error) {
+	haltCheck func(oldEpoch, newEpoch idx.Epoch, age time.Time) bool, reporter *reporter.Reporter, listener *verifier.EventListener) (*Service, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -183,7 +184,7 @@ func NewService(stack *node.Node, config Config, store *Store, blockProc BlockPr
 	svc.netRPCService = ethapi.NewPublicNetAPI(svc.p2pServer, store.GetRules().NetworkID)
 	svc.haltCheck = haltCheck
 	svc.reporter = reporter.Start(svc.p2pServer)
-
+	svc.eventListener = listener
 	return svc, nil
 }
 
