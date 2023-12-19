@@ -77,8 +77,14 @@ func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) [
 
 	blockTime := v.getBlockTime(event.Raw.BlockHash)
 
-	parallelism, memory, iterations, _, salt, key := decodeRecordBytes(event.Bytes)
-	argon2Result, err := argon2Hash(parallelism, memory, iterations, salt, key)
+	dr, err := v.bs.DecodeRecordBytes0(nil, event.HashId)
+	if err != nil {
+		log.Warn("Failed to decode hash record", "err", err)
+		return nil
+	}
+
+	key := []byte(common.Bytes2Hex(dr.K[:]))
+	argon2Result, err := argon2Hash(dr.C, dr.M, dr.T, dr.S, key)
 	if err != nil {
 		log.Warn("Argon2 hash failed", "err", err)
 		return nil
@@ -89,14 +95,14 @@ func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) [
 		return nil
 	}
 
-	if !validateSalt(salt) {
+	if !validateSalt(dr.S) {
 		log.Warn("Salt fails verification", "hash", argon2Result, "hashId", event.HashId)
 		return nil
 	}
 
-	//if !v.verifyDifficultly(memory, event.Raw.BlockNumber) {
+	//if !v.verifyDifficultly(dr.M, event.Raw.BlockNumber) {
 	//	log.Warn("Difficulty too low", "hash", argon2Result, "hashId", event.HashId)
-	//	return nil
+	//	return
 	//}
 
 	tokens := FindTokensFromHash(argon2Result, blockTime)
@@ -223,21 +229,4 @@ func validateSalt(s []byte) bool {
 	}
 
 	return validatePattern2(salt)
-}
-
-func decodeRecordBytes(data []byte) (parallelism uint8, memory uint32, iterations uint8, version byte, salt []byte, key []byte) {
-	lenData := len(data)
-
-	// Read values using binary.BigEndian
-	parallelism = data[0]
-	memory = binary.BigEndian.Uint32(data[1:5])
-	iterations = data[5]
-	version = data[6]
-	keyOut := []byte(common.Bytes2Hex(data[7:39]))
-
-	// Copy the remaining bytes to s
-	salt = make([]byte, lenData-39)
-	copy(salt, data[39:])
-
-	return parallelism, memory, iterations, version, salt, keyOut
 }
