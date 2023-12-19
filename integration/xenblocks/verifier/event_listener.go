@@ -104,6 +104,10 @@ func (e *EventListener) initializeEventSystem() error {
 }
 
 func (e *EventListener) OnNewLog(l *types.Log) {
+	if e.enabled == false {
+		return
+	}
+
 	if l.Address == common.HexToAddress(blockStorageAddr) {
 
 		evt, err := e.bs.ParseNewHash(*l)
@@ -117,6 +121,10 @@ func (e *EventListener) OnNewLog(l *types.Log) {
 }
 
 func (e *EventListener) OnNewBlock(blockNumber uint64) {
+	if e.enabled == false {
+		return
+	}
+
 	//log.Info("New block received", "blockNumber", blockNumber)
 	e.currentBlockNumber = blockNumber
 }
