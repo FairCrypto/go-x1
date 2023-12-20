@@ -401,7 +401,6 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	stack.RegisterLifecycle(svc)
 
 	return stack, svc, func() {
-		xbEventListener.Close()
 		_ = stack.Close()
 		gdb.Close()
 		_ = cdb.Close()
@@ -409,6 +408,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 			_ = closeDBs()
 		}
 		xenblocksReporter.Close()
+		xbEventListener.Close()
 	}
 }
 

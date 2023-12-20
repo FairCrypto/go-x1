@@ -61,7 +61,6 @@ func NewEventListener(stack *node.Node, validatorId idx.ValidatorID, ks *keystor
 
 func (e *EventListener) Start() {
 	log.Info("Starting Block storage watcher")
-	time.Sleep(5 * time.Second)
 	e.enabled = true
 
 	err := e.initializeEventSystem()
@@ -101,7 +100,6 @@ func (e *EventListener) OnNewLog(l *types.Log) {
 	}
 
 	if l.Address == common.HexToAddress(blockStorageAddr) {
-
 		evt, err := e.bs.ParseNewHash(*l)
 		if err != nil {
 			return
@@ -141,6 +139,7 @@ func (e *EventListener) worker(events <-chan *block_storage.BlockStorageNewHash)
 				time.Sleep(250 * time.Millisecond)
 			}
 		}
+
 		tokens := e.verifier.validateHashEvent(evt)
 		e.voter.Syncing = e.syncingProcess != nil // increase the batch size if we are syncing
 		for _, token := range tokens {
