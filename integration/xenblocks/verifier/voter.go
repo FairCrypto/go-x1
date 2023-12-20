@@ -16,9 +16,8 @@ import (
 )
 
 var (
-	voteManagerAddr = common.HexToAddress("0x9224c3121c050546Ba76960c00c8B7e26C1E7b33")
-	BatchSize       = 50
-	GasLimit        = uint64(8000000)
+	BatchSize = 50
+	GasLimit  = uint64(8000000)
 )
 
 type Voter struct {
@@ -29,14 +28,10 @@ type Voter struct {
 	account accounts.Account
 	chainId uint64
 	mu      sync.Mutex
+	Syncing bool
 }
 
-func NewVoter(conn *ethclient.Client, ks *keystore.KeyStore, account accounts.Account, chainId uint64) *Voter {
-	vm, err := votemanager.NewVotemanager(voteManagerAddr, conn)
-	if err != nil {
-		panic(err)
-	}
-
+func NewVoter(conn *ethclient.Client, ks *keystore.KeyStore, account accounts.Account, chainId uint64, vm *votemanager.Votemanager) *Voter {
 	var queue []votemanager.VoteManagerPayload
 
 	return &Voter{
@@ -64,13 +59,15 @@ func (v *Voter) waitTxConfirmed(hash common.Hash) <-chan *types.Transaction {
 	return ch
 }
 
-func (v *Voter) AddToQueue(hashId *big.Int, currencyType uint8) {
+func (v *Voter) AddToQueue(hashId *big.Int, MintedBlockNumber uint64, currencyType uint8) {
 	cc := big.NewInt(int64(currencyType))
-	v.queue = append(v.queue, votemanager.VoteManagerPayload{HashId: hashId, CurrencyType: cc})
+	mbn := big.NewInt(int64(MintedBlockNumber))
+	v.queue = append(v.queue, votemanager.VoteManagerPayload{HashId: hashId, CurrencyType: cc, MintedBlockNumber: mbn})
 
 	v.mu.Lock()
 	defer v.mu.Unlock()
-	if len(v.queue) >= BatchSize {
+
+	if len(v.queue) >= v.getBatchSize() {
 		_ = v.Vote()
 		v.queue = []votemanager.VoteManagerPayload{}
 	}
@@ -93,9 +90,19 @@ func (v *Voter) Vote() error {
 	if err != nil {
 		log.Error("vote error", "err", err)
 	}
+	if tx == nil {
+		log.Error("vote error", "err", "tx is nil")
+	}
 
 	v.waitTxConfirmed(tx.Hash())
 	log.Info("vote success!", "tx", tx.Hash().Hex())
 
 	return nil
+}
+
+func (v *Voter) getBatchSize() int {
+	if v.Syncing {
+		return BatchSize * 4
+	}
+	return BatchSize
 }

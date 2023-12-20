@@ -30,13 +30,14 @@ var (
 
 // VoteManagerPayload is an auto generated low-level Go binding around an user-defined struct.
 type VoteManagerPayload struct {
-	HashId       *big.Int
-	CurrencyType *big.Int
+	HashId            *big.Int
+	CurrencyType      *big.Int
+	MintedBlockNumber *big.Int
 }
 
 // VotemanagerMetaData contains all meta data concerning the Votemanager contract.
 var VotemanagerMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"}],\"name\":\"MintToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"validatorId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"votes\",\"type\":\"uint16\"}],\"name\":\"VoteToken\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"blockStorage\",\"outputs\":[{\"internalType\":\"contractBlockStorage\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"initialOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialSfcAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialBlockStorageAddress\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"initialVotePercentage\",\"type\":\"uint8\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"mintedByHashId\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"mintedByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"newVotesByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requiredNumOfValidators\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sfcLib\",\"outputs\":[{\"internalType\":\"contractSFCLib\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_validatorId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_validatorCount\",\"type\":\"uint256\"}],\"name\":\"shouldVote\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tokenRegistry\",\"outputs\":[{\"internalType\":\"contractTokenRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_blockStorageAddress\",\"type\":\"address\"}],\"name\":\"updateBlockStorageAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_sfcLibAddress\",\"type\":\"address\"}],\"name\":\"updateSfcLibAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenRegistryAddress\",\"type\":\"address\"}],\"name\":\"updateTokenRegistryAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"_votePercentage\",\"type\":\"uint8\"}],\"name\":\"updateVotePercentage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"validatorCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_currencyType\",\"type\":\"uint256\"}],\"name\":\"vote\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"}],\"internalType\":\"structVoteManager.Payload[]\",\"name\":\"payload\",\"type\":\"tuple[]\"}],\"name\":\"voteBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votePercentage\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"name\":\"votesByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndValidatorId\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndValidatorIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"}],\"name\":\"MintToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"validatorId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"votes\",\"type\":\"uint16\"}],\"name\":\"VoteToken\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"blockStorage\",\"outputs\":[{\"internalType\":\"contractBlockStorage\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"initialOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialSfcAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialBlockStorageAddress\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"initialVotePercentage\",\"type\":\"uint8\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"mintedByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requiredNumOfValidators\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sfcLib\",\"outputs\":[{\"internalType\":\"contractSFCLib\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_mintedBlockNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_validatorId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"}],\"name\":\"shouldVote\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tokenRegistry\",\"outputs\":[{\"internalType\":\"contractTokenRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_blockStorageAddress\",\"type\":\"address\"}],\"name\":\"updateBlockStorageAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_sfcLibAddress\",\"type\":\"address\"}],\"name\":\"updateSfcLibAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenRegistryAddress\",\"type\":\"address\"}],\"name\":\"updateTokenRegistryAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"_votePercentage\",\"type\":\"uint8\"}],\"name\":\"updateVotePercentage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"validatorCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"mintedBlockNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_currencyType\",\"type\":\"uint256\"}],\"name\":\"vote\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"mintedBlockNumber\",\"type\":\"uint256\"}],\"internalType\":\"structVoteManager.Payload[]\",\"name\":\"payload\",\"type\":\"tuple[]\"}],\"name\":\"voteBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votePercentage\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndValidatorIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // VotemanagerABI is the input ABI used to generate the binding from.
@@ -216,37 +217,6 @@ func (_Votemanager *VotemanagerCallerSession) BlockStorage() (common.Address, er
 	return _Votemanager.Contract.BlockStorage(&_Votemanager.CallOpts)
 }
 
-// MintedByHashId is a free data retrieval call binding the contract method 0x9f4ee5af.
-//
-// Solidity: function mintedByHashId(uint256 ) view returns(bool)
-func (_Votemanager *VotemanagerCaller) MintedByHashId(opts *bind.CallOpts, arg0 *big.Int) (bool, error) {
-	var out []interface{}
-	err := _Votemanager.contract.Call(opts, &out, "mintedByHashId", arg0)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// MintedByHashId is a free data retrieval call binding the contract method 0x9f4ee5af.
-//
-// Solidity: function mintedByHashId(uint256 ) view returns(bool)
-func (_Votemanager *VotemanagerSession) MintedByHashId(arg0 *big.Int) (bool, error) {
-	return _Votemanager.Contract.MintedByHashId(&_Votemanager.CallOpts, arg0)
-}
-
-// MintedByHashId is a free data retrieval call binding the contract method 0x9f4ee5af.
-//
-// Solidity: function mintedByHashId(uint256 ) view returns(bool)
-func (_Votemanager *VotemanagerCallerSession) MintedByHashId(arg0 *big.Int) (bool, error) {
-	return _Votemanager.Contract.MintedByHashId(&_Votemanager.CallOpts, arg0)
-}
-
 // MintedByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x47ce239d.
 //
 // Solidity: function mintedByHashIdAndCurrencyType(uint256 , uint256 ) view returns(bool)
@@ -276,37 +246,6 @@ func (_Votemanager *VotemanagerSession) MintedByHashIdAndCurrencyType(arg0 *big.
 // Solidity: function mintedByHashIdAndCurrencyType(uint256 , uint256 ) view returns(bool)
 func (_Votemanager *VotemanagerCallerSession) MintedByHashIdAndCurrencyType(arg0 *big.Int, arg1 *big.Int) (bool, error) {
 	return _Votemanager.Contract.MintedByHashIdAndCurrencyType(&_Votemanager.CallOpts, arg0, arg1)
-}
-
-// NewVotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x0c1c9308.
-//
-// Solidity: function newVotesByHashIdAndCurrencyType(uint256 , uint256 ) view returns(uint16)
-func (_Votemanager *VotemanagerCaller) NewVotesByHashIdAndCurrencyType(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int) (uint16, error) {
-	var out []interface{}
-	err := _Votemanager.contract.Call(opts, &out, "newVotesByHashIdAndCurrencyType", arg0, arg1)
-
-	if err != nil {
-		return *new(uint16), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint16)).(*uint16)
-
-	return out0, err
-
-}
-
-// NewVotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x0c1c9308.
-//
-// Solidity: function newVotesByHashIdAndCurrencyType(uint256 , uint256 ) view returns(uint16)
-func (_Votemanager *VotemanagerSession) NewVotesByHashIdAndCurrencyType(arg0 *big.Int, arg1 *big.Int) (uint16, error) {
-	return _Votemanager.Contract.NewVotesByHashIdAndCurrencyType(&_Votemanager.CallOpts, arg0, arg1)
-}
-
-// NewVotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x0c1c9308.
-//
-// Solidity: function newVotesByHashIdAndCurrencyType(uint256 , uint256 ) view returns(uint16)
-func (_Votemanager *VotemanagerCallerSession) NewVotesByHashIdAndCurrencyType(arg0 *big.Int, arg1 *big.Int) (uint16, error) {
-	return _Votemanager.Contract.NewVotesByHashIdAndCurrencyType(&_Votemanager.CallOpts, arg0, arg1)
 }
 
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
@@ -404,10 +343,10 @@ func (_Votemanager *VotemanagerCallerSession) SfcLib() (common.Address, error) {
 
 // ShouldVote is a free data retrieval call binding the contract method 0xb1faefbb.
 //
-// Solidity: function shouldVote(uint256 _validatorId, uint256 _hashId, uint256 _validatorCount) pure returns(bool)
-func (_Votemanager *VotemanagerCaller) ShouldVote(opts *bind.CallOpts, _validatorId *big.Int, _hashId *big.Int, _validatorCount *big.Int) (bool, error) {
+// Solidity: function shouldVote(uint256 _mintedBlockNumber, uint256 _validatorId, uint256 _hashId) view returns(bool)
+func (_Votemanager *VotemanagerCaller) ShouldVote(opts *bind.CallOpts, _mintedBlockNumber *big.Int, _validatorId *big.Int, _hashId *big.Int) (bool, error) {
 	var out []interface{}
-	err := _Votemanager.contract.Call(opts, &out, "shouldVote", _validatorId, _hashId, _validatorCount)
+	err := _Votemanager.contract.Call(opts, &out, "shouldVote", _mintedBlockNumber, _validatorId, _hashId)
 
 	if err != nil {
 		return *new(bool), err
@@ -421,16 +360,16 @@ func (_Votemanager *VotemanagerCaller) ShouldVote(opts *bind.CallOpts, _validato
 
 // ShouldVote is a free data retrieval call binding the contract method 0xb1faefbb.
 //
-// Solidity: function shouldVote(uint256 _validatorId, uint256 _hashId, uint256 _validatorCount) pure returns(bool)
-func (_Votemanager *VotemanagerSession) ShouldVote(_validatorId *big.Int, _hashId *big.Int, _validatorCount *big.Int) (bool, error) {
-	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, _validatorId, _hashId, _validatorCount)
+// Solidity: function shouldVote(uint256 _mintedBlockNumber, uint256 _validatorId, uint256 _hashId) view returns(bool)
+func (_Votemanager *VotemanagerSession) ShouldVote(_mintedBlockNumber *big.Int, _validatorId *big.Int, _hashId *big.Int) (bool, error) {
+	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, _mintedBlockNumber, _validatorId, _hashId)
 }
 
 // ShouldVote is a free data retrieval call binding the contract method 0xb1faefbb.
 //
-// Solidity: function shouldVote(uint256 _validatorId, uint256 _hashId, uint256 _validatorCount) pure returns(bool)
-func (_Votemanager *VotemanagerCallerSession) ShouldVote(_validatorId *big.Int, _hashId *big.Int, _validatorCount *big.Int) (bool, error) {
-	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, _validatorId, _hashId, _validatorCount)
+// Solidity: function shouldVote(uint256 _mintedBlockNumber, uint256 _validatorId, uint256 _hashId) view returns(bool)
+func (_Votemanager *VotemanagerCallerSession) ShouldVote(_mintedBlockNumber *big.Int, _validatorId *big.Int, _hashId *big.Int) (bool, error) {
+	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, _mintedBlockNumber, _validatorId, _hashId)
 }
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
@@ -526,10 +465,10 @@ func (_Votemanager *VotemanagerCallerSession) VotePercentage() (uint8, error) {
 	return _Votemanager.Contract.VotePercentage(&_Votemanager.CallOpts)
 }
 
-// VotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x770a9e50.
+// VotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x348fbd64.
 //
-// Solidity: function votesByHashIdAndCurrencyType(uint256 , uint8 ) view returns(uint16)
-func (_Votemanager *VotemanagerCaller) VotesByHashIdAndCurrencyType(opts *bind.CallOpts, arg0 *big.Int, arg1 uint8) (uint16, error) {
+// Solidity: function votesByHashIdAndCurrencyType(uint256 , uint256 ) view returns(uint16)
+func (_Votemanager *VotemanagerCaller) VotesByHashIdAndCurrencyType(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int) (uint16, error) {
 	var out []interface{}
 	err := _Votemanager.contract.Call(opts, &out, "votesByHashIdAndCurrencyType", arg0, arg1)
 
@@ -543,49 +482,18 @@ func (_Votemanager *VotemanagerCaller) VotesByHashIdAndCurrencyType(opts *bind.C
 
 }
 
-// VotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x770a9e50.
+// VotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x348fbd64.
 //
-// Solidity: function votesByHashIdAndCurrencyType(uint256 , uint8 ) view returns(uint16)
-func (_Votemanager *VotemanagerSession) VotesByHashIdAndCurrencyType(arg0 *big.Int, arg1 uint8) (uint16, error) {
+// Solidity: function votesByHashIdAndCurrencyType(uint256 , uint256 ) view returns(uint16)
+func (_Votemanager *VotemanagerSession) VotesByHashIdAndCurrencyType(arg0 *big.Int, arg1 *big.Int) (uint16, error) {
 	return _Votemanager.Contract.VotesByHashIdAndCurrencyType(&_Votemanager.CallOpts, arg0, arg1)
 }
 
-// VotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x770a9e50.
+// VotesByHashIdAndCurrencyType is a free data retrieval call binding the contract method 0x348fbd64.
 //
-// Solidity: function votesByHashIdAndCurrencyType(uint256 , uint8 ) view returns(uint16)
-func (_Votemanager *VotemanagerCallerSession) VotesByHashIdAndCurrencyType(arg0 *big.Int, arg1 uint8) (uint16, error) {
+// Solidity: function votesByHashIdAndCurrencyType(uint256 , uint256 ) view returns(uint16)
+func (_Votemanager *VotemanagerCallerSession) VotesByHashIdAndCurrencyType(arg0 *big.Int, arg1 *big.Int) (uint16, error) {
 	return _Votemanager.Contract.VotesByHashIdAndCurrencyType(&_Votemanager.CallOpts, arg0, arg1)
-}
-
-// VotesByHashIdAndValidatorId is a free data retrieval call binding the contract method 0x6da2b74b.
-//
-// Solidity: function votesByHashIdAndValidatorId(uint256 , uint256 ) view returns(bool)
-func (_Votemanager *VotemanagerCaller) VotesByHashIdAndValidatorId(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int) (bool, error) {
-	var out []interface{}
-	err := _Votemanager.contract.Call(opts, &out, "votesByHashIdAndValidatorId", arg0, arg1)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// VotesByHashIdAndValidatorId is a free data retrieval call binding the contract method 0x6da2b74b.
-//
-// Solidity: function votesByHashIdAndValidatorId(uint256 , uint256 ) view returns(bool)
-func (_Votemanager *VotemanagerSession) VotesByHashIdAndValidatorId(arg0 *big.Int, arg1 *big.Int) (bool, error) {
-	return _Votemanager.Contract.VotesByHashIdAndValidatorId(&_Votemanager.CallOpts, arg0, arg1)
-}
-
-// VotesByHashIdAndValidatorId is a free data retrieval call binding the contract method 0x6da2b74b.
-//
-// Solidity: function votesByHashIdAndValidatorId(uint256 , uint256 ) view returns(bool)
-func (_Votemanager *VotemanagerCallerSession) VotesByHashIdAndValidatorId(arg0 *big.Int, arg1 *big.Int) (bool, error) {
-	return _Votemanager.Contract.VotesByHashIdAndValidatorId(&_Votemanager.CallOpts, arg0, arg1)
 }
 
 // VotesByHashIdAndValidatorIdAndCurrencyType is a free data retrieval call binding the contract method 0x95c6286c.
@@ -766,44 +674,44 @@ func (_Votemanager *VotemanagerTransactorSession) UpdateVotePercentage(_votePerc
 	return _Votemanager.Contract.UpdateVotePercentage(&_Votemanager.TransactOpts, _votePercentage)
 }
 
-// Vote is a paid mutator transaction binding the contract method 0xb384abef.
+// Vote is a paid mutator transaction binding the contract method 0x8a6655d6.
 //
-// Solidity: function vote(uint256 _hashId, uint256 _currencyType) returns()
-func (_Votemanager *VotemanagerTransactor) Vote(opts *bind.TransactOpts, _hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
-	return _Votemanager.contract.Transact(opts, "vote", _hashId, _currencyType)
+// Solidity: function vote(uint256 mintedBlockNumber, uint256 _hashId, uint256 _currencyType) returns()
+func (_Votemanager *VotemanagerTransactor) Vote(opts *bind.TransactOpts, mintedBlockNumber *big.Int, _hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
+	return _Votemanager.contract.Transact(opts, "vote", mintedBlockNumber, _hashId, _currencyType)
 }
 
-// Vote is a paid mutator transaction binding the contract method 0xb384abef.
+// Vote is a paid mutator transaction binding the contract method 0x8a6655d6.
 //
-// Solidity: function vote(uint256 _hashId, uint256 _currencyType) returns()
-func (_Votemanager *VotemanagerSession) Vote(_hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
-	return _Votemanager.Contract.Vote(&_Votemanager.TransactOpts, _hashId, _currencyType)
+// Solidity: function vote(uint256 mintedBlockNumber, uint256 _hashId, uint256 _currencyType) returns()
+func (_Votemanager *VotemanagerSession) Vote(mintedBlockNumber *big.Int, _hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
+	return _Votemanager.Contract.Vote(&_Votemanager.TransactOpts, mintedBlockNumber, _hashId, _currencyType)
 }
 
-// Vote is a paid mutator transaction binding the contract method 0xb384abef.
+// Vote is a paid mutator transaction binding the contract method 0x8a6655d6.
 //
-// Solidity: function vote(uint256 _hashId, uint256 _currencyType) returns()
-func (_Votemanager *VotemanagerTransactorSession) Vote(_hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
-	return _Votemanager.Contract.Vote(&_Votemanager.TransactOpts, _hashId, _currencyType)
+// Solidity: function vote(uint256 mintedBlockNumber, uint256 _hashId, uint256 _currencyType) returns()
+func (_Votemanager *VotemanagerTransactorSession) Vote(mintedBlockNumber *big.Int, _hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
+	return _Votemanager.Contract.Vote(&_Votemanager.TransactOpts, mintedBlockNumber, _hashId, _currencyType)
 }
 
-// VoteBatch is a paid mutator transaction binding the contract method 0xbceb2e60.
+// VoteBatch is a paid mutator transaction binding the contract method 0x149ff154.
 //
-// Solidity: function voteBatch((uint256,uint256)[] payload) returns()
+// Solidity: function voteBatch((uint256,uint256,uint256)[] payload) returns()
 func (_Votemanager *VotemanagerTransactor) VoteBatch(opts *bind.TransactOpts, payload []VoteManagerPayload) (*types.Transaction, error) {
 	return _Votemanager.contract.Transact(opts, "voteBatch", payload)
 }
 
-// VoteBatch is a paid mutator transaction binding the contract method 0xbceb2e60.
+// VoteBatch is a paid mutator transaction binding the contract method 0x149ff154.
 //
-// Solidity: function voteBatch((uint256,uint256)[] payload) returns()
+// Solidity: function voteBatch((uint256,uint256,uint256)[] payload) returns()
 func (_Votemanager *VotemanagerSession) VoteBatch(payload []VoteManagerPayload) (*types.Transaction, error) {
 	return _Votemanager.Contract.VoteBatch(&_Votemanager.TransactOpts, payload)
 }
 
-// VoteBatch is a paid mutator transaction binding the contract method 0xbceb2e60.
+// VoteBatch is a paid mutator transaction binding the contract method 0x149ff154.
 //
-// Solidity: function voteBatch((uint256,uint256)[] payload) returns()
+// Solidity: function voteBatch((uint256,uint256,uint256)[] payload) returns()
 func (_Votemanager *VotemanagerTransactorSession) VoteBatch(payload []VoteManagerPayload) (*types.Transaction, error) {
 	return _Votemanager.Contract.VoteBatch(&_Votemanager.TransactOpts, payload)
 }

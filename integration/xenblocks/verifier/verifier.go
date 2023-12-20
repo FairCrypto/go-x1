@@ -2,13 +2,11 @@ package verifier
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/base64"
-	"encoding/binary"
 	"encoding/hex"
-	"fmt"
 	"github.com/Fantom-foundation/go-opera/gossip/contract/sfclib100"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/votemanager"
 	"github.com/Fantom-foundation/go-opera/opera/contracts/sfc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -17,7 +15,6 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/hashicorp/golang-lru"
 	"github.com/tvdburgt/go-argon2"
-	"math"
 	"math/big"
 	"regexp"
 	"strings"
@@ -25,9 +22,8 @@ import (
 )
 
 const (
-	hashLen          = 64
-	validatorsFactor = 0.2
-	pattern1Salt     = "WEVOMTAwODIwMjJYRU4"
+	hashLen      = 64
+	pattern1Salt = "WEVOMTAwODIwMjJYRU4"
 )
 
 type Verifier struct {
@@ -42,9 +38,10 @@ type Verifier struct {
 	conn              *ethclient.Client
 	sub               event.Subscription
 	validatorCountLRU *lru.Cache
+	vm                *votemanager.Votemanager
 }
 
-func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.BlockStorage) *Verifier {
+func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.BlockStorage, vm *votemanager.Votemanager) *Verifier {
 	validatorCountLRU, err := lru.New(100)
 	if err != nil {
 		panic(err)
@@ -64,16 +61,19 @@ func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.B
 		validatorCountLRU: validatorCountLRU,
 		sfcLib:            sfcLib,
 		bs:                bs,
+		vm:                vm,
 	}
 }
 
 func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) []Token {
 	log.Debug("NewHash event received", "hashId", event.HashId, "epoch", event.Epoch, "account", event.Account)
 
-	if !v.shouldVote(event.Raw.BlockNumber) {
-		log.Debug("Not voting for this hash", "hash", event.Raw.BlockHash)
-		return nil
-	}
+	// TODO: uncomment. for dev we are voting on all hashes
+	//sv, err := v.shouldVote(event.Raw.BlockNumber, event.HashId)
+	//if !sv {
+	//	log.Info("Not voting for this hash", "hash", event.Raw.BlockHash)
+	//	return nil
+	//}
 
 	blockTime := v.getBlockTime(event.Raw.BlockHash)
 
@@ -150,24 +150,9 @@ func (v *Verifier) getValidatorCount(blockNumber uint64) (int, error) {
 	return count, err
 }
 
-func (v *Verifier) shouldVote(blockNumber uint64) bool {
-	validatorsCount, err := v.getValidatorCount(blockNumber)
-	if err != nil {
-		log.Error("Error getting validator count", "err", err)
-		return false
-	}
-
-	seed := sha256.Sum256([]byte(fmt.Sprintf("%d-%d", blockNumber, v.validatorId)))
-	randomState := int(binary.LittleEndian.Uint64(seed[:])) % validatorsCount
-
-	// Calculate the number of validators to vote (percentage of validators)
-	numVotingValidators := max(1, int(math.Round(validatorsFactor*float64(validatorsCount))))
-
-	// Calculate the position of the validator within the selected validators
-	positionInSelectedValidators := randomState % numVotingValidators
-
-	// Check if the given validator index matches the calculated position
-	return positionInSelectedValidators == int(v.validatorId)%numVotingValidators
+func (v *Verifier) shouldVote(blockNumber uint64, hashId *big.Int) (bool, error) {
+	bn := new(big.Int).SetUint64(blockNumber)
+	return v.vm.ShouldVote(nil, bn, big.NewInt(int64(v.validatorId)), hashId)
 }
 
 func (v *Verifier) verifyDifficultly(difficulty uint32, blockNumber uint64) bool {
