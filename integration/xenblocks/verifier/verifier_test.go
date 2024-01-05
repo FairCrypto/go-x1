@@ -11,7 +11,7 @@ func TestArgon2Hash(t *testing.T) {
 	salt := []byte("XEN10082022XEN")
 	key := []byte("0000da975bd6ec3aa878dadc395943619d23407371bc15066c1505ef23203d871633c687a9e5e89f5fc7fb61f05e1ff4ec49ecee28577c5143711185afe2d5a5")[:]
 
-	hash, err := argon2Hash(1, 8, 1, salt, key)
+	hash, err := Argon2Hash(1, 8, 1, salt, key)
 	if err != nil {
 		t.Fatalf("error: %v", err)
 	}

@@ -112,21 +112,21 @@ abi = JSON.parse('[{"anonymous":false,"inputs":[{"indexed":true,"internalType":"
 
 … as well as the SFC contract object itself:
 ```shell
-sfcc = web3.ftm.contract(abi).at("0xfc00face00000000000000000000000000000000")
+sfc = web3.ftm.contract(abi).at("0xfc00face00000000000000000000000000000000")
 ```
 
 Next, unlock your validator wallet to be able to execute the registration transaction (make sure to use the password you set before). 
 
 ```shell
 # Unlock validator wallet
-personal.unlockAccount("{VALIDATOR_WALLET_ADDRESS}", "{PASSWORD}", 60)
+personal.unlockAccount("ACCOUNT_WALLET_ADDRESS", "PASSWORD", 60)
 ```
 
 Next, send the createValidator transaction to register your validator. Use quotes for "0xYOUR_PUBKEY" and "0xYOUR_ADDRESS":
 
 ```shell
 # Register your validator
-tx = sfcc.createValidator("0xYOUR_PUBKEY", {from:"0xYOUR_ADDRESS", value: web3.toWei("500000.0", "xn")})
+tx = sfc.createValidator("0xYOUR_PUBKEY", {from:"0xYOUR_ADDRESS", value: web3.toWei("500000.0", "xn")})
 ```
 
 ```shell

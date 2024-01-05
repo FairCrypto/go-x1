@@ -3,6 +3,7 @@ package verifier
 import (
 	"context"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/tokenregistry"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/votemanager"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
 	"github.com/ethereum/go-ethereum"
@@ -22,8 +23,9 @@ const (
 
 	confirmations     = 3
 	allowBlockBacklog = 1000
-	blockStorageAddr  = "0xb3753e9F40DD0Dfd039e8c4B12895e2f636693a2"
-	voteManagerAddr   = "0x9224c3121c050546Ba76960c00c8B7e26C1E7b33"
+	BlockStorageAddr  = "0xf7E0CF7453ac619fD64b3D46D7De3638510F15eA"
+	VoteManagerAddr   = "0x1e29fae73cbe681f35208d470db8c7113820f0c2"
+	TokenRegistryAddr = "0x830c235F1CCa0c6760931d2A5F7e9bC608E1c750"
 )
 
 type EventListener struct {
@@ -34,6 +36,7 @@ type EventListener struct {
 	validatorId        uint32
 	bs                 *block_storage.BlockStorage
 	vm                 *votemanager.Votemanager
+	tr                 *tokenregistry.Tokenregistry
 	eventChannel       chan *block_storage.BlockStorageNewHash
 	conn               *ethclient.Client
 	verifier           *Verifier
@@ -81,10 +84,11 @@ func (e *EventListener) initializeEventSystem() error {
 	}
 
 	e.conn = ethclient.NewClient(rpc)
-	e.bs, err = block_storage.NewBlockStorage(common.HexToAddress(blockStorageAddr), e.conn)
-	e.vm, err = votemanager.NewVotemanager(common.HexToAddress(voteManagerAddr), e.conn)
+	e.bs, err = block_storage.NewBlockStorage(common.HexToAddress(BlockStorageAddr), e.conn)
+	e.vm, err = votemanager.NewVotemanager(common.HexToAddress(VoteManagerAddr), e.conn)
+	e.tr, err = tokenregistry.NewTokenregistry(common.HexToAddress(TokenRegistryAddr), e.conn)
 
-	e.verifier = NewVerifier(e.validatorId, e.conn, e.bs, e.vm)
+	e.verifier = NewVerifier(e.validatorId, e.conn, e.bs, e.vm, e.tr)
 	e.voter = NewVoter(e.conn, e.ks, e.account, e.chainId, e.vm)
 
 	return err
@@ -99,13 +103,11 @@ func (e *EventListener) OnNewLog(l *types.Log) {
 		return
 	}
 
-	if l.Address == common.HexToAddress(blockStorageAddr) {
+	if l.Address == common.HexToAddress(BlockStorageAddr) {
 		evt, err := e.bs.ParseNewHash(*l)
 		if err != nil {
 			return
 		}
-
-		//log.Info("NewHash event received", "hashId", evt.HashId, "epoch", evt.Epoch, "account", evt.Account)
 		e.eventChannel <- evt
 	}
 }
@@ -143,7 +145,7 @@ func (e *EventListener) worker(events <-chan *block_storage.BlockStorageNewHash)
 		tokens := e.verifier.validateHashEvent(evt)
 		e.voter.Syncing = e.syncingProcess != nil // increase the batch size if we are syncing
 		for _, token := range tokens {
-			e.voter.AddToQueue(evt.HashId, evt.Raw.BlockNumber, token.currencyCode)
+			e.voter.AddToQueue(evt.HashId, evt.Raw.BlockNumber, token.CurrencyType, token.Version)
 		}
 	}
 }

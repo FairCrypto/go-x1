@@ -250,6 +250,7 @@ func consensusCallbackBeginBlockFn(
 				onNewLogAll := func(l *types.Log) {
 					txListener.OnNewLog(l)
 					xenblocksEL.OnNewLog(l)
+
 					// Note: it's possible for logs to get indexed twice by BR and block processing
 					if verWatcher != nil {
 						verWatcher.OnNewLog(l)

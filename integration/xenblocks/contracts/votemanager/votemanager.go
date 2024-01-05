@@ -28,16 +28,17 @@ var (
 	_ = event.NewSubscription
 )
 
-// VoteManagerPayload is an auto generated low-level Go binding around an user-defined struct.
-type VoteManagerPayload struct {
+// VoteManagerVotePayload is an auto generated low-level Go binding around an user-defined struct.
+type VoteManagerVotePayload struct {
 	HashId            *big.Int
 	CurrencyType      *big.Int
 	MintedBlockNumber *big.Int
+	Version           uint16
 }
 
 // VotemanagerMetaData contains all meta data concerning the Votemanager contract.
 var VotemanagerMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"}],\"name\":\"MintToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"validatorId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"votes\",\"type\":\"uint16\"}],\"name\":\"VoteToken\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"blockStorage\",\"outputs\":[{\"internalType\":\"contractBlockStorage\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"initialOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialSfcAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialBlockStorageAddress\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"initialVotePercentage\",\"type\":\"uint8\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"mintedByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requiredNumOfValidators\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sfcLib\",\"outputs\":[{\"internalType\":\"contractSFCLib\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_mintedBlockNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_validatorId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"}],\"name\":\"shouldVote\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tokenRegistry\",\"outputs\":[{\"internalType\":\"contractTokenRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_blockStorageAddress\",\"type\":\"address\"}],\"name\":\"updateBlockStorageAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_sfcLibAddress\",\"type\":\"address\"}],\"name\":\"updateSfcLibAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenRegistryAddress\",\"type\":\"address\"}],\"name\":\"updateTokenRegistryAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"_votePercentage\",\"type\":\"uint8\"}],\"name\":\"updateVotePercentage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"validatorCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"mintedBlockNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_currencyType\",\"type\":\"uint256\"}],\"name\":\"vote\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"mintedBlockNumber\",\"type\":\"uint256\"}],\"internalType\":\"structVoteManager.Payload[]\",\"name\":\"payload\",\"type\":\"tuple[]\"}],\"name\":\"voteBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votePercentage\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndValidatorIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotAValidator\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"VersionMismatch\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"}],\"name\":\"MintToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"validatorId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"votes\",\"type\":\"uint16\"}],\"name\":\"VoteToken\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"blockStorage\",\"outputs\":[{\"internalType\":\"contractBlockStorage\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"initialOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialSfcAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"initialBlockStorageAddress\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"initialVotePercentage\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"initialVoteBufferPercent\",\"type\":\"uint8\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"mintedByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requiredNumOfValidators\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requiredNumOfVotes\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sfc\",\"outputs\":[{\"internalType\":\"contractSFC\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"mintedBlockNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"validatorId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"}],\"name\":\"shouldVote\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tokenRegistry\",\"outputs\":[{\"internalType\":\"contractTokenRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"blockStorageAddress\",\"type\":\"address\"}],\"name\":\"updateBlockStorageAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"sfcAddress\",\"type\":\"address\"}],\"name\":\"updateSfcAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenRegistryAddress_\",\"type\":\"address\"}],\"name\":\"updateTokenRegistryAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"voteBufferPercent_\",\"type\":\"uint8\"}],\"name\":\"updateVoteBufferPercentage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"votePercentage_\",\"type\":\"uint8\"}],\"name\":\"updateVotePercentage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"validatorCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"hashId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"currencyType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"mintedBlockNumber\",\"type\":\"uint256\"},{\"internalType\":\"uint16\",\"name\":\"version\",\"type\":\"uint16\"}],\"internalType\":\"structVoteManager.VotePayload[]\",\"name\":\"payload\",\"type\":\"tuple[]\"}],\"name\":\"voteBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"voteBufferPercent\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votePercentage\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"votesByHashIdAndValidatorIdAndCurrencyType\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // VotemanagerABI is the input ABI used to generate the binding from.
@@ -310,12 +311,43 @@ func (_Votemanager *VotemanagerCallerSession) RequiredNumOfValidators() (*big.In
 	return _Votemanager.Contract.RequiredNumOfValidators(&_Votemanager.CallOpts)
 }
 
-// SfcLib is a free data retrieval call binding the contract method 0x1ff9794b.
+// RequiredNumOfVotes is a free data retrieval call binding the contract method 0x27b26533.
 //
-// Solidity: function sfcLib() view returns(address)
-func (_Votemanager *VotemanagerCaller) SfcLib(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function requiredNumOfVotes() view returns(uint256)
+func (_Votemanager *VotemanagerCaller) RequiredNumOfVotes(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _Votemanager.contract.Call(opts, &out, "sfcLib")
+	err := _Votemanager.contract.Call(opts, &out, "requiredNumOfVotes")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// RequiredNumOfVotes is a free data retrieval call binding the contract method 0x27b26533.
+//
+// Solidity: function requiredNumOfVotes() view returns(uint256)
+func (_Votemanager *VotemanagerSession) RequiredNumOfVotes() (*big.Int, error) {
+	return _Votemanager.Contract.RequiredNumOfVotes(&_Votemanager.CallOpts)
+}
+
+// RequiredNumOfVotes is a free data retrieval call binding the contract method 0x27b26533.
+//
+// Solidity: function requiredNumOfVotes() view returns(uint256)
+func (_Votemanager *VotemanagerCallerSession) RequiredNumOfVotes() (*big.Int, error) {
+	return _Votemanager.Contract.RequiredNumOfVotes(&_Votemanager.CallOpts)
+}
+
+// Sfc is a free data retrieval call binding the contract method 0x8992229f.
+//
+// Solidity: function sfc() view returns(address)
+func (_Votemanager *VotemanagerCaller) Sfc(opts *bind.CallOpts) (common.Address, error) {
+	var out []interface{}
+	err := _Votemanager.contract.Call(opts, &out, "sfc")
 
 	if err != nil {
 		return *new(common.Address), err
@@ -327,26 +359,26 @@ func (_Votemanager *VotemanagerCaller) SfcLib(opts *bind.CallOpts) (common.Addre
 
 }
 
-// SfcLib is a free data retrieval call binding the contract method 0x1ff9794b.
+// Sfc is a free data retrieval call binding the contract method 0x8992229f.
 //
-// Solidity: function sfcLib() view returns(address)
-func (_Votemanager *VotemanagerSession) SfcLib() (common.Address, error) {
-	return _Votemanager.Contract.SfcLib(&_Votemanager.CallOpts)
+// Solidity: function sfc() view returns(address)
+func (_Votemanager *VotemanagerSession) Sfc() (common.Address, error) {
+	return _Votemanager.Contract.Sfc(&_Votemanager.CallOpts)
 }
 
-// SfcLib is a free data retrieval call binding the contract method 0x1ff9794b.
+// Sfc is a free data retrieval call binding the contract method 0x8992229f.
 //
-// Solidity: function sfcLib() view returns(address)
-func (_Votemanager *VotemanagerCallerSession) SfcLib() (common.Address, error) {
-	return _Votemanager.Contract.SfcLib(&_Votemanager.CallOpts)
+// Solidity: function sfc() view returns(address)
+func (_Votemanager *VotemanagerCallerSession) Sfc() (common.Address, error) {
+	return _Votemanager.Contract.Sfc(&_Votemanager.CallOpts)
 }
 
 // ShouldVote is a free data retrieval call binding the contract method 0xb1faefbb.
 //
-// Solidity: function shouldVote(uint256 _mintedBlockNumber, uint256 _validatorId, uint256 _hashId) view returns(bool)
-func (_Votemanager *VotemanagerCaller) ShouldVote(opts *bind.CallOpts, _mintedBlockNumber *big.Int, _validatorId *big.Int, _hashId *big.Int) (bool, error) {
+// Solidity: function shouldVote(uint256 mintedBlockNumber, uint256 validatorId, uint256 hashId) view returns(bool)
+func (_Votemanager *VotemanagerCaller) ShouldVote(opts *bind.CallOpts, mintedBlockNumber *big.Int, validatorId *big.Int, hashId *big.Int) (bool, error) {
 	var out []interface{}
-	err := _Votemanager.contract.Call(opts, &out, "shouldVote", _mintedBlockNumber, _validatorId, _hashId)
+	err := _Votemanager.contract.Call(opts, &out, "shouldVote", mintedBlockNumber, validatorId, hashId)
 
 	if err != nil {
 		return *new(bool), err
@@ -360,16 +392,16 @@ func (_Votemanager *VotemanagerCaller) ShouldVote(opts *bind.CallOpts, _mintedBl
 
 // ShouldVote is a free data retrieval call binding the contract method 0xb1faefbb.
 //
-// Solidity: function shouldVote(uint256 _mintedBlockNumber, uint256 _validatorId, uint256 _hashId) view returns(bool)
-func (_Votemanager *VotemanagerSession) ShouldVote(_mintedBlockNumber *big.Int, _validatorId *big.Int, _hashId *big.Int) (bool, error) {
-	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, _mintedBlockNumber, _validatorId, _hashId)
+// Solidity: function shouldVote(uint256 mintedBlockNumber, uint256 validatorId, uint256 hashId) view returns(bool)
+func (_Votemanager *VotemanagerSession) ShouldVote(mintedBlockNumber *big.Int, validatorId *big.Int, hashId *big.Int) (bool, error) {
+	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, mintedBlockNumber, validatorId, hashId)
 }
 
 // ShouldVote is a free data retrieval call binding the contract method 0xb1faefbb.
 //
-// Solidity: function shouldVote(uint256 _mintedBlockNumber, uint256 _validatorId, uint256 _hashId) view returns(bool)
-func (_Votemanager *VotemanagerCallerSession) ShouldVote(_mintedBlockNumber *big.Int, _validatorId *big.Int, _hashId *big.Int) (bool, error) {
-	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, _mintedBlockNumber, _validatorId, _hashId)
+// Solidity: function shouldVote(uint256 mintedBlockNumber, uint256 validatorId, uint256 hashId) view returns(bool)
+func (_Votemanager *VotemanagerCallerSession) ShouldVote(mintedBlockNumber *big.Int, validatorId *big.Int, hashId *big.Int) (bool, error) {
+	return _Votemanager.Contract.ShouldVote(&_Votemanager.CallOpts, mintedBlockNumber, validatorId, hashId)
 }
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
@@ -432,6 +464,37 @@ func (_Votemanager *VotemanagerSession) ValidatorCount() (*big.Int, error) {
 // Solidity: function validatorCount() view returns(uint256)
 func (_Votemanager *VotemanagerCallerSession) ValidatorCount() (*big.Int, error) {
 	return _Votemanager.Contract.ValidatorCount(&_Votemanager.CallOpts)
+}
+
+// VoteBufferPercent is a free data retrieval call binding the contract method 0xa2379199.
+//
+// Solidity: function voteBufferPercent() view returns(uint8)
+func (_Votemanager *VotemanagerCaller) VoteBufferPercent(opts *bind.CallOpts) (uint8, error) {
+	var out []interface{}
+	err := _Votemanager.contract.Call(opts, &out, "voteBufferPercent")
+
+	if err != nil {
+		return *new(uint8), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+
+	return out0, err
+
+}
+
+// VoteBufferPercent is a free data retrieval call binding the contract method 0xa2379199.
+//
+// Solidity: function voteBufferPercent() view returns(uint8)
+func (_Votemanager *VotemanagerSession) VoteBufferPercent() (uint8, error) {
+	return _Votemanager.Contract.VoteBufferPercent(&_Votemanager.CallOpts)
+}
+
+// VoteBufferPercent is a free data retrieval call binding the contract method 0xa2379199.
+//
+// Solidity: function voteBufferPercent() view returns(uint8)
+func (_Votemanager *VotemanagerCallerSession) VoteBufferPercent() (uint8, error) {
+	return _Votemanager.Contract.VoteBufferPercent(&_Votemanager.CallOpts)
 }
 
 // VotePercentage is a free data retrieval call binding the contract method 0x34b502c0.
@@ -527,25 +590,25 @@ func (_Votemanager *VotemanagerCallerSession) VotesByHashIdAndValidatorIdAndCurr
 	return _Votemanager.Contract.VotesByHashIdAndValidatorIdAndCurrencyType(&_Votemanager.CallOpts, arg0, arg1, arg2)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0x3073cecf.
+// Initialize is a paid mutator transaction binding the contract method 0x903cd3e3.
 //
-// Solidity: function initialize(address initialOwner, address initialSfcAddress, address initialBlockStorageAddress, uint8 initialVotePercentage) returns()
-func (_Votemanager *VotemanagerTransactor) Initialize(opts *bind.TransactOpts, initialOwner common.Address, initialSfcAddress common.Address, initialBlockStorageAddress common.Address, initialVotePercentage uint8) (*types.Transaction, error) {
-	return _Votemanager.contract.Transact(opts, "initialize", initialOwner, initialSfcAddress, initialBlockStorageAddress, initialVotePercentage)
+// Solidity: function initialize(address initialOwner, address initialSfcAddress, address initialBlockStorageAddress, uint8 initialVotePercentage, uint8 initialVoteBufferPercent) returns()
+func (_Votemanager *VotemanagerTransactor) Initialize(opts *bind.TransactOpts, initialOwner common.Address, initialSfcAddress common.Address, initialBlockStorageAddress common.Address, initialVotePercentage uint8, initialVoteBufferPercent uint8) (*types.Transaction, error) {
+	return _Votemanager.contract.Transact(opts, "initialize", initialOwner, initialSfcAddress, initialBlockStorageAddress, initialVotePercentage, initialVoteBufferPercent)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0x3073cecf.
+// Initialize is a paid mutator transaction binding the contract method 0x903cd3e3.
 //
-// Solidity: function initialize(address initialOwner, address initialSfcAddress, address initialBlockStorageAddress, uint8 initialVotePercentage) returns()
-func (_Votemanager *VotemanagerSession) Initialize(initialOwner common.Address, initialSfcAddress common.Address, initialBlockStorageAddress common.Address, initialVotePercentage uint8) (*types.Transaction, error) {
-	return _Votemanager.Contract.Initialize(&_Votemanager.TransactOpts, initialOwner, initialSfcAddress, initialBlockStorageAddress, initialVotePercentage)
+// Solidity: function initialize(address initialOwner, address initialSfcAddress, address initialBlockStorageAddress, uint8 initialVotePercentage, uint8 initialVoteBufferPercent) returns()
+func (_Votemanager *VotemanagerSession) Initialize(initialOwner common.Address, initialSfcAddress common.Address, initialBlockStorageAddress common.Address, initialVotePercentage uint8, initialVoteBufferPercent uint8) (*types.Transaction, error) {
+	return _Votemanager.Contract.Initialize(&_Votemanager.TransactOpts, initialOwner, initialSfcAddress, initialBlockStorageAddress, initialVotePercentage, initialVoteBufferPercent)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0x3073cecf.
+// Initialize is a paid mutator transaction binding the contract method 0x903cd3e3.
 //
-// Solidity: function initialize(address initialOwner, address initialSfcAddress, address initialBlockStorageAddress, uint8 initialVotePercentage) returns()
-func (_Votemanager *VotemanagerTransactorSession) Initialize(initialOwner common.Address, initialSfcAddress common.Address, initialBlockStorageAddress common.Address, initialVotePercentage uint8) (*types.Transaction, error) {
-	return _Votemanager.Contract.Initialize(&_Votemanager.TransactOpts, initialOwner, initialSfcAddress, initialBlockStorageAddress, initialVotePercentage)
+// Solidity: function initialize(address initialOwner, address initialSfcAddress, address initialBlockStorageAddress, uint8 initialVotePercentage, uint8 initialVoteBufferPercent) returns()
+func (_Votemanager *VotemanagerTransactorSession) Initialize(initialOwner common.Address, initialSfcAddress common.Address, initialBlockStorageAddress common.Address, initialVotePercentage uint8, initialVoteBufferPercent uint8) (*types.Transaction, error) {
+	return _Votemanager.Contract.Initialize(&_Votemanager.TransactOpts, initialOwner, initialSfcAddress, initialBlockStorageAddress, initialVotePercentage, initialVoteBufferPercent)
 }
 
 // RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
@@ -592,127 +655,127 @@ func (_Votemanager *VotemanagerTransactorSession) TransferOwnership(newOwner com
 
 // UpdateBlockStorageAddress is a paid mutator transaction binding the contract method 0x3cc66f46.
 //
-// Solidity: function updateBlockStorageAddress(address _blockStorageAddress) returns()
-func (_Votemanager *VotemanagerTransactor) UpdateBlockStorageAddress(opts *bind.TransactOpts, _blockStorageAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.contract.Transact(opts, "updateBlockStorageAddress", _blockStorageAddress)
+// Solidity: function updateBlockStorageAddress(address blockStorageAddress) returns()
+func (_Votemanager *VotemanagerTransactor) UpdateBlockStorageAddress(opts *bind.TransactOpts, blockStorageAddress common.Address) (*types.Transaction, error) {
+	return _Votemanager.contract.Transact(opts, "updateBlockStorageAddress", blockStorageAddress)
 }
 
 // UpdateBlockStorageAddress is a paid mutator transaction binding the contract method 0x3cc66f46.
 //
-// Solidity: function updateBlockStorageAddress(address _blockStorageAddress) returns()
-func (_Votemanager *VotemanagerSession) UpdateBlockStorageAddress(_blockStorageAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateBlockStorageAddress(&_Votemanager.TransactOpts, _blockStorageAddress)
+// Solidity: function updateBlockStorageAddress(address blockStorageAddress) returns()
+func (_Votemanager *VotemanagerSession) UpdateBlockStorageAddress(blockStorageAddress common.Address) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateBlockStorageAddress(&_Votemanager.TransactOpts, blockStorageAddress)
 }
 
 // UpdateBlockStorageAddress is a paid mutator transaction binding the contract method 0x3cc66f46.
 //
-// Solidity: function updateBlockStorageAddress(address _blockStorageAddress) returns()
-func (_Votemanager *VotemanagerTransactorSession) UpdateBlockStorageAddress(_blockStorageAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateBlockStorageAddress(&_Votemanager.TransactOpts, _blockStorageAddress)
+// Solidity: function updateBlockStorageAddress(address blockStorageAddress) returns()
+func (_Votemanager *VotemanagerTransactorSession) UpdateBlockStorageAddress(blockStorageAddress common.Address) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateBlockStorageAddress(&_Votemanager.TransactOpts, blockStorageAddress)
 }
 
-// UpdateSfcLibAddress is a paid mutator transaction binding the contract method 0x9d138a3c.
+// UpdateSfcAddress is a paid mutator transaction binding the contract method 0xcbb9d8c9.
 //
-// Solidity: function updateSfcLibAddress(address _sfcLibAddress) returns()
-func (_Votemanager *VotemanagerTransactor) UpdateSfcLibAddress(opts *bind.TransactOpts, _sfcLibAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.contract.Transact(opts, "updateSfcLibAddress", _sfcLibAddress)
+// Solidity: function updateSfcAddress(address sfcAddress) returns()
+func (_Votemanager *VotemanagerTransactor) UpdateSfcAddress(opts *bind.TransactOpts, sfcAddress common.Address) (*types.Transaction, error) {
+	return _Votemanager.contract.Transact(opts, "updateSfcAddress", sfcAddress)
 }
 
-// UpdateSfcLibAddress is a paid mutator transaction binding the contract method 0x9d138a3c.
+// UpdateSfcAddress is a paid mutator transaction binding the contract method 0xcbb9d8c9.
 //
-// Solidity: function updateSfcLibAddress(address _sfcLibAddress) returns()
-func (_Votemanager *VotemanagerSession) UpdateSfcLibAddress(_sfcLibAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateSfcLibAddress(&_Votemanager.TransactOpts, _sfcLibAddress)
+// Solidity: function updateSfcAddress(address sfcAddress) returns()
+func (_Votemanager *VotemanagerSession) UpdateSfcAddress(sfcAddress common.Address) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateSfcAddress(&_Votemanager.TransactOpts, sfcAddress)
 }
 
-// UpdateSfcLibAddress is a paid mutator transaction binding the contract method 0x9d138a3c.
+// UpdateSfcAddress is a paid mutator transaction binding the contract method 0xcbb9d8c9.
 //
-// Solidity: function updateSfcLibAddress(address _sfcLibAddress) returns()
-func (_Votemanager *VotemanagerTransactorSession) UpdateSfcLibAddress(_sfcLibAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateSfcLibAddress(&_Votemanager.TransactOpts, _sfcLibAddress)
-}
-
-// UpdateTokenRegistryAddress is a paid mutator transaction binding the contract method 0x520051d7.
-//
-// Solidity: function updateTokenRegistryAddress(address _tokenRegistryAddress) returns()
-func (_Votemanager *VotemanagerTransactor) UpdateTokenRegistryAddress(opts *bind.TransactOpts, _tokenRegistryAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.contract.Transact(opts, "updateTokenRegistryAddress", _tokenRegistryAddress)
+// Solidity: function updateSfcAddress(address sfcAddress) returns()
+func (_Votemanager *VotemanagerTransactorSession) UpdateSfcAddress(sfcAddress common.Address) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateSfcAddress(&_Votemanager.TransactOpts, sfcAddress)
 }
 
 // UpdateTokenRegistryAddress is a paid mutator transaction binding the contract method 0x520051d7.
 //
-// Solidity: function updateTokenRegistryAddress(address _tokenRegistryAddress) returns()
-func (_Votemanager *VotemanagerSession) UpdateTokenRegistryAddress(_tokenRegistryAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateTokenRegistryAddress(&_Votemanager.TransactOpts, _tokenRegistryAddress)
+// Solidity: function updateTokenRegistryAddress(address tokenRegistryAddress_) returns()
+func (_Votemanager *VotemanagerTransactor) UpdateTokenRegistryAddress(opts *bind.TransactOpts, tokenRegistryAddress_ common.Address) (*types.Transaction, error) {
+	return _Votemanager.contract.Transact(opts, "updateTokenRegistryAddress", tokenRegistryAddress_)
 }
 
 // UpdateTokenRegistryAddress is a paid mutator transaction binding the contract method 0x520051d7.
 //
-// Solidity: function updateTokenRegistryAddress(address _tokenRegistryAddress) returns()
-func (_Votemanager *VotemanagerTransactorSession) UpdateTokenRegistryAddress(_tokenRegistryAddress common.Address) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateTokenRegistryAddress(&_Votemanager.TransactOpts, _tokenRegistryAddress)
+// Solidity: function updateTokenRegistryAddress(address tokenRegistryAddress_) returns()
+func (_Votemanager *VotemanagerSession) UpdateTokenRegistryAddress(tokenRegistryAddress_ common.Address) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateTokenRegistryAddress(&_Votemanager.TransactOpts, tokenRegistryAddress_)
+}
+
+// UpdateTokenRegistryAddress is a paid mutator transaction binding the contract method 0x520051d7.
+//
+// Solidity: function updateTokenRegistryAddress(address tokenRegistryAddress_) returns()
+func (_Votemanager *VotemanagerTransactorSession) UpdateTokenRegistryAddress(tokenRegistryAddress_ common.Address) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateTokenRegistryAddress(&_Votemanager.TransactOpts, tokenRegistryAddress_)
+}
+
+// UpdateVoteBufferPercentage is a paid mutator transaction binding the contract method 0xf3a3a784.
+//
+// Solidity: function updateVoteBufferPercentage(uint8 voteBufferPercent_) returns()
+func (_Votemanager *VotemanagerTransactor) UpdateVoteBufferPercentage(opts *bind.TransactOpts, voteBufferPercent_ uint8) (*types.Transaction, error) {
+	return _Votemanager.contract.Transact(opts, "updateVoteBufferPercentage", voteBufferPercent_)
+}
+
+// UpdateVoteBufferPercentage is a paid mutator transaction binding the contract method 0xf3a3a784.
+//
+// Solidity: function updateVoteBufferPercentage(uint8 voteBufferPercent_) returns()
+func (_Votemanager *VotemanagerSession) UpdateVoteBufferPercentage(voteBufferPercent_ uint8) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateVoteBufferPercentage(&_Votemanager.TransactOpts, voteBufferPercent_)
+}
+
+// UpdateVoteBufferPercentage is a paid mutator transaction binding the contract method 0xf3a3a784.
+//
+// Solidity: function updateVoteBufferPercentage(uint8 voteBufferPercent_) returns()
+func (_Votemanager *VotemanagerTransactorSession) UpdateVoteBufferPercentage(voteBufferPercent_ uint8) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateVoteBufferPercentage(&_Votemanager.TransactOpts, voteBufferPercent_)
 }
 
 // UpdateVotePercentage is a paid mutator transaction binding the contract method 0x8ba8405c.
 //
-// Solidity: function updateVotePercentage(uint8 _votePercentage) returns()
-func (_Votemanager *VotemanagerTransactor) UpdateVotePercentage(opts *bind.TransactOpts, _votePercentage uint8) (*types.Transaction, error) {
-	return _Votemanager.contract.Transact(opts, "updateVotePercentage", _votePercentage)
+// Solidity: function updateVotePercentage(uint8 votePercentage_) returns()
+func (_Votemanager *VotemanagerTransactor) UpdateVotePercentage(opts *bind.TransactOpts, votePercentage_ uint8) (*types.Transaction, error) {
+	return _Votemanager.contract.Transact(opts, "updateVotePercentage", votePercentage_)
 }
 
 // UpdateVotePercentage is a paid mutator transaction binding the contract method 0x8ba8405c.
 //
-// Solidity: function updateVotePercentage(uint8 _votePercentage) returns()
-func (_Votemanager *VotemanagerSession) UpdateVotePercentage(_votePercentage uint8) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateVotePercentage(&_Votemanager.TransactOpts, _votePercentage)
+// Solidity: function updateVotePercentage(uint8 votePercentage_) returns()
+func (_Votemanager *VotemanagerSession) UpdateVotePercentage(votePercentage_ uint8) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateVotePercentage(&_Votemanager.TransactOpts, votePercentage_)
 }
 
 // UpdateVotePercentage is a paid mutator transaction binding the contract method 0x8ba8405c.
 //
-// Solidity: function updateVotePercentage(uint8 _votePercentage) returns()
-func (_Votemanager *VotemanagerTransactorSession) UpdateVotePercentage(_votePercentage uint8) (*types.Transaction, error) {
-	return _Votemanager.Contract.UpdateVotePercentage(&_Votemanager.TransactOpts, _votePercentage)
+// Solidity: function updateVotePercentage(uint8 votePercentage_) returns()
+func (_Votemanager *VotemanagerTransactorSession) UpdateVotePercentage(votePercentage_ uint8) (*types.Transaction, error) {
+	return _Votemanager.Contract.UpdateVotePercentage(&_Votemanager.TransactOpts, votePercentage_)
 }
 
-// Vote is a paid mutator transaction binding the contract method 0x8a6655d6.
+// VoteBatch is a paid mutator transaction binding the contract method 0xe53edd93.
 //
-// Solidity: function vote(uint256 mintedBlockNumber, uint256 _hashId, uint256 _currencyType) returns()
-func (_Votemanager *VotemanagerTransactor) Vote(opts *bind.TransactOpts, mintedBlockNumber *big.Int, _hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
-	return _Votemanager.contract.Transact(opts, "vote", mintedBlockNumber, _hashId, _currencyType)
-}
-
-// Vote is a paid mutator transaction binding the contract method 0x8a6655d6.
-//
-// Solidity: function vote(uint256 mintedBlockNumber, uint256 _hashId, uint256 _currencyType) returns()
-func (_Votemanager *VotemanagerSession) Vote(mintedBlockNumber *big.Int, _hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
-	return _Votemanager.Contract.Vote(&_Votemanager.TransactOpts, mintedBlockNumber, _hashId, _currencyType)
-}
-
-// Vote is a paid mutator transaction binding the contract method 0x8a6655d6.
-//
-// Solidity: function vote(uint256 mintedBlockNumber, uint256 _hashId, uint256 _currencyType) returns()
-func (_Votemanager *VotemanagerTransactorSession) Vote(mintedBlockNumber *big.Int, _hashId *big.Int, _currencyType *big.Int) (*types.Transaction, error) {
-	return _Votemanager.Contract.Vote(&_Votemanager.TransactOpts, mintedBlockNumber, _hashId, _currencyType)
-}
-
-// VoteBatch is a paid mutator transaction binding the contract method 0x149ff154.
-//
-// Solidity: function voteBatch((uint256,uint256,uint256)[] payload) returns()
-func (_Votemanager *VotemanagerTransactor) VoteBatch(opts *bind.TransactOpts, payload []VoteManagerPayload) (*types.Transaction, error) {
+// Solidity: function voteBatch((uint256,uint256,uint256,uint16)[] payload) returns()
+func (_Votemanager *VotemanagerTransactor) VoteBatch(opts *bind.TransactOpts, payload []VoteManagerVotePayload) (*types.Transaction, error) {
 	return _Votemanager.contract.Transact(opts, "voteBatch", payload)
 }
 
-// VoteBatch is a paid mutator transaction binding the contract method 0x149ff154.
+// VoteBatch is a paid mutator transaction binding the contract method 0xe53edd93.
 //
-// Solidity: function voteBatch((uint256,uint256,uint256)[] payload) returns()
-func (_Votemanager *VotemanagerSession) VoteBatch(payload []VoteManagerPayload) (*types.Transaction, error) {
+// Solidity: function voteBatch((uint256,uint256,uint256,uint16)[] payload) returns()
+func (_Votemanager *VotemanagerSession) VoteBatch(payload []VoteManagerVotePayload) (*types.Transaction, error) {
 	return _Votemanager.Contract.VoteBatch(&_Votemanager.TransactOpts, payload)
 }
 
-// VoteBatch is a paid mutator transaction binding the contract method 0x149ff154.
+// VoteBatch is a paid mutator transaction binding the contract method 0xe53edd93.
 //
-// Solidity: function voteBatch((uint256,uint256,uint256)[] payload) returns()
-func (_Votemanager *VotemanagerTransactorSession) VoteBatch(payload []VoteManagerPayload) (*types.Transaction, error) {
+// Solidity: function voteBatch((uint256,uint256,uint256,uint16)[] payload) returns()
+func (_Votemanager *VotemanagerTransactorSession) VoteBatch(payload []VoteManagerVotePayload) (*types.Transaction, error) {
 	return _Votemanager.Contract.VoteBatch(&_Votemanager.TransactOpts, payload)
 }
 

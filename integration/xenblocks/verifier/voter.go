@@ -23,7 +23,7 @@ var (
 type Voter struct {
 	vm      *votemanager.Votemanager
 	conn    *ethclient.Client
-	queue   []votemanager.VoteManagerPayload
+	queue   []votemanager.VoteManagerVotePayload
 	ks      *keystore.KeyStore
 	account accounts.Account
 	chainId uint64
@@ -32,7 +32,7 @@ type Voter struct {
 }
 
 func NewVoter(conn *ethclient.Client, ks *keystore.KeyStore, account accounts.Account, chainId uint64, vm *votemanager.Votemanager) *Voter {
-	var queue []votemanager.VoteManagerPayload
+	var queue []votemanager.VoteManagerVotePayload
 
 	return &Voter{
 		vm:      vm,
@@ -59,17 +59,16 @@ func (v *Voter) waitTxConfirmed(hash common.Hash) <-chan *types.Transaction {
 	return ch
 }
 
-func (v *Voter) AddToQueue(hashId *big.Int, MintedBlockNumber uint64, currencyType uint8) {
-	cc := big.NewInt(int64(currencyType))
+func (v *Voter) AddToQueue(hashId *big.Int, MintedBlockNumber uint64, currencyType *big.Int, version uint16) {
 	mbn := big.NewInt(int64(MintedBlockNumber))
-	v.queue = append(v.queue, votemanager.VoteManagerPayload{HashId: hashId, CurrencyType: cc, MintedBlockNumber: mbn})
+	v.queue = append(v.queue, votemanager.VoteManagerVotePayload{HashId: hashId, CurrencyType: currencyType, MintedBlockNumber: mbn, Version: version})
 
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
 	if len(v.queue) >= v.getBatchSize() {
 		_ = v.Vote()
-		v.queue = []votemanager.VoteManagerPayload{}
+		v.queue = []votemanager.VoteManagerVotePayload{}
 	}
 }
 

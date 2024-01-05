@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"github.com/Fantom-foundation/go-opera/gossip/contract/sfclib100"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/block_storage"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/tokenregistry"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/votemanager"
 	"github.com/Fantom-foundation/go-opera/opera/contracts/sfc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -18,30 +19,42 @@ import (
 	"math/big"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
 const (
-	hashLen      = 64
-	pattern1Salt = "WEVOMTAwODIwMjJYRU4"
+	hashLen                 = 64
+	pattern1Salt            = "WEVOMTAwODIwMjJYRU4"
+	BlockNumberTimeCheckReq = 0
 )
 
 type Verifier struct {
-	enabled           bool
-	numOfWorkers      int
-	backlog           int
-	ipcPath           string
-	validatorId       uint32
-	bs                *block_storage.BlockStorage
-	sfcLib            *sfclib100.ContractCaller
-	eventChannel      chan *block_storage.BlockStorageNewHash
-	conn              *ethclient.Client
-	sub               event.Subscription
-	validatorCountLRU *lru.Cache
-	vm                *votemanager.Votemanager
+	enabled             bool
+	numOfWorkers        int
+	backlog             int
+	ipcPath             string
+	validatorId         uint32
+	bs                  *block_storage.BlockStorage
+	sfcLib              *sfclib100.ContractCaller
+	eventChannel        chan *block_storage.BlockStorageNewHash
+	conn                *ethclient.Client
+	sub                 event.Subscription
+	validatorCountLRU   *lru.Cache
+	vm                  *votemanager.Votemanager
+	Tr                  *tokenregistry.Tokenregistry
+	mu                  sync.Mutex
+	tokens              []tokenregistry.TokenRegistryTokenConfig
+	blockNumberUpgrades []uint64
 }
 
-func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.BlockStorage, vm *votemanager.Votemanager) *Verifier {
+func NewVerifier(
+	validatorId uint32,
+	conn *ethclient.Client,
+	bs *block_storage.BlockStorage,
+	vm *votemanager.Votemanager,
+	tr *tokenregistry.Tokenregistry,
+) *Verifier {
 	validatorCountLRU, err := lru.New(100)
 	if err != nil {
 		panic(err)
@@ -51,6 +64,8 @@ func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.B
 	if err != nil {
 		panic(err)
 	}
+
+	//categorized := make(map[uint64]&upcomingTokens)
 
 	return &Verifier{
 		enabled:           false,
@@ -62,10 +77,11 @@ func NewVerifier(validatorId uint32, conn *ethclient.Client, bs *block_storage.B
 		sfcLib:            sfcLib,
 		bs:                bs,
 		vm:                vm,
+		Tr:                tr,
 	}
 }
 
-func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) []Token {
+func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) []tokenregistry.TokenRegistryFoundToken {
 	log.Debug("NewHash event received", "hashId", event.HashId, "epoch", event.Epoch, "account", event.Account)
 
 	// TODO: uncomment. for dev we are voting on all hashes
@@ -75,9 +91,6 @@ func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) [
 	//	return nil
 	//}
 
-	blockTime := v.getBlockTime(event.Raw.BlockHash)
-	blockNumber := event.Raw.BlockNumber
-
 	dr, err := v.bs.DecodeRecordBytes0(nil, event.HashId)
 	if err != nil {
 		log.Warn("Failed to decode hash record", "err", err)
@@ -85,7 +98,7 @@ func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) [
 	}
 
 	key := []byte(common.Bytes2Hex(dr.K[:]))
-	argon2Result, err := argon2Hash(dr.C, dr.M, dr.T, dr.S, key)
+	argon2Result, err := Argon2Hash(dr.C, dr.M, dr.T, dr.S, key)
 	if err != nil {
 		log.Warn("Argon2 hash failed", "err", err)
 		return nil
@@ -101,12 +114,20 @@ func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) [
 		return nil
 	}
 
-	//if !v.verifyDifficultly(dr.M, blockNumber) {
+	//if !v.verifyDifficultly(dr.M, event.Raw.BlockNumber) {
 	//	log.Warn("Difficulty too low", "hash", argon2Result, "hashId", event.HashId)
 	//	return
 	//}
 
-	tokens := FindTokensFromHash(argon2Result, blockTime, blockNumber)
+	splits := strings.Split(argon2Result, "$")
+	hashOnly := splits[len(splits)-1]
+	blockTime := big.NewInt(v.getBlockTime(event.Raw.BlockHash).UnixMilli())
+	tokens, err := v.Tr.FindTokensFromArgon2Hash(nil, hashOnly, blockTime)
+	if err != nil {
+		log.Warn("Failed to find tokens", "err", err)
+		return nil
+	}
+
 	if len(tokens) == 0 {
 		log.Warn("No tokens found", "hash", argon2Result, "hashId", event.HashId)
 		return nil
@@ -116,7 +137,7 @@ func (v *Verifier) validateHashEvent(event *block_storage.BlockStorageNewHash) [
 	return tokens
 }
 
-func argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte, key []byte) (string, error) {
+func Argon2Hash(parallelism uint8, memory uint32, iterations uint8, salt []byte, key []byte) (string, error) {
 	ctx := argon2.NewContext()
 	ctx.Iterations = int(iterations)
 	ctx.Memory = int(memory)
