@@ -355,9 +355,20 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	// Config the XenBlocks verifier
 	ks := stack.AccountManager().Backends(keystore.KeyStoreType)[0].(*keystore.KeyStore)
 	passwords := utils.MakePasswordList(ctx)
-	account, _ := unlockAccount(ks, cfg.XenBlocks.VerifierAddress.Hex(), 0, passwords)
+
+	var account accounts.Account
+	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
+		account, _ = unlockAccount(ks, cfg.XenBlocks.VerifierAddress.Hex(), 0, passwords)
+	}
 	xbEventListener := verifier.NewEventListener(stack, cfg.Emitter.Validator.ID, ks, account, gdb.GetRules().NetworkID)
 	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
+
+		// Set validator ID to 1 if it is not set
+		// this is only needed for testing
+		if cfg.Emitter.Validator.ID == 0 {
+			xbEventListener.SetValidatorId(1)
+		}
+
 		go xbEventListener.Start()
 	}
 
@@ -377,6 +388,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 		if stop {
 			go func() {
 				// do it in a separate thread to avoid deadlock
+				xbEventListener.Close()
 				_ = stack.Close()
 			}()
 			return true
@@ -401,6 +413,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	stack.RegisterLifecycle(svc)
 
 	return stack, svc, func() {
+		xbEventListener.Close()
 		_ = stack.Close()
 		gdb.Close()
 		_ = cdb.Close()
@@ -408,7 +421,6 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 			_ = closeDBs()
 		}
 		xenblocksReporter.Close()
-		xbEventListener.Close()
 	}
 }
 

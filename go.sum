@@ -488,8 +488,8 @@ github.com/naoina/toml v0.1.2-0.20170918210437-9fafd6967416/go.mod h1:NBIhNtsFMo
 github.com/nats-io/nats.go v1.8.1/go.mod h1:BrFz9vVn0fU3AcH9Vn4Kd7W0NpJ651tD5omQ3M8LwxM=
 github.com/nats-io/nkeys v0.0.2/go.mod h1:dab7URMsZm6Z/jp9Z5UGa87Uutgc2mVpXLC4B7TDb/4=
 github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OSON2c=
-github.com/nibty/go-ethereum v1.10.8-ftm-rc12-x1-2 h1:q1Filh2L9v2MjaadUGZhk8v3uo0yNiOidVqV21KPZsk=
-github.com/nibty/go-ethereum v1.10.8-ftm-rc12-x1-2/go.mod h1:IeQDjWCNBj/QiWIPosfF6/kRC6pHPNs7W7LfBzjj+P4=
+github.com/nibty/go-ethereum v1.10.8-ftm-rc12-x1-3 h1:v07QogU/zZE/wqi5ny0uos/IcjuhU+Mi2Q4VE/H5P+o=
+github.com/nibty/go-ethereum v1.10.8-ftm-rc12-x1-3/go.mod h1:IeQDjWCNBj/QiWIPosfF6/kRC6pHPNs7W7LfBzjj+P4=
 github.com/nibty/recws v0.0.0-20231129011923-06823df0d0db h1:5NSkB+3RDcKx0fWRPCsNiyORrCzYLzoCip6q83SKdn4=
 github.com/nibty/recws v0.0.0-20231129011923-06823df0d0db/go.mod h1:i6EuUq15zzNHzljFI2bM6FdxOTRlvw6vthcDaOQjenU=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=

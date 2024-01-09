@@ -4,20 +4,16 @@ import (
 	"context"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/contracts/votemanager"
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
 	"math/big"
 	"sync"
-	"time"
 )
 
 var (
 	BatchSize = 50
-	GasLimit  = uint64(8000000)
+	gasLimit  = uint64(8000000)
 )
 
 type Voter struct {
@@ -43,21 +39,6 @@ func NewVoter(conn *ethclient.Client, ks *keystore.KeyStore, account accounts.Ac
 		chainId: chainId,
 	}
 }
-func (v *Voter) waitTxConfirmed(hash common.Hash) <-chan *types.Transaction {
-	ch := make(chan *types.Transaction)
-	go func() {
-		for {
-			tx, pending, _ := v.conn.TransactionByHash(context.TODO(), hash)
-			if !pending {
-				ch <- tx
-			}
-
-			time.Sleep(time.Millisecond * 500)
-		}
-	}()
-
-	return ch
-}
 
 func (v *Voter) AddToQueue(hashId *big.Int, MintedBlockNumber uint64, currencyType *big.Int, version uint16) {
 	mbn := big.NewInt(int64(MintedBlockNumber))
@@ -75,15 +56,10 @@ func (v *Voter) AddToQueue(hashId *big.Int, MintedBlockNumber uint64, currencyTy
 func (v *Voter) Vote() error {
 	log.Info("voting now!", "queue", len(v.queue))
 
-	chainId := new(big.Int).SetUint64(v.chainId)
-	auth, err := bind.NewKeyStoreTransactorWithChainID(v.ks, v.account, chainId)
+	auth, err := NewTransactionOpts(context.Background(), *v.conn, v.chainId, v.ks, v.account, gasLimit)
 	if err != nil {
 		panic(err)
 	}
-
-	auth.GasTipCap, _ = v.conn.SuggestGasTipCap(context.TODO())
-	auth.GasFeeCap, _ = v.conn.SuggestGasPrice(context.TODO())
-	auth.GasLimit = GasLimit
 
 	tx, err := v.vm.VoteBatch(auth, v.queue)
 	if err != nil {
@@ -93,7 +69,7 @@ func (v *Voter) Vote() error {
 		log.Error("vote error", "err", "tx is nil")
 	}
 
-	v.waitTxConfirmed(tx.Hash())
+	WaitTxConfirmed(context.Background(), *v.conn, tx.Hash())
 	log.Info("vote success!", "tx", tx.Hash().Hex())
 
 	return nil
