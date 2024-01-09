@@ -2,6 +2,7 @@ package reporter
 
 import (
 	"encoding/json"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/gorilla/websocket"
@@ -10,9 +11,10 @@ import (
 )
 
 type Config struct {
-	Endpoint string
-	Enabled  bool
-	Verifier bool
+	Endpoint        string
+	Enabled         bool
+	ForceVerifier   bool
+	VerifierAddress common.Address
 }
 
 type Reporter struct {
@@ -25,9 +27,9 @@ type Reporter struct {
 
 func DefaultConfig() Config {
 	return Config{
-		Endpoint: "",
-		Enabled:  false,
-		Verifier: false,
+		Endpoint:      "",
+		Enabled:       false,
+		ForceVerifier: false,
 	}
 }
 

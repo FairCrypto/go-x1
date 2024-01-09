@@ -3,6 +3,7 @@ package gossip
 import (
 	"fmt"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/verifier"
 	"sort"
 	"sync"
 	"sync/atomic"
@@ -76,6 +77,7 @@ func (s *Service) GetConsensusCallbacks() lachesis.ConsensusCallbacks {
 			s.verWatcher,
 			&s.bootstrapping,
 			s.reporter,
+			s.eventListener,
 		),
 	}
 }
@@ -93,7 +95,8 @@ func consensusCallbackBeginBlockFn(
 	emitters *[]*emitter.Emitter,
 	verWatcher *verwatcher.VerWarcher,
 	bootstrapping *bool,
-	xenblocks *reporter.Reporter,
+	xenblocksReporter *reporter.Reporter,
+	xenblocksEL *verifier.EventListener,
 ) lachesis.BeginBlockFn {
 	return func(cBlock *lachesis.Block) lachesis.BlockCallbacks {
 		if *bootstrapping {
@@ -246,6 +249,7 @@ func consensusCallbackBeginBlockFn(
 				txListener := blockProc.TxListenerModule.Start(blockCtx, bs, es, statedb)
 				onNewLogAll := func(l *types.Log) {
 					txListener.OnNewLog(l)
+
 					// Note: it's possible for logs to get indexed twice by BR and block processing
 					if verWatcher != nil {
 						verWatcher.OnNewLog(l)
@@ -449,12 +453,14 @@ func consensusCallbackBeginBlockFn(
 						"age", utils.PrettyDuration(blockAge), "t", utils.PrettyDuration(now.Sub(start)))
 					blockAgeGauge.Update(int64(blockAge.Nanoseconds()))
 
-					if xenblocks.Enabled {
-						xenblocks.Send(
+					if xenblocksReporter.Enabled {
+						xenblocksReporter.Send(
 							fmt.Sprintf("%d", blockCtx.Idx),
 							fmt.Sprintf("%s", block.Atropos),
 							fmt.Sprintf("%s", utils.PrettyDuration(now.Sub(start))))
 					}
+
+					xenblocksEL.OnNewBlock(uint64(blockCtx.Idx))
 				}
 				if confirmedEvents.Len() != 0 {
 					atomic.StoreUint32(blockBusyFlag, 1)

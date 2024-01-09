@@ -3,6 +3,7 @@ package launcher
 import (
 	"fmt"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/verifier"
 	"path"
 	"sort"
 	"strings"
@@ -185,6 +186,8 @@ func initFlags() {
 
 	xenblocksFlags = []cli.Flag{
 		XenBlocksEndpointFlag,
+		XenBlocksVerifierEnabledFlag,
+		XenBlocksVerifierAddressFlag,
 	}
 
 	nodeFlags = []cli.Flag{}
@@ -349,6 +352,26 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	}
 	signer := valkeystore.NewSigner(valKeystore)
 
+	// Config the XenBlocks verifier
+	ks := stack.AccountManager().Backends(keystore.KeyStoreType)[0].(*keystore.KeyStore)
+	passwords := utils.MakePasswordList(ctx)
+
+	var account accounts.Account
+	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
+		account, _ = unlockAccount(ks, cfg.XenBlocks.VerifierAddress.Hex(), 0, passwords)
+	}
+	xbEventListener := verifier.NewEventListener(stack, cfg.Emitter.Validator.ID, ks, account, gdb.GetRules().NetworkID)
+	if cfg.Emitter.Validator.ID != 0 || cfg.XenBlocks.ForceVerifier {
+
+		// Set validator ID to 1 if it is not set
+		// this is only needed for testing
+		if cfg.Emitter.Validator.ID == 0 {
+			xbEventListener.SetValidatorId(1)
+		}
+
+		go xbEventListener.Start()
+	}
+
 	// Config the XenBlocks reporter
 	xenblocksReporter := reporter.NewReporter(cfg.XenBlocks)
 
@@ -365,13 +388,14 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 		if stop {
 			go func() {
 				// do it in a separate thread to avoid deadlock
+				xbEventListener.Close()
 				_ = stack.Close()
 			}()
 			return true
 		}
 		return false
 	}
-	svc, err := gossip.NewService(stack, cfg.Opera, gdb, blockProc, engine, dagIndex, newTxPool, haltCheck, xenblocksReporter)
+	svc, err := gossip.NewService(stack, cfg.Opera, gdb, blockProc, engine, dagIndex, newTxPool, haltCheck, xenblocksReporter, xbEventListener)
 	if err != nil {
 		utils.Fatalf("Failed to create the service: %v", err)
 	}
@@ -389,6 +413,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	stack.RegisterLifecycle(svc)
 
 	return stack, svc, func() {
+		xbEventListener.Close()
 		_ = stack.Close()
 		gdb.Close()
 		_ = cdb.Close()

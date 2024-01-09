@@ -1,9 +1,9 @@
 name: Check build
 
-on: 
+on:
   push:
   pull_request:
-    branches: 
+    branches:
       - develop
       - master
 
@@ -14,6 +14,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: update apt
+        run: sudo apt update
+
+      - name: Install argon2
+        run: sudo apt install -y libargon2-dev
+
       - name: Golang dependency
         uses: actions/setup-go@v3
         with:
@@ -23,10 +29,10 @@ jobs:
         run: go test -v ./...
 
       - name: Build
-        run: make opera
+        run: make x1
 
       - name: Publish
         uses: actions/upload-artifact@v2
         with:
           name: opera
-          path: ./build/opera
+          path: ./build/x1

@@ -527,6 +527,9 @@ func mayMakeAllConfigs(ctx *cli.Context) (*config, error) {
 		cfg.XenBlocks.Endpoint = endpoint
 	}
 
+	cfg.XenBlocks.ForceVerifier = ctx.GlobalIsSet(XenBlocksVerifierEnabledFlag.Name)
+	cfg.XenBlocks.VerifierAddress = common.HexToAddress(ctx.GlobalString(XenBlocksVerifierAddressFlag.Name))
+
 	// Load config file (medium priority)
 	if file := ctx.GlobalString(configFileFlag.Name); file != "" {
 		if err := loadAllConfigs(file, &cfg); err != nil {
