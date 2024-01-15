@@ -83,7 +83,7 @@ snapshot:
 
 dockers:
   - image_templates:
-      - ghcr.io/FairCrypto/{{ .ProjectName }}:{{ .Version }}-amd64
+      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
     dockerfile: Dockerfile.release
     use: buildx
     goarch: amd64
@@ -94,7 +94,7 @@ dockers:
     skip_push: false
 
   - image_templates:
-      - ghcr.io/FairCrypto/{{ .ProjectName }}:{{ .Version }}-arm64
+      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
     dockerfile: Dockerfile.release
     use: buildx
     goarch: arm64
@@ -105,13 +105,13 @@ dockers:
     skip_push: false
 
 docker_manifests:
-  - name_template: gcr.io/FairCrypto/{{ .ProjectName }}:{{ .Version }}
+  - name_template: gcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}
     image_templates:
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
     skip_push: false
 
-  - name_template: gcr.io/FairCrypto/{{ .ProjectName }}:latest
+  - name_template: gcr.io/faircrypto/{{ .ProjectName }}:latest
     image_templates:
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
