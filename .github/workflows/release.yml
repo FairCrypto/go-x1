@@ -1,9 +1,13 @@
 ---
 name: Release
-on:
+on:  # yamllint disable-line rule:truthy
   push:
+    branches-ignore:
+      - '**'
     tags:
-      - 'release/*'
+      - 'v*.*.*'
+      # to be used by fork patch-releases ^^
+      - 'v*.*.*-*'
 
 jobs:
   goreleaser:
