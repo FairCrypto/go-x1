@@ -39,6 +39,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
+      - name: Run GoReleaser
         run: |
           docker run \
           		--rm \
