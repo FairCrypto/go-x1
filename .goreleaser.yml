@@ -7,7 +7,7 @@ release:
 
 builds:
   - id: darwin-amd64
-  - main: ./cmd/opera/main.go
+    main: ./cmd/opera/main.go
     binary: x1
     goos:
       - darwin
@@ -22,7 +22,7 @@ builds:
       - -X github.com/Fantom-foundation/go-opera/cmd/opera/launcher.gitDate={{ .CommitDate }}
 
   - id: darwin-arm64
-  - main: ./cmd/opera/main.go
+    main: ./cmd/opera/main.go
     binary: x1
     goos:
       - darwin
@@ -37,7 +37,7 @@ builds:
       - -X github.com/Fantom-foundation/go-opera/cmd/opera/launcher.gitDate={{ .CommitDate }}
 
   - id: linux-amd64
-  - main: ./cmd/opera/main.go
+    main: ./cmd/opera/main.go
     binary: x1
     goos:
       - linux
@@ -55,7 +55,7 @@ builds:
       - osusergo
 
   - id: linux-arm64
-  - main: ./cmd/opera/main.go
+    main: ./cmd/opera/main.go
     binary: x1
     goos:
       - linux

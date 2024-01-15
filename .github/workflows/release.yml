@@ -28,7 +28,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18.x
+          go-version:2 1.18.x
 
       - name: Prepare
         id: prepare
@@ -39,14 +39,13 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Run GoReleaser
         run: |
           docker run \
           		--rm \
           		--privileged \
           		-e CGO_ENABLED=1 \
           		-e GITHUB_TOKEN \
-          		-e SLACK_WEBHOOK \
+              -e DOCKER_CONFIG \
           		-v /var/run/docker.sock:/var/run/docker.sock \
           		-v `pwd`:/go/src/$(PACKAGE_NAME) \
           		-w /go/src/$(PACKAGE_NAME) \
