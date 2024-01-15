@@ -75,7 +75,7 @@ builds:
 archives:
   -
     files:
-      - LICENSE
+      - COPYING.LESSER
       - README.md
 
 snapshot:
