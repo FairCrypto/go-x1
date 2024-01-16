@@ -130,13 +130,13 @@ dockers:
     skip_push: false
 
 docker_manifests:
-  - name_template: gcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}
+  - name_template: ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}
     image_templates:
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
     skip_push: false
 
-  - name_template: gcr.io/{{ .Env.REGISTRY_NAME }}/{{ .ProjectName }}:latest
+  - name_template: ghcr.io/{{ .Env.REGISTRY_NAME }}/{{ .ProjectName }}:latest
     image_templates:
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
