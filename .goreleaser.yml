@@ -105,13 +105,13 @@ dockers:
     skip_push: false
 
 docker_manifests:
-  - name_template: gcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}
+  - name_template: ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}
     image_templates:
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
     skip_push: false
 
-  - name_template: gcr.io/faircrypto/{{ .ProjectName }}:latest
+  - name_template: ghcr.io/faircrypto/{{ .ProjectName }}:latest
     image_templates:
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
       - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
