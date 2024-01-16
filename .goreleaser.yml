@@ -73,17 +73,27 @@ builds:
       - osusergo
 
 archives:
-  -
+  - format: tar.gz
+    replacements:
+      darwin: MacOS
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}'
     files:
       - COPYING.LESSER
-      - README.md
+      - LICENSE
 
 snapshot:
   name_template: "{{ .Tag }}.next"
 
 dockers:
   - image_templates:
-      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
+      - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
     dockerfile: Dockerfile.release
     use: buildx
     goarch: amd64
@@ -94,7 +104,7 @@ dockers:
     skip_push: false
 
   - image_templates:
-      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
+      - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
     dockerfile: Dockerfile.release
     use: buildx
     goarch: arm64
@@ -105,14 +115,14 @@ dockers:
     skip_push: false
 
 docker_manifests:
-  - name_template: ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}
+  - name_template: gcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}
     image_templates:
-      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
-      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
+      - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
+      - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
     skip_push: false
 
-  - name_template: ghcr.io/faircrypto/{{ .ProjectName }}:latest
+  - name_template: gcr.io/{{ .Env.REGISTRY_NAME }}/{{ .ProjectName }}:latest
     image_templates:
-      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-amd64
-      - ghcr.io/faircrypto/{{ .ProjectName }}:{{ .Version }}-arm64
+      - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
+      - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
     skip_push: auto
