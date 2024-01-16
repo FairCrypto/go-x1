@@ -2,7 +2,6 @@ project_name: go-x1
 
 release:
   disable: false
-  draft: true
   prerelease: auto
 
 builds:
@@ -101,6 +100,23 @@ nfpms:
       rpm:
         replacements:
           amd64: x86_64
+      deb:
+        replacements:
+          amd64: x86_64
+
+archives:
+  - format: tar.gz
+    replacements:
+      darwin: macos
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}'
+    files:
+      - COPYING.LESSER
+      - LICENSE
 
 snapshot:
   name_template: "{{ .Tag }}.next"
