@@ -1,0 +1,11 @@
+# Add additional options to the command line
+#
+# Examples:
+#
+# API Node
+# X1_OPTS="--testnet --syncmode snap --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts "*" --http.corsdomain "*" --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins "*""
+#
+# Validator Node
+# X1_OPTS="--testnet --validator.id VALIDATOR_ID --validator.pubkey VALIDATOR_PUBKEY --validator.password /var/lib/x1/.x1/.password"
+
+X1_OPTS="--testnet --syncmode snap"

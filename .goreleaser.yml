@@ -72,21 +72,36 @@ builds:
       - netgo
       - osusergo
 
-archives:
-  - format: tar.gz
-    replacements:
-      darwin: MacOS
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    format_overrides:
-      - goos: windows
-        format: zip
-    name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}'
-    files:
-      - COPYING.LESSER
-      - LICENSE
+nfpms:
+  - vendor: Faircrypto
+    homepage: https://faircrypto.org
+    maintainer: Faircrypto <nick@faircrypto.org>
+    description:  X1 is a simple, fast, and secure EVM-compatible network for the next generation of decentralized applications powered by Lachesis consensus algorithm.
+    license: GPLv3 LGPLv3
+
+    bindir: /usr/local/bin
+
+    formats:
+      - apk
+      - deb
+      - rpm
+
+    contents:
+      - src: system/lib/systemd/system/x1.service
+        dst: /lib/systemd/system/x1.service
+        type: config
+
+      - src: system/etc/default/x1
+        dst: /etc/default/x1
+
+    scripts:
+      preinstall: system/x1-pre-install.sh
+      postinstall: system/x1-post-install.sh
+
+    overrides:
+      rpm:
+        replacements:
+          amd64: x86_64
 
 snapshot:
   name_template: "{{ .Tag }}.next"
