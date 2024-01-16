@@ -3,8 +3,8 @@ Description=X1
 After=syslog.target network.target
 
 [Service]
-User=%i
-Group=%i
+User=x1
+Group=x1
 Type=simple
 WorkingDirectory=~
 LimitNOFILE=infinity

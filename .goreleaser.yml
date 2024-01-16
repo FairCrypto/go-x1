@@ -82,7 +82,6 @@ nfpms:
     bindir: /usr/local/bin
 
     formats:
-      - apk
       - deb
       - rpm
 
@@ -136,7 +135,7 @@ docker_manifests:
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
     skip_push: false
 
-  - name_template: ghcr.io/{{ .Env.REGISTRY_NAME }}/{{ .ProjectName }}:latest
+  - name_template: ghcr.io/{{ .Env.REPOSITORY }}/{{ .ProjectName }}:latest
     image_templates:
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
