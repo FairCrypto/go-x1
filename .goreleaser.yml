@@ -158,14 +158,3 @@ docker_manifests:
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
     skip_push: auto
-
-brews:
-  -
-    name: x1
-    homepage: "https://github.com/faircrypto/go-x1"
-    tap:
-      owner: faircrypto
-      name: x1
-    commit_author:
-      name: nibty
-      email: nick@faircrypto.org
