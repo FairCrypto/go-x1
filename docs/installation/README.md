@@ -6,19 +6,19 @@
 
 #### Ubuntu
 
-Download the latest deb release from [here](https://github.com/FairCrypto/go-x1/releases).
+Download the latest deb release from [here](https://github.com/FairCrypto/go-x1/releases/latest).
 
 > Install the deb package
 ```shell
-sudo dpkg -i go-x1_x.x.x_amd64.deb
+sudo dpkg -i go-x1_x.x.x_x86_64.deb
 ```
 
 #### Redhat/Centos
-Download the latest rpm release from [here](https://github.com/FairCrypto/go-x1/releases).
+Download the latest rpm release from [here](https://github.com/FairCrypto/go-x1/releases/latest).
 
 > Install the rpm package
 ```shell
-sudo yum install go-x1_x.x.x_amd64.rpm
+sudo yum install go-x1_x.x.x_x86_64.rpm
 ```
 
 ### Config
@@ -27,7 +27,7 @@ Modify the configuration file `/etc/default/x1` to your needs.
 
 By default, the service will run as the user `x1` and group `x1` with the home directory `/var/lib/x1`.
 
-> You may change this to your needs by running the following commands:
+> You may change the user to your needs by running the following commands:
 ```shell
 sudo systemctl edit x1.service
 ```
@@ -41,9 +41,9 @@ Group=<group>
 
 ### Start
 
-> Start the service
+> Start the service and enable it on boot
 ```shell
-sudo systemctl start x1.service
+sudo systemctl enable --now x1.service
 ```
 
 ### Logs

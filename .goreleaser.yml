@@ -116,7 +116,7 @@ archives:
     name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}'
     files:
       - COPYING.LESSER
-      - LICENSE
+      - README.md
 
 snapshot:
   name_template: "{{ .Tag }}.next"
