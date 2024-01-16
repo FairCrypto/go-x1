@@ -96,7 +96,7 @@ nfpms:
       preinstall: system/x1-pre-install.sh
       postinstall: system/x1-post-install.sh
 
-    file_name_template: "{{ .PackageName }}-{{ .Arch }}"
+    file_name_template: "{{ .PackageName }}{{.Os}}-{{ .Arch }}"
 
     overrides:
       rpm:
@@ -115,7 +115,7 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-    name_template: '{{.ProjectName}}-{{.Arch}}'
+    name_template: '{{.ProjectName}}{{.Os}}-{{.Arch}}'
     files:
       - COPYING.LESSER
       - README.md
