@@ -115,7 +115,7 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-    name_template: '{{.ProjectName}_{{.Os}}-{{.Arch}}'
+    name_template: '{{.ProjectName}}_{{.Os}}-{{.Arch}}'
     files:
       - COPYING.LESSER
       - README.md
@@ -158,16 +158,3 @@ docker_manifests:
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-amd64
       - ghcr.io/{{ .Env.REPOSITORY }}:{{ .Version }}-arm64
     skip_push: auto
-
-brews:
-  -
-    name: x1
-    homepage: "https://github.com/{{ .Env.REPOSITORY }}"
-
-    tap:
-      owner: nibty
-      name: go-x1
-
-    commit_author:
-      name: nibty
-      email: nick@faircrypto.org
