@@ -1,0 +1,5 @@
+[Node]
+Testnet = true
+
+[Opera]
+AllowSnapsync = true

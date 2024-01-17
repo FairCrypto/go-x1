@@ -15,7 +15,7 @@ TimeoutStopSec=600
 Restart=on-failure
 RestartSec=10s
 SyslogIdentifier=x1
-ExecStart=/usr/local/bin/x1 $X1_OPTS
+ExecStart=/usr/local/bin/x1 --config /etc/x1/config.toml $X1_OPTS
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+[Node]
+Testnet = true
+
+[OperaStore.EVM.Cache]
+TrieDirtyDisabled = true
+GreedyGC = false

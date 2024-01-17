@@ -12,7 +12,15 @@ x1:
 	    -o build/x1 \
 	    ./cmd/opera
 
+install:
+	cp build/x1 /usr/local/bin/x1
+ifneq ("$(wildcard $(/etc/default))","")
+	cp system/etc/default/x1 /etc/default/x1
+endif
 
+ifneq ("$(wildcard $(/etc/systemd/system))","")
+	cp system/etc/systemd/system/x1.service /etc/systemd/system/x1.service
+endif
 TAG ?= "latest"
 .PHONY: x1-image
 x1-image:
