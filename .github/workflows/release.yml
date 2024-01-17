@@ -11,7 +11,7 @@ on:  # yamllint disable-line rule:truthy
 
 env:
   REGISTRY: ghcr.io
-  REPOSITORY: ${{ github.repository }}
+  REPOSITORY: faircrypto/go-x1
 
 jobs:
   goreleaser:
@@ -25,10 +25,6 @@ jobs:
       packages: write
 
     steps:
-      - name: lowercase github.repository
-        run: |
-          echo "IMAGE_NAME=${GITHUB_REPOSITORY@L}" >> ${REPOSITORY}
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
