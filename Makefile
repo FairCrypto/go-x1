@@ -27,9 +27,9 @@ ifneq ("$(wildcard $(/etc/systemd/system))","")
 endif
 
 	install -d $(DESTDIR)$(PREFIX)/share/x1/
-	install -m 644 system/usr/share/x1/configs/testnet/full-node.toml $(DESTDIR)$(PREFIX)/share/x1/
-	install -m 644 system/usr/share/x1/configs/testnet/api-node.toml $(DESTDIR)$(PREFIX)/share/x1/
-	install -m 644 system/usr/share/x1/configs/testnet/archive-node.toml $(DESTDIR)$(PREFIX)/share/x1/
+	install -m 644 system/usr/share/x1/configs/testnet/full-node.toml $(DESTDIR)$(PREFIX)/share/x1/configs/testnet/full-node.toml
+	install -m 644 system/usr/share/x1/configs/testnet/api-node.toml $(DESTDIR)$(PREFIX)/share/x1/configs/testnet/full-node.toml
+	install -m 644 system/usr/share/x1/configs/testnet/archive-node.toml $(DESTDIR)$(PREFIX)/share/x1/configs/testnet/full-node.toml
 
 TAG ?= "latest"
 .PHONY: x1-image
