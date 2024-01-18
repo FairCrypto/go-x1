@@ -5,8 +5,6 @@ ifeq ($(PREFIX),)
     PREFIX := /usr/local
 endif
 
-
-
 GOPROXY ?= "https://proxy.golang.org,direct"
 .PHONY: x1
 x1:
