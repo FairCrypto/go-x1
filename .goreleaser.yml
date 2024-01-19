@@ -90,7 +90,11 @@ nfpms:
 
       - src: system/etc/default/x1
         dst: /etc/default/x1
-        type: config
+        type: "config|noreplace"
+
+      - src: system/etc/x1/config.toml
+        dst: /etc/x1/config.toml
+        type: "config|noreplace"
 
     scripts:
       preinstall: system/x1-pre-install.sh
