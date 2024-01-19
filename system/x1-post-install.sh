@@ -8,7 +8,7 @@ if [ -d /etc ]; then
 	fi
 
 	if [ ! -f /etc/x1/config.toml ]; then
-  	touch /etc/x1/config.toml
+  	cp system/etc/x1/config.toml /etc/x1/config.toml
   fi
 fi
 
