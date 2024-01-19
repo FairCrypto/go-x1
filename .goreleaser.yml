@@ -87,10 +87,10 @@ nfpms:
     contents:
       - src: system/lib/systemd/system/x1.service
         dst: /lib/systemd/system/x1.service
-        type: config
 
       - src: system/etc/default/x1
         dst: /etc/default/x1
+        type: config
 
     scripts:
       preinstall: system/x1-pre-install.sh

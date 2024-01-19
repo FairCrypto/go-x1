@@ -1,8 +1,18 @@
 #!/bin/sh
 set -e
 
+# create an empty config if it doesn't exist
+if [ -d /etc ]; then
+	if [ ! -d /etc/x1 ]; then
+		mkdir -p /etc/x1 2>/dev/null || true
+	fi
+
+	if [ ! -f /etc/x1/config.toml ]; then
+  	touch /etc/x1/config.toml
+  fi
+fi
+
 if [ -d /run/systemd/system ] && [ -d /etc/systemd/system/ ]; then
-	cp system/lib/systemd/system/x1.service /etc/systemd/system/
 	systemctl daemon-reload
 	systemctl try-restart x1
 fi
