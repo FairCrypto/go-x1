@@ -10,6 +10,10 @@ if [ -d /etc ]; then
 	if [ ! -f /etc/x1/config.toml ]; then
   	cp system/etc/x1/config.toml /etc/x1/config.toml
   fi
+
+  if [ -d /etc/default ] && [ ! -f /etc/default/x1 ]; then
+		cp system/etc/default/x1 /etc/default/x1
+	fi
 fi
 
 if [ -d /run/systemd/system ] && [ -d /etc/systemd/system/ ]; then
