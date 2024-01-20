@@ -1,6 +1,9 @@
 [Node]
 Testnet = true
 
+[Node.P2P]
+ListenAddr = ":5050"
+
 # RPC server
 HTTPHost = "0.0.0.0"
 HTTPVirtualHosts = ["*"]

@@ -1,6 +1,9 @@
 [Node]
 Testnet = true
 
+[Node.P2P]
+ListenAddr = ":5050"
+
 [Opera]
 AllowSnapsync = true
 
