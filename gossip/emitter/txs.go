@@ -170,12 +170,7 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 			sorted.Pop()
 			continue
 		}
-		// my turn, i.e. try to not include the same tx simultaneously by different validators
-		if !em.isMyTxTurn(tx.Hash(), sender, tx.Nonce(), time.Now(), em.validators, e.Creator(), em.epoch) {
-		        fmt.Println("Not my turn TX from sender: ", sender, tx.Hash(), tx.Nonce(), time.Now(), e.Creator())
-			sorted.Pop()
-			continue
-		}
+
 		// check transaction is not outdated
 		if !em.world.TxPool.Has(tx.Hash()) {
 		        fmt.Println("Outdated TX from sender: ", sender, tx.Hash(), tx.Nonce(), time.Now(), e.Creator())
