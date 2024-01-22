@@ -173,7 +173,7 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 		// check not conflicted with already originated txs (in any connected event)
 		if em.originatedTxs.TotalOf(sender) != 0 {
 			sorted.Pop()
-		        fmt.Println("Already Originated TX from sender: ", sender, tx.Hash(), tx.Nonce(), time.Now(),e.Creator())
+		        fmt.Println("Throttle TX as already Originated: ", sender, tx.Hash(), tx.Nonce(), time.Now(),e.Creator())
 			continue
 		}
 		// my turn, i.e. try to not include the same tx simultaneously by different validators
