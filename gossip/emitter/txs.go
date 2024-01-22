@@ -3,7 +3,7 @@ package emitter
 import (
 	"time"
 	"fmt"
-    	"math/rand"
+    "math/rand"
 	"github.com/Fantom-foundation/lachesis-base/common/bigendian"
 	"github.com/Fantom-foundation/lachesis-base/hash"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
@@ -47,7 +47,7 @@ func (em *Emitter) maxGasPowerToUse(e *inter.MutableEventPayload) uint64 {
 
 		estimatedAlloc := gaspowercheck.CalcValidatorGasPower(e, e.CreationTime(), e.MedianTime(), 0, em.validators, gaspowercheck.Config{
 			Idx:                inter.LongTermGas,
-			AllocPerSec:        rules.Economy.LongGasPower.AllocPerSec * 2,
+			AllocPerSec:        rules.Economy.LongGasPower.AllocPerSec * 5,
 			MaxAllocPeriod:     inter.Timestamp(time.Minute) * 2,
 			MinEnsuredAlloc:    0,
 			StartupAllocPeriod: 0,
@@ -87,27 +87,8 @@ func (em *Emitter) maxGasPowerToUse(e *inter.MutableEventPayload) uint64 {
 		//override 
 		//maxGasToUse = estimatedAlloc
 	}
-	// pendingGas should be below MaxBlockGas
-	//{
-	//	maxPendingGas := max64(max64(rules.Blocks.MaxBlockGas/3, rules.Economy.Gas.MaxEventGas), 15000000)
-	//	if maxPendingGas <= em.pendingGas {
-	//		return 0
-	//	}
-		// this is likely a bug, there is no pendingGas
-		//if maxPendingGas < em.pendingGas+maxGasToUse {
-		//	maxGasToUse = maxPendingGas - em.pendingGas
-		//}
-	//}
-	// No txs if power is low
-	//{
-	//	threshold := em.config.NoTxsThreshold
-	//	if e.GasPowerLeft().Min() <= threshold {
-	//		return 0
-	//	} else if e.GasPowerLeft().Min() < threshold+maxGasToUse {
-	//		maxGasToUse = e.GasPowerLeft().Min() - threshold
-	//		fmt.Println("Show me maxGasToUse = e.GasPowerLeft().Min() - threshold ", maxGasToUse , e.GasPowerLeft().Min(), threshold)
-	//	}
-	//}
+    // ignore all calculations and speedbumps
+	maxGasToUse = rules.Economy.Gas.MaxEventGas 
 	return maxGasToUse
 }
 
@@ -176,8 +157,11 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 			continue
 		}
 		// check there's enough gas power to originate the transaction
-		if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
-			if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
+		//if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
+		//	if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
+		// Do not track GasPowerLeft
+		if e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
+			if e.GasPowerUsed()+params.TxGas >= maxGasUsed {
 
 				// stop if cannot originate even an empty transaction
 				break
