@@ -2,7 +2,7 @@ package launcher
 
 import (
 	"fmt"
-	"github.com/Fantom-foundation/go-opera/integration/xenblocks"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
 	"path"
 	"sort"
 	"strings"
@@ -287,7 +287,7 @@ func lachesisMain(ctx *cli.Context) error {
 	//defer tracingStop()
 
 	cfg := makeAllConfigs(ctx)
-	genesisStore := mayGetGenesisStore(ctx)
+	genesisStore := mayGetGenesisStore(ctx, cfg)
 	node, _, nodeClose := makeNode(ctx, cfg, genesisStore)
 	defer nodeClose()
 	startNode(ctx, node)
@@ -344,7 +344,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 
 	// unlock validator key
 	if !valPubkey.Empty() {
-		err := unlockValidatorKey(ctx, valPubkey, valKeystore)
+		err := unlockValidatorKey(cfg, ctx, valPubkey, valKeystore)
 		if err != nil {
 			utils.Fatalf("Failed to unlock validator key: %v", err)
 		}
@@ -352,9 +352,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 	signer := valkeystore.NewSigner(valKeystore)
 
 	// Config the XenBlocks reporter
-	xb := xenblocks.Xenblocks{
-		Config: cfg.XenBlocks,
-	}
+	xenblocksReporter := reporter.NewReporter(cfg.XenBlocks)
 
 	// Create and register a gossip network service.
 	newTxPool := func(reader evmcore.StateReader) gossip.TxPool {
@@ -375,7 +373,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 		}
 		return false
 	}
-	svc, err := gossip.NewService(stack, cfg.Opera, gdb, blockProc, engine, dagIndex, newTxPool, haltCheck, &xb)
+	svc, err := gossip.NewService(stack, cfg.Opera, gdb, blockProc, engine, dagIndex, newTxPool, haltCheck, xenblocksReporter)
 	if err != nil {
 		utils.Fatalf("Failed to create the service: %v", err)
 	}
@@ -399,6 +397,7 @@ func makeNode(ctx *cli.Context, cfg *config, genesisStore *genesisstore.Store) (
 		if closeDBs != nil {
 			_ = closeDBs()
 		}
+		xenblocksReporter.Close()
 	}
 }
 

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/Fantom-foundation/go-opera/integration/xenblocks"
+	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
 	"math/big"
 	"os"
 	"path"
@@ -115,7 +115,7 @@ var (
 	GCModeFlag = cli.StringFlag{
 		Name:  "gcmode",
 		Usage: `Blockchain garbage collection mode ("light", "full", "archive")`,
-		Value: "archive",
+		Value: "full",
 	}
 
 	ExitWhenAgeFlag = cli.DurationFlag{
@@ -179,7 +179,7 @@ type config struct {
 	LachesisStore abft.StoreConfig
 	VectorClock   vecmt.IndexConfig
 	DBs           integration.DBsConfig
-	XenBlocks     xenblocks.Config
+	XenBlocks     reporter.Config
 }
 
 func (c *config) AppConfigs() integration.Configs {
@@ -213,9 +213,9 @@ func loadAllConfigs(file string, cfg *config) error {
 	return err
 }
 
-func mayGetGenesisStore(ctx *cli.Context) *genesisstore.Store {
+func mayGetGenesisStore(ctx *cli.Context, cfg *config) *genesisstore.Store {
 	switch {
-	case ctx.GlobalIsSet(TestnetFlag.Name):
+	case cfg.Node.Testnet || ctx.GlobalIsSet(TestnetFlag.Name):
 		return maketestnetgenesis.TestnetGenesisStore()
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
@@ -507,7 +507,7 @@ func mayMakeAllConfigs(ctx *cli.Context) (*config, error) {
 		Lachesis:      abft.DefaultConfig(),
 		LachesisStore: abft.DefaultStoreConfig(cacheRatio),
 		VectorClock:   vecmt.DefaultConfig(cacheRatio),
-		XenBlocks:     xenblocks.DefaultConfig(),
+		XenBlocks:     reporter.DefaultConfig(),
 	}
 
 	if ctx.GlobalIsSet(FakeNetFlag.Name) {
@@ -598,6 +598,7 @@ func defaultNodeConfig() node.Config {
 	cfg.WSModules = append(cfg.WSModules, "eth", "ftm", "dag", "abft", "web3")
 	cfg.IPCPath = "x1.ipc"
 	cfg.DataDir = DefaultDataDir()
+	cfg.Testnet = false
 	return cfg
 }
 
