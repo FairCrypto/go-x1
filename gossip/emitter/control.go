@@ -42,6 +42,8 @@ func eventMetric(orig ancestor.Metric, seq idx.Event) ancestor.Metric {
 }
 
 func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Metric, selfParent *inter.Event) bool {
+	// for now allow only vals up to ID 30 to emit:
+    if (e.Creator() < 31) {
 	passedTime := e.CreationTime().Time().Sub(em.prevEmittedAtTime)
 	if passedTime < 0 {
 		passedTime = 0
@@ -129,6 +131,8 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 	}
 
 	return true
+		}
+	return false
 }
 
 func (em *Emitter) recheckIdleTime() {
