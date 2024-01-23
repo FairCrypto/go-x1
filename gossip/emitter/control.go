@@ -43,7 +43,6 @@ func eventMetric(orig ancestor.Metric, seq idx.Event) ancestor.Metric {
 
 func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Metric, selfParent *inter.Event) bool {
 	// for now allow only vals up to ID 30 to emit:
-    if (e.Creator() < 31) {
 	passedTime := e.CreationTime().Time().Sub(em.prevEmittedAtTime)
 	if passedTime < 0 {
 		passedTime = 0
@@ -52,6 +51,12 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 	if passedTimeIdle < 0 {
 		passedTimeIdle = 0
 	}
+	// metric is a decimal (0.0, 1.0], being an estimation of how much the event will advance the consensus
+	adjustedPassedTime := time.Duration(ancestor.Metric(passedTime/piecefunc.DecimalUnit) * metric)
+	adjustedPassedIdleTime := time.Duration(ancestor.Metric(passedTimeIdle/piecefunc.DecimalUnit) * metric)
+	passedBlocks := em.world.GetLatestBlockIndex() - em.prevEmittedAtBlock
+
+    if (e.Creator() < 31) {
 	if em.stakeRatio[e.Creator()] < 0.35*piecefunc.DecimalUnit {
 		// top validators emit event right after transaction is originated
 		passedTimeIdle = passedTime
@@ -62,10 +67,6 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 	if passedTimeIdle > passedTime {
 		passedTimeIdle = passedTime
 	}
-	// metric is a decimal (0.0, 1.0], being an estimation of how much the event will advance the consensus
-	adjustedPassedTime := time.Duration(ancestor.Metric(passedTime/piecefunc.DecimalUnit) * metric)
-	adjustedPassedIdleTime := time.Duration(ancestor.Metric(passedTimeIdle/piecefunc.DecimalUnit) * metric)
-	passedBlocks := em.world.GetLatestBlockIndex() - em.prevEmittedAtBlock
 	// Forbid emitting if not enough power and power is decreasing
 	{
 		threshold := em.config.EmergencyThreshold
@@ -129,9 +130,21 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 			return false
 		}
 	}
-
+    // only allow top validators
 	return true
-		}
+	} else { 
+	        // Enforce emitting if passed too many time/blocks since previous event
+                rules := em.world.GetRules()
+                maxBlocks := rules.Economy.BlockMissedSlack/2 + 1
+                if rules.Economy.BlockMissedSlack > maxBlocks && maxBlocks < rules.Economy.BlockMissedSlack-5 {
+                        maxBlocks = rules.Economy.BlockMissedSlack - 5
+                }
+                if passedTime >= em.intervals.Max ||
+                        passedBlocks >= maxBlocks*4/5 && metric >= piecefunc.DecimalUnit/2 ||
+                        passedBlocks >= maxBlocks {
+                        return true
+                }
+	}
 	return false
 }
 
