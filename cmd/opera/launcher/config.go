@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
+	"github.com/Fantom-foundation/lachesis-base/inter/idx"
 	"math/big"
 	"os"
 	"path"
@@ -211,7 +212,17 @@ func loadAllConfigs(file string, cfg *config) error {
 func mayGetGenesisStore(ctx *cli.Context, cfg *config) *genesisstore.Store {
 	switch {
 	case cfg.Node.Testnet || ctx.GlobalIsSet(TestnetFlag.Name):
-		return maketestnetgenesis.TestnetGenesisStore()
+		num := idx.Validator(0)
+		// use fakenet keys if specified
+		if ctx.GlobalIsSet(FakeNetFlag.Name) {
+			_, fnNum, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
+			if err != nil {
+				log.Crit("Invalid flag", "flag", FakeNetFlag.Name, "err", err)
+			}
+			num = fnNum
+		}
+
+		return maketestnetgenesis.TestnetGenesisStore(num)
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
 		if err != nil {
@@ -278,6 +289,14 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
+
+	case ctx.GlobalIsSet(TestnetFlag.Name) && ctx.GlobalIsSet(FakeNetFlag.Name):
+		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
+		if err != nil {
+			log.Crit("Invalid flag", "flag", FakeNetFlag.Name, "err", err)
+		}
+		cfg.DataDir = filepath.Join(defaultDataDir, fmt.Sprintf("fakenet-testnet-%d", num))
+
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
 		if err != nil {

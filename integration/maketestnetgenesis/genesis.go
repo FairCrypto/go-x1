@@ -1,6 +1,7 @@
 package maketestnetgenesis
 
 import (
+	"github.com/Fantom-foundation/go-opera/integration/makefakegenesis"
 	"github.com/Fantom-foundation/go-opera/integration/makegenesis"
 	"github.com/Fantom-foundation/go-opera/inter/drivertype"
 	"github.com/Fantom-foundation/go-opera/inter/iblockproc"
@@ -30,18 +31,23 @@ import (
 	"math/big"
 )
 
-func TestnetGenesisStore() *genesisstore.Store {
-	return TestnetGenesisStoreWithRules(futils.ToFtm(opera.TestnetStartBalance), futils.ToFtm(opera.TestnetStartStake), opera.TestNetRules())
+func TestnetGenesisStore(fakenetKeys idx.Validator) *genesisstore.Store {
+	return TestnetGenesisStoreWithRules(futils.ToFtm(opera.TestnetStartBalance), futils.ToFtm(opera.TestnetStartStake), opera.TestNetRules(), fakenetKeys)
 }
 
-func TestnetGenesisStoreWithRules(balance, stake *big.Int, rules opera.Rules) *genesisstore.Store {
-	return TestnetGenesisStoreWithRulesAndStart(balance, stake, rules, 2, 1)
+func TestnetGenesisStoreWithRules(balance, stake *big.Int, rules opera.Rules, fakenetKeys idx.Validator) *genesisstore.Store {
+	return TestnetGenesisStoreWithRulesAndStart(balance, stake, rules, 2, 1, fakenetKeys)
 }
 
-func TestnetGenesisStoreWithRulesAndStart(balance, stake *big.Int, rules opera.Rules, epoch idx.Epoch, block idx.Block) *genesisstore.Store {
+func TestnetGenesisStoreWithRulesAndStart(balance, stake *big.Int, rules opera.Rules, epoch idx.Epoch, block idx.Block, fakenetKeys idx.Validator) *genesisstore.Store {
 	builder := makegenesis.NewGenesisBuilder(memorydb.NewProducer(""))
 
-	validators := GetTestnetValidators()
+	validators := gpos.Validators{}
+	if fakenetKeys > 0 {
+		validators = makefakegenesis.GetFakeValidators(fakenetKeys)
+	} else {
+		validators = GetTestnetValidators()
+	}
 
 	// add balances to validators
 	var delegations []drivercall.Delegation

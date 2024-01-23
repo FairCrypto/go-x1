@@ -62,3 +62,4 @@ testnet.g
 **/coverage.txt
 
 dist/
+/simulate/docker-compose.yaml
