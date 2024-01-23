@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	validatorChallenge = 4 * time.Second
+	validatorChallenge = 200 * time.Second
 )
 
 func (em *Emitter) recountConfirmingIntervals(validators *pos.Validators) {
