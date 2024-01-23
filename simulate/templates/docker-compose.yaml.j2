@@ -1,0 +1,53 @@
+networks:
+  front-tier:
+    ipam:
+      driver: default
+      config:
+        - subnet: "{{ ip_base }}/16"
+
+services:
+  node1:
+    image: x1
+    build:
+        context: ..
+        dockerfile: ./simulate/Dockerfile
+    command: "--fakenet 1/{{ num_nodes }} --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts '*' --http.corsdomain '*' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --verbosity 3 --port {{ starting_port }}  --maxpeers {{ num_nodes }} --nat 'extip:{{ ip_base | ip_address + 1 }}' --nodekeyhex a990fd697515b460482856549dbab85279e31276f9e9027f1c2d85bfb4f5bcb1"
+    ports:
+      - "{{ starting_port }}:{{ starting_port }}"
+      - "{{ starting_port }}:{{ starting_port }}/udp"
+      - "8545:8545"
+      - "8546:8546"
+    networks:
+      front-tier:
+        ipv4_address: {{ ip_base | ip_address + 1 }}
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://{{ ip_base | ip_address + 1 }}:8545"]
+      interval: 1s
+      timeout: 1s
+      retries: 30
+
+{% for id in range(2, num_nodes + 1) %}
+  node{{ id }}:
+    image: x1
+    build:
+        context: ..
+        dockerfile: ./simulate/Dockerfile
+    command: "--fakenet {{ id }}/{{ num_nodes }} --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts '*' --http.corsdomain '*' --verbosity 3 --port {{ starting_port + id - 1 }} --bootnodes 'enode://f1f6ea0bb37434adbee2df628a95b0a46b6b6a13d21d0cfc3714cd5558f904beeaddfb29d090b1c49a8fce52ae1894273b454f3c2bdf113ac3f4f645225043ae@node1:{{ starting_port }}'"
+    ports:
+      - "{{ starting_port + id - 1 }}:{{ starting_port + id - 1 }}"
+      - "{{ starting_port + id - 1 }}:{{ starting_port + id - 1 }}/udp"
+    networks:
+      front-tier:
+        ipv4_address: {{ ip_base | ip_address + id }}
+    depends_on:
+      node{{ id - 1 }}:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+        test: ["CMD", "uptime"]
+        interval: 3s
+        timeout: 3s
+        retries: 60
+
+{% endfor %}

@@ -208,14 +208,14 @@ func TestNetRules() Rules {
 
 func FakeNetRules() Rules {
 	return Rules{
-		Name:      "fake",
+		Name:      "x1-fakenet",
 		NetworkID: FakeNetworkID,
 		Dag:       DefaultDagRules(),
-		Epochs:    FakeNetEpochsRules(),
-		Economy:   FakeEconomyRules(),
+		Epochs:    DefaultEpochsRules(),
+		Economy:   TestnetEconomyRules(),
 		Blocks: BlocksRules{
 			MaxBlockGas:             20500000,
-			MaxEmptyBlockSkipPeriod: inter.Timestamp(3 * time.Second),
+			MaxEmptyBlockSkipPeriod: inter.Timestamp(1 * time.Minute),
 		},
 		Upgrades: Upgrades{
 			Berlin: true,
