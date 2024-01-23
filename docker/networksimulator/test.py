@@ -1,6 +1,6 @@
 from web3 import Web3, HTTPProvider
 from web3.middleware import construct_sign_and_send_raw_middleware
-from time import sleep, time
+from time import time
 import os
 
 # Connect to local Ethereum node
@@ -15,18 +15,12 @@ while True:
     tx_hash = w3.eth.send_transaction({
         "from": acct1.address,
         "to": acct1.address,
-        "value": 123123123123123,
-        'gas': 22000,
-        "maxFeePerGas": Web3.to_wei(90, 'gwei'),
-        "maxPriorityFeePerGas": Web3.to_wei(200, 'gwei'),
+        "value": Web3.to_wei(1, 'ether'),
+        'gas': 9000000,
+        # "maxFeePerGas": Web3.to_wei(240, 'gwei'),
+        # "maxPriorityFeePerGas": Web3.to_wei(120, 'gwei'),
     })
 
     start_time = time()
-    while True:
-        sleep(.1)
-        tx = w3.eth.get_transaction(tx_hash)
-        if tx.blockNumber is not None:
-            break
-
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     print(time() - start_time)
-
