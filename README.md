@@ -13,6 +13,10 @@ Chain ID: `204005`
 - https://x1-testnet.xen.network/
 - wss://x1-testnet.xen.network
 
+## Documentation
+
+See our [docs](https://docs.xen.network/x1/developer/getting-started) for more information on the X1 network and how to get started.
+
 ## Run Full Node (Testnet)
 
 > Quick start a full node and run in the foreground
@@ -55,15 +59,6 @@ x1 --testnet --http --http.port 8545 --ws --ws.port 8546
 > Run with RPC server open to the world (only run if you know what you are doing)
 ```shell
 x1 --testnet --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts "*" --http.corsdomain "*" --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins "*"
-```
-
-## Run an Archive Node (Testnet)
-
-Synchronizing an archive node is a time-consuming process with substantial disk space requirements. 
-However, it provides the capability to retrieve historical data through queries.
-
-```shell
-x1 --testnet --gcmode archive --syncmode full
 ```
 
 ## Run a Validator Node (Testnet)
