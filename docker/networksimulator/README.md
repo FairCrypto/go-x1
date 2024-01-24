@@ -19,6 +19,9 @@ python3 generate.py NUM_OF_NODES
 # Run the network
 # use --build to rebuild the docker image from source ex: docker-compose up --build
 docker-compose up
+
+# Example: build and run a network of 10 nodes
+python3 generate.py 10 && docker compose up --build
 ```
 
 Give it a few minutes for all the nodes to start up.
