@@ -16,7 +16,7 @@ while True:
         "from": acct1.address,
         "to": acct1.address,
         "value": Web3.to_wei(1, 'ether'),
-        'gas': 9000000,
+        'gas': 21000,
         # "maxFeePerGas": Web3.to_wei(240, 'gwei'),
         # "maxPriorityFeePerGas": Web3.to_wei(120, 'gwei'),
     })
