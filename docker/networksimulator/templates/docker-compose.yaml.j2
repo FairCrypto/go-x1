@@ -11,10 +11,11 @@ services:
     build:
         context: ../..
         dockerfile: ./docker/networksimulator/Dockerfile
-    command: "--fakenet 1/{{ num_nodes }} --testnet --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts '*' --http.corsdomain '*' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --verbosity 3 --port {{ starting_port }}  --maxpeers {{ num_nodes }} --nat 'extip:{{ ip_base | ip_address + 1 }}' --nodekeyhex a990fd697515b460482856549dbab85279e31276f9e9027f1c2d85bfb4f5bcb1"
+    command: "{{ flags }} --fakenet 1/{{ num_nodes }} --maxpeers {{ num_nodes }} --nat 'extip:{{ ip_base | ip_address + 1 }}' --nodekeyhex {{ bootnode_key }}"
     ports:
-      - "{{ starting_port }}:{{ starting_port }}"
-      - "{{ starting_port }}:{{ starting_port }}/udp"
+      - "{{ starting_port }}:5050"
+      - "{{ starting_port }}:5050/udp"
+      - "{{ starting_port + 1000 }}:6060"
       - "8545:8545"
       - "8546:8546"
     networks:
@@ -30,10 +31,13 @@ services:
 {% for id in range(2, num_nodes + 1) %}
   node{{ id }}:
     image: x1-network-simulator
-    command: "--fakenet {{ id }}/{{ num_nodes }} --testnet --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts '*' --http.corsdomain '*' --verbosity 3 --port {{ starting_port + id - 1 }} --bootnodes 'enode://f1f6ea0bb37434adbee2df628a95b0a46b6b6a13d21d0cfc3714cd5558f904beeaddfb29d090b1c49a8fce52ae1894273b454f3c2bdf113ac3f4f645225043ae@node1:{{ starting_port }}'"
+    command: "{{ flags }} --fakenet {{ id }}/{{ num_nodes }} --maxpeers {{ num_nodes }} --bootnodes 'enode://{{ bootnode_pub_key }}@{{ ip_base | ip_address + 1 }}:5050'"
     ports:
-      - "{{ starting_port + id - 1 }}:{{ starting_port + id - 1 }}"
-      - "{{ starting_port + id - 1 }}:{{ starting_port + id - 1 }}/udp"
+      - "{{ starting_port + id - 1 }}:5050"
+      - "{{ starting_port + id - 1 }}:5050/udp"
+      - "{{ starting_port + id + 1001 }}:6060"
+      - "{{ starting_port + id + 2001 }}:8545"
+      - "{{ starting_port + id + 3001 }}:8546"
     networks:
       front-tier:
         ipv4_address: {{ ip_base | ip_address + id }}
