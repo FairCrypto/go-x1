@@ -1,20 +1,16 @@
 # Simulate a Network
 
 > install deps
-
 ```shell
+# be in the docker/networksimulator directory
+cd docker/networksimulator
+
 pip3 install -r requirements.txt
 ```
 
 > run the simulated network. Replace NUM_OF_NODES with the number of nodes you want to simulate.
 
 ```shell
-# be in the docker/networksimulator directory
-cd docker/networksimulator
-
-# install deps
-pip3 install -r requirements.txt
-
 # Generate the docker compose file
 # Replace NUM_OF_NODES with the number of nodes you want to simulate.
 python3 generate.py NUM_OF_NODES
