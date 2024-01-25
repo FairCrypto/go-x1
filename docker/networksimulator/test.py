@@ -14,8 +14,8 @@ argparser = argparse.ArgumentParser("Run Send Transaction Tests", add_help=False
 argparser.add_argument(dest="num_txs", nargs='?', type=int, const=1, default=1000, help="Number of transactions to send")
 argparser.add_argument('--no-wait', action="store_true", default=False, help="Don't wait for tx receipt")
 argparser.add_argument('--gas', type=int, default=21000)
-argparser.add_argument('--max-gas-fee', type=int, default=100, help="in gwei")
-argparser.add_argument('--max-gas-priority-fee', type=int, default=20, help="in gwei")
+argparser.add_argument('--max-gas-fee', type=int, help="in gwei")
+argparser.add_argument('--max-gas-priority-fee', type=int, help="in gwei")
 argparser.add_argument('--value', type=int, default=1, help="in ether")
 argparser.add_argument('--help', '-h', action="store_true", help="show this help message and exit")
 
