@@ -17,11 +17,22 @@ argparser.add_argument('--flags', type=str, default=DEFAULT_FLAGS)
 argparser.add_argument('--starting-port', type=int, default=DEFAULT_STARTING_PORT)
 args = argparser.parse_args()
 
+nodes = []
+for i in range(1, args.num_nodes + 1):
+    nodes.append({
+        "id": i,
+        "ip": ipaddress.ip_address(args.ip_base) + i,
+        "p2p_port": args.starting_port + i,
+        "metrics_port": args.starting_port + i + 1000,
+        "rpc_port": args.starting_port + i + 2000,
+        "ws_port": args.starting_port + i + 3000,
+    })
+
 environment = jinja2.Environment()
 environment.filters['ip_address'] = ipaddress.ip_address
 environment.loader = jinja2.FileSystemLoader('templates')
-template = environment.get_template('docker-compose.yaml.j2')
 
+template = environment.get_template('docker-compose.yaml.j2')
 template.stream({
     "num_nodes": args.num_nodes,
     "ip_base": args.ip_base,
@@ -29,4 +40,10 @@ template.stream({
     "flags": args.flags,
     "bootnode_key": BOOT_NODE_KEY,
     "bootnode_pub_key": BOOT_NODE_PUB_KEY,
+    "nodes": nodes,
 }).dump('docker-compose.yaml')
+
+prometheus = environment.get_template('prometheus.yml.j2')
+prometheus.stream({
+    "nodes": nodes,
+}).dump('prometheus/prometheus.yml')

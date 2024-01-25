@@ -85,3 +85,11 @@ cd docker/networksimulator
 # Example: build and run a network of 10 nodes
 python3 generate.py 10 && docker compose up --build
 ```
+
+## Metrics and Monitoring
+
+Prometheus and Granfana are included in the docker-compose file.
+
+- Prometheus server at http://localhost:9090/targets
+- Grafana dashboards at http://localhost:3000
+

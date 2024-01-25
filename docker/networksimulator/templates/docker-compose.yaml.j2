@@ -1,5 +1,5 @@
 networks:
-  front-tier:
+  x1-simulator:
     ipam:
       driver: default
       config:
@@ -11,19 +11,19 @@ services:
     build:
         context: ../..
         dockerfile: ./docker/networksimulator/Dockerfile
-    command: "{{ flags }} --fakenet 1/{{ num_nodes }} --maxpeers {{ num_nodes }} --nat 'extip:{{ ip_base | ip_address + 1 }}' --nodekeyhex {{ bootnode_key }}"
+    command: "{{ flags }} --fakenet 1/{{ num_nodes }} --maxpeers {{ num_nodes }} --nat 'extip:{{ nodes[0].ip }}' --nodekeyhex {{ bootnode_key }}"
     ports:
-      - "{{ starting_port }}:5050"
-      - "{{ starting_port }}:5050/udp"
-      - "{{ starting_port + 1000 }}:6060"
+      - "{{ nodes[0].p2p_port }}:5050"
+      - "{{ nodes[0].p2p_port }}:5050/udp"
+      - "{{ nodes[0].metrics_port }}:6060"
       - "8545:8545"
       - "8546:8546"
     networks:
-      front-tier:
-        ipv4_address: {{ ip_base | ip_address + 1 }}
+      x1-simulator:
+        ipv4_address: {{ nodes[0].ip }}
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://{{ ip_base | ip_address + 1 }}:8545"]
+      test: ["CMD", "curl", "-f", "http://{{ nodes[0].ip }}:8545"]
       interval: 1s
       timeout: 1s
       retries: 30
@@ -31,16 +31,16 @@ services:
 {% for id in range(2, num_nodes + 1) %}
   node{{ id }}:
     image: x1-network-simulator
-    command: "{{ flags }} --fakenet {{ id }}/{{ num_nodes }} --maxpeers {{ num_nodes }} --bootnodes 'enode://{{ bootnode_pub_key }}@{{ ip_base | ip_address + 1 }}:5050'"
+    command: "{{ flags }} --fakenet {{ id }}/{{ num_nodes }} --maxpeers {{ num_nodes }} --bootnodes 'enode://{{ bootnode_pub_key }}@{{ nodes[0].ip }}:5050'"
     ports:
-      - "{{ starting_port + id - 1 }}:5050"
-      - "{{ starting_port + id - 1 }}:5050/udp"
-      - "{{ starting_port + id + 1001 }}:6060"
-      - "{{ starting_port + id + 2001 }}:8545"
-      - "{{ starting_port + id + 3001 }}:8546"
+      - "{{ nodes[id - 1].p2p_port }}:5050"
+      - "{{ nodes[id - 1].p2p_port }}:5050/udp"
+      - "{{ nodes[id - 1].metrics_port }}:6060"
+      - "{{ nodes[id - 1].rpc_port }}:8545"
+      - "{{ nodes[id - 1].ws_port }}:8546"
     networks:
-      front-tier:
-        ipv4_address: {{ ip_base | ip_address + id }}
+      x1-simulator:
+        ipv4_address: {{ nodes[id - 1].ip }}
     depends_on:
       node{{ id - 1 }}:
         condition: service_healthy
@@ -52,3 +52,46 @@ services:
         retries: 60
 
 {% endfor %}
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
+    networks:
+      x1-simulator:
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_SIGNOUT_MENU: "true"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_LOG_LEVEL: error
+      GF_ORG_NAME: "X1"
+      GF_ORG_ROLE: "Admin"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: "/var/lib/grafana/dashboards/home.json"
+    volumes:
+      - ./grafana/etc/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/etc/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - grafana_data:/var/lib/grafana
+      - ./grafana/var/lib/grafana/dashboards:/var/lib/grafana/dashboards
+
+    networks:
+      x1-simulator:
+
+volumes:
+  prom_data:
+  grafana_data:
