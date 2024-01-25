@@ -1138,7 +1138,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "avg(chain_head_header{instance=~\"$instance\"})",
+          "expr": "max(chain_head_header{instance=~\"$instance\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1152,7 +1152,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "avg(chain_head_receipt{instance=~\"$instance\"})",
+          "expr": "max(chain_head_receipt{instance=~\"$instance\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1166,7 +1166,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "avg(chain_head_block{instance=~\"$instance\"})",
+          "expr": "max(chain_head_block{instance=~\"$instance\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1267,7 +1267,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "avg(txpool_pending{instance=~\"$instance\"})",
+          "expr": "max(txpool_pending{instance=~\"$instance\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1281,7 +1281,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "avg(txpool_queued{instance=~\"$instance\"})",
+          "expr": "max(txpool_queued{instance=~\"$instance\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -1295,7 +1295,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "avg(txpool_local{instance=~\"$instance\"})",
+          "expr": "max(txpool_local{instance=~\"$instance\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2383,7 +2383,7 @@
     ]
   },
   "timezone": "",
-  "title": "X1 Nodes Copy",
+  "title": "X1 Nodes",
   "uid": "dd0419a2-4be6-4f6d-89b1-ee259c5a9f14",
   "version": 1,
   "weekStart": ""
