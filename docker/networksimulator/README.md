@@ -93,3 +93,24 @@ Prometheus and Granfana are included in the docker-compose file.
 - Prometheus server at http://localhost:9090/targets
 - Grafana dashboards at http://localhost:3000
 
+## Test Script
+
+The test.py script is an example of how to interact with the simulated network. It uses the web3.py library to send transactions to the network.
+
+Note: grab a private key from [../evmcore/apply_fake_genesis.go](../evmcore/apply_fake_genesis.go) to use as the sender.
+
+> send 5 transactions to the network
+```shell
+PRIVATE_KEY= python3 test.py 5
+```
+
+> send 100 transactions to the network and don't wait for a receipt
+```shell
+PRIVATE_KEY= python3 test.py 5 --no-wait
+```
+
+> see all the options
+```shell
+python3 test.py --help
+```
+
