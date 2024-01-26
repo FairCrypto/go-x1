@@ -30,18 +30,16 @@ import (
 	"math/big"
 )
 
-func TestnetGenesisStore() *genesisstore.Store {
-	return TestnetGenesisStoreWithRules(futils.ToFtm(opera.TestnetStartBalance), futils.ToFtm(opera.TestnetStartStake), opera.TestNetRules())
+func TestnetGenesisStoreWithValidators(validators gpos.Validators) *genesisstore.Store {
+	return TestnetGenesisStoreWithRules(futils.ToFtm(opera.TestnetStartBalance), futils.ToFtm(opera.TestnetStartStake), opera.TestNetRules(), validators)
 }
 
-func TestnetGenesisStoreWithRules(balance, stake *big.Int, rules opera.Rules) *genesisstore.Store {
-	return TestnetGenesisStoreWithRulesAndStart(balance, stake, rules, 2, 1)
+func TestnetGenesisStoreWithRules(balance, stake *big.Int, rules opera.Rules, validators gpos.Validators) *genesisstore.Store {
+	return TestnetGenesisStoreWithRulesAndStart(balance, stake, rules, 2, 1, validators)
 }
 
-func TestnetGenesisStoreWithRulesAndStart(balance, stake *big.Int, rules opera.Rules, epoch idx.Epoch, block idx.Block) *genesisstore.Store {
+func TestnetGenesisStoreWithRulesAndStart(balance, stake *big.Int, rules opera.Rules, epoch idx.Epoch, block idx.Block, validators gpos.Validators) *genesisstore.Store {
 	builder := makegenesis.NewGenesisBuilder(memorydb.NewProducer(""))
-
-	validators := GetTestnetValidators()
 
 	// add balances to validators
 	var delegations []drivercall.Delegation
