@@ -287,6 +287,12 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
+	case ctx.GlobalIsSet(FakeNetFlag.Name) && (cfg.Testnet || ctx.GlobalIsSet(TestnetFlag.Name)):
+		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
+		if err != nil {
+			log.Crit("Invalid flag", "flag", FakeNetFlag.Name, "err", err)
+		}
+		cfg.DataDir = filepath.Join(defaultDataDir, fmt.Sprintf("fakenet-testnet-%d", num))
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
 		if err != nil {
