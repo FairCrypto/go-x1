@@ -119,14 +119,15 @@ func (em *Emitter) OnEventConnected(e inter.EventPayloadI) {
 		fmt.Println("This node is not in supermajority")
 		supermajority = false	
 	}
-
-	if em.fcIndexer != nil && supermajority {
+    if supermajority {
+	if em.fcIndexer != nil {
 		em.fcIndexer.ProcessEvent(e)
 	        fmt.Printf("OnEventConnected fcIndexer.ProcessEvent %v\n", e)
 	} else if em.quorumIndexer != nil {
 	        fmt.Printf("OnEventConnected quorumIndexer.ProcessEvent %v \n", e)
 	        //fmt.Printf("OnEventConnected quorumIndexer.ProcessEvent %v %v\n", e, em.validators.SortedIDs())
 		em.quorumIndexer.ProcessEvent(e, e.Creator() == em.config.Validator.ID)
+	}
 	}
 	em.payloadIndexer.ProcessEvent(e, ancestor.Metric(e.Txs().Len()))
 	for _, tx := range e.Txs() {
