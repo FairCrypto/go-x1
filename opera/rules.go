@@ -208,7 +208,7 @@ func TestNetRules() Rules {
 
 func FakeNetRules() Rules {
 	return Rules{
-		Name:      "x1-fakenet",
+		Name:      "fake",
 		NetworkID: FakeNetworkID,
 		Dag:       DefaultDagRules(),
 		Epochs:    FakeNetEpochsRules(),
