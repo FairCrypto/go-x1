@@ -5,11 +5,17 @@ import os
 import argparse
 import threading
 import logging
+import datetime
 
 PRIVATE_KEY = os.environ.get('PRIVATE_KEY')  # add private key here
 RPC_URL = os.environ.get('RPC_URL')  # add rpc url here
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+logging.Formatter.formatTime = (lambda self, record, datefmt=None:
+                                datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc)
+                                .astimezone()
+                                .isoformat(sep="T", timespec="milliseconds"))
 
 
 # These are fake validators keys for testing purposes only
@@ -428,6 +434,7 @@ argparser.add_argument('--help', '-h', action="store_true", help="show this help
 argparser.add_argument('--validator', type=int, default=1, help="the validator id to use for signing transactions")
 argparser.add_argument('--validators', type=int,
                        help="the number of concurrent validators to use for signing transactions")
+argparser.add_argument('--rpc', type=str, default=RPC_URL, help="The RPC URL to use")
 
 args = argparser.parse_args()
 
@@ -441,11 +448,11 @@ if not PRIVATE_KEY and not args.validator or (args.validator and args.validator 
 
 
 def run_transactions(key):
-    logging.info("running transactions key=%s txs=%d gas=%d value=%d",
-                 key, args.num_txs, args.gas, args.value)
-
-    w3 = Web3(HTTPProvider(RPC_URL))
+    w3 = Web3(HTTPProvider(args.rpc))
     acct1 = w3.eth.account.from_key(key)
+    logging.info("running transactions account=%s txs=%d gas=%d value=%d",
+                 acct1.address, args.num_txs, args.gas, args.value)
+
     w3.middleware_onion.add(construct_sign_and_send_raw_middleware(acct1))
 
     tx_params = {
@@ -471,18 +478,18 @@ def run_transactions(key):
 
         start_time = time()
         w3.eth.wait_for_transaction_receipt(tx_hash)
-        logging.debug("tx_hash: %s", tx_hash)
-        logging.info("receipt time: %f", time() - start_time)
-        print(time() - start_time)
+        logging.info("tx confirmed tx_receipt=%s time=%f", tx_hash.hex(), time() - start_time)
 
 
 validator_keys = []
-if args.validators:
+if PRIVATE_KEY:
+    validator_keys.append(PRIVATE_KEY)
+elif args.validators:
     validator_keys = FAKE_VALIDATORS[:args.validators]
 elif args.validator:
     validator_keys.append(FAKE_VALIDATORS[args.validator - 1])
 
-logging.debug("using validator_keys: ", validator_keys)
+logging.debug("using validator_keys: %s", validator_keys)
 
 threads = []
 
