@@ -30,8 +30,6 @@ Give it a few minutes for all the nodes to start up.
 curl -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":83}' http://127.0.0.1:8545
 ```
 
-Use the fakenet private keys from [../evmcore/apply_fake_genesis.go](../evmcore/apply_fake_genesis.go) to access the validator accounts and their funds
-
 See test.py for an example of how to interact with the network.
 
 ## Lachesis Base
@@ -97,16 +95,19 @@ Prometheus and Granfana are included in the docker-compose file.
 
 The test.py script is an example of how to interact with the simulated network. It uses the web3.py library to send transactions to the network.
 
-Note: grab a private key from [../evmcore/apply_fake_genesis.go](../evmcore/apply_fake_genesis.go) to use as the sender.
-
-> send 5 transactions to the network
+> send 5 transactions to the network using validator 1's private key
 ```shell
-PRIVATE_KEY= python3 test.py 5
+python3 test.py 5
 ```
 
-> send 100 transactions to the network and don't wait for a receipt
+> send 100 transactions and don't wait for a receipt from validator 2
 ```shell
-PRIVATE_KEY= python3 test.py 5 --no-wait
+python3 test.py 5 --no-wait --validator 2
+```
+
+> send 1000 transactions and don't wait for a receipt from 10 validators concurrently
+```shell
+python3 test.py 5 --no-wait --validator 2
 ```
 
 > see all the options
