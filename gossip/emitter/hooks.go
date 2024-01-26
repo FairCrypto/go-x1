@@ -2,7 +2,7 @@ package emitter
 
 import (
 	"time"
-	"fmt"
+
 	"github.com/Fantom-foundation/lachesis-base/emitter/ancestor"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
 	"github.com/Fantom-foundation/lachesis-base/inter/pos"
@@ -85,49 +85,15 @@ func (em *Emitter) OnNewEpoch(newValidators *pos.Validators, newEpoch idx.Epoch)
 	em.payloadIndexer = ancestor.NewPayloadIndexer(PayloadIndexerSize)
 }
 
-
-// Function to get the top 100 elements from a slice
-func top100(slice []idx.ValidatorID) []idx.ValidatorID {
-    if len(slice) > 100 {
-        return slice[:100] // Return the first 100 elements
-    }
-    return slice // Return the slice as is if it has less than or equal to 100 elements
-}
-
-// Function to check if a number is in the top 100 elements of a slice
-func isInTop100(number idx.ValidatorID, slice []idx.ValidatorID) bool {
-    var v idx.ValidatorID
-    top100Slice := top100(slice)
-    for _, v = range top100Slice {
-        if v == number {
-            return true
-        }
-    }
-    return false
-}
-
-
 // OnEventConnected tracks new events
 func (em *Emitter) OnEventConnected(e inter.EventPayloadI) {
-	var supermajority bool
-	supermajority = true
 	if !em.isValidator() {
 		return
 	}
-	// Filter this node's events if not in top100 supermajority of stakers
-	if e.Creator() == em.config.Validator.ID && !isInTop100(e.Creator(), em.validators.SortedIDs()) {
-		fmt.Println("This node is not in supermajority")
-		supermajority = false	
-	}
-    if supermajority {
 	if em.fcIndexer != nil {
 		em.fcIndexer.ProcessEvent(e)
-	        fmt.Printf("OnEventConnected fcIndexer.ProcessEvent %v\n", e)
 	} else if em.quorumIndexer != nil {
-	        fmt.Printf("OnEventConnected quorumIndexer.ProcessEvent %v \n", e)
-	        //fmt.Printf("OnEventConnected quorumIndexer.ProcessEvent %v %v\n", e, em.validators.SortedIDs())
 		em.quorumIndexer.ProcessEvent(e, e.Creator() == em.config.Validator.ID)
-	}
 	}
 	em.payloadIndexer.ProcessEvent(e, ancestor.Metric(e.Txs().Len()))
 	for _, tx := range e.Txs() {
