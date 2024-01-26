@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/Fantom-foundation/go-opera/integration/makeoriginaltestnetgenesis"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
 	"math/big"
 	"os"
@@ -12,7 +13,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Fantom-foundation/go-opera/integration/maketestnetgenesis"
 	"github.com/Fantom-foundation/lachesis-base/abft"
 	"github.com/Fantom-foundation/lachesis-base/utils/cachescale"
 	"github.com/ethereum/go-ethereum/cmd/utils"
@@ -211,7 +211,7 @@ func loadAllConfigs(file string, cfg *config) error {
 func mayGetGenesisStore(ctx *cli.Context, cfg *config) *genesisstore.Store {
 	switch {
 	case cfg.Node.Testnet || ctx.GlobalIsSet(TestnetFlag.Name):
-		return maketestnetgenesis.TestnetGenesisStore()
+		return makeoriginaltestnetgenesis.TestnetGenesisStore()
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
 		if err != nil {
