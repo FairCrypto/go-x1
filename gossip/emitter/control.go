@@ -2,7 +2,7 @@ package emitter
 
 import (
 	"time"
-	"fmt"
+	
 	"github.com/Fantom-foundation/lachesis-base/emitter/ancestor"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
 	"github.com/Fantom-foundation/lachesis-base/inter/pos"
