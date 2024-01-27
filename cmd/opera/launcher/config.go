@@ -525,7 +525,13 @@ func mayMakeAllConfigs(ctx *cli.Context) (*config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid fakenet flag")
 		}
-		cfg.Emitter = emitter.FakeConfig(num)
+
+		if ctx.GlobalIsSet(TestnetFlag.Name) {
+			cfg.Emitter = emitter.FakeTestnetConfig(num)
+		} else {
+			cfg.Emitter = emitter.FakeConfig(num)
+		}
+
 		setBootnodes(ctx, []string{}, &cfg.Node)
 	} else {
 		// "asDefault" means set network defaults
