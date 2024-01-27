@@ -160,15 +160,8 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
     // only allow top validators
 	return true
 	} else { 
-	        // Enforce emitting if passed too many time/blocks since previous event
-                rules := em.world.GetRules()
-                maxBlocks := rules.Economy.BlockMissedSlack/2 + 1
-                if rules.Economy.BlockMissedSlack > maxBlocks && maxBlocks < rules.Economy.BlockMissedSlack-5 {
-                        maxBlocks = rules.Economy.BlockMissedSlack - 5
-                }
-                if passedTime >= em.intervals.Max ||
-                        passedBlocks >= maxBlocks*4/5 && metric >= piecefunc.DecimalUnit/2 ||
-                        passedBlocks >= maxBlocks {
+	        // Enforce emitting if passed Max time (10 mins)
+                if passedTime >= em.intervals.Max {
                         return true
                 }
 	}
