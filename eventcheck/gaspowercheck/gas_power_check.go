@@ -167,6 +167,8 @@ func CalcValidatorGasPowerPerSec(
 
 // Validate event
 func (v *Checker) Validate(e inter.EventI, selfParent inter.EventI) error {
+	// do no validate gas power (with weak consensus) everything allowed
+	return nil
 	gasPowers, err := v.CalcGasPower(e, selfParent)
 	if err != nil {
 		return err
