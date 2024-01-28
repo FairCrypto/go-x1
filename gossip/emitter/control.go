@@ -80,7 +80,9 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 	// Filter this node's events if not in top50 supermajority of stakers
         if e.Creator() == em.config.Validator.ID && !isInTop50(e.Creator(), em.validators.SortedIDs()) {
                 //fmt.Println("This node is not in supermajority")
-                supermajority = false
+                //supermajority = false
+				// disable check
+				supermajority = true
         }
 
     if (supermajority) {
