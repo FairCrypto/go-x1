@@ -116,5 +116,3 @@ replace github.com/Fantom-foundation/lachesis-base => github.com/faircrypto/lach
 replace github.com/dvyukov/go-fuzz => github.com/guzenok/go-fuzz v0.0.0-20210201043429-a8e90a2a4f88
 
 replace github.com/recws-org/recws => github.com/nibty/recws v0.0.0-20231129011923-06823df0d0db
-
-replace github.com/Fantom-foundation/lachesis-base => github.com/jacklevin74/lachesis-base v0.0.0-20230817040848-1326ba9aa59b
