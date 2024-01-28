@@ -93,6 +93,7 @@
               }
             ]
           },
+          "unit": "short",
           "unitScale": true
         },
         "overrides": [
@@ -135,6 +136,7 @@
         "y": 1
       },
       "id": 124,
+      "interval": "$interval",
       "options": {
         "legend": {
           "calcs": [],
@@ -262,7 +264,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "rate(rpc_requests{instance=~\"$instance\"}[$__rate_interval])",
+          "expr": "rate(rpc_requests{instance=~\"$instance\"}[$interval])",
           "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
@@ -2014,7 +2016,7 @@
               }
             ]
           },
-          "unit": "none",
+          "unit": "reqps",
           "unitScale": true
         },
         "overrides": []
@@ -2051,7 +2053,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(txpool_valid{instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(txpool_valid{instance=~\"$instance\"}[$interval]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2065,7 +2067,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(txpool_invalid{instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(txpool_invalid{instance=~\"$instance\"}[$interval]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2079,7 +2081,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(txpool_underpriced{instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(txpool_underpriced{instance=~\"$instance\"}[$interval]))",
           "format": "time_series",
           "hide": false,
           "interval": "",
@@ -2094,7 +2096,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(txpool_pending_discard{instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(txpool_pending_discard{instance=~\"$instance\"}[$interval]))",
           "format": "time_series",
           "hide": false,
           "interval": "",
@@ -2109,7 +2111,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(txpool_pending_replace{instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(txpool_pending_replace{instance=~\"$instance\"}[$interval]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2123,7 +2125,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(txpool_pending_ratelimit{instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(txpool_pending_ratelimit{instance=~\"$instance\"}[$interval]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2137,7 +2139,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(txpool_pending_nofunds{instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(txpool_pending_nofunds{instance=~\"$instance\"}[$interval]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -2206,7 +2208,7 @@
           "refId": "J"
         }
       ],
-      "title": "Transaction propagation",
+      "title": "Transaction propagation (Total)",
       "type": "timeseries"
     },
     {
@@ -2290,6 +2292,7 @@
         "y": 52
       },
       "id": 134,
+      "interval": "$interval",
       "options": {
         "legend": {
           "calcs": [],
@@ -2387,6 +2390,7 @@
         "y": 52
       },
       "id": 136,
+      "interval": "$interval",
       "options": {
         "legend": {
           "calcs": [],
@@ -2993,7 +2997,7 @@
         "auto_count": 100,
         "auto_min": "1m",
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "1m",
           "value": "1m"
         },
