@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+scrape_configs:
+- job_name: x1
+  honor_timestamps: true
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /debug/metrics/prometheus
+  scheme: http
+  static_configs:
+  - targets:
+{% for node in nodes %}
+    - node{{ node.id }}:6060
+{% endfor %}

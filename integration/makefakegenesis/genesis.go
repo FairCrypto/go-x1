@@ -182,8 +182,6 @@ func GetFakeValidators(num idx.Validator) gpos.Validators {
 			Type: validatorpk.Types.Secp256k1,
 		}
 
-		log.Info("publicKey", "key", publicKey, "addr", addr)
-
 		validators = append(validators, gpos.Validator{
 			ID:               i,
 			Address:          addr,

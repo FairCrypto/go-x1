@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/Fantom-foundation/go-opera/integration/makeoriginaltestnetgenesis"
+	"github.com/Fantom-foundation/go-opera/integration/maketestnetgenesis"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
 	"math/big"
 	"os"
@@ -12,7 +14,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Fantom-foundation/go-opera/integration/maketestnetgenesis"
 	"github.com/Fantom-foundation/lachesis-base/abft"
 	"github.com/Fantom-foundation/lachesis-base/utils/cachescale"
 	"github.com/ethereum/go-ethereum/cmd/utils"
@@ -215,8 +216,16 @@ func loadAllConfigs(file string, cfg *config) error {
 
 func mayGetGenesisStore(ctx *cli.Context, cfg *config) *genesisstore.Store {
 	switch {
+	case ctx.GlobalIsSet(FakeNetFlag.Name) && (cfg.Node.Testnet || ctx.GlobalIsSet(TestnetFlag.Name)):
+		log.Info("Using testnet genesis to create a fake network")
+		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
+		if err != nil {
+			log.Crit("Invalid flag", "flag", FakeNetFlag.Name, "err", err)
+		}
+		validators := makefakegenesis.GetFakeValidators(num)
+		return maketestnetgenesis.TestnetGenesisStoreWithValidators(validators)
 	case cfg.Node.Testnet || ctx.GlobalIsSet(TestnetFlag.Name):
-		return maketestnetgenesis.TestnetGenesisStore()
+		return makeoriginaltestnetgenesis.TestnetGenesisStore()
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
 		if err != nil {
@@ -283,6 +292,12 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
+	case ctx.GlobalIsSet(FakeNetFlag.Name) && (cfg.Testnet || ctx.GlobalIsSet(TestnetFlag.Name)):
+		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
+		if err != nil {
+			log.Crit("Invalid flag", "flag", FakeNetFlag.Name, "err", err)
+		}
+		cfg.DataDir = filepath.Join(defaultDataDir, fmt.Sprintf("fakenet-testnet-%d", num))
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
 		if err != nil {
@@ -515,7 +530,13 @@ func mayMakeAllConfigs(ctx *cli.Context) (*config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid fakenet flag")
 		}
-		cfg.Emitter = emitter.FakeConfig(num)
+
+		if ctx.GlobalIsSet(TestnetFlag.Name) {
+			cfg.Emitter = emitter.FakeTestnetConfig(num)
+		} else {
+			cfg.Emitter = emitter.FakeConfig(num)
+		}
+
 		setBootnodes(ctx, []string{}, &cfg.Node)
 	} else {
 		// "asDefault" means set network defaults
