@@ -106,3 +106,12 @@ func FakeConfig(num idx.Validator) Config {
 	}
 	return cfg
 }
+
+func FakeTestnetConfig(num idx.Validator) Config {
+	cfg := DefaultConfig()
+	cfg.EmitIntervals.DoublesignProtection = 10 * time.Second
+	if num <= 1 {
+		cfg.EmitIntervals.DoublesignProtection = 0
+	}
+	return cfg
+}

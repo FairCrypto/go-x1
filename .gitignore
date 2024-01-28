@@ -62,3 +62,5 @@ testnet.g
 **/coverage.txt
 
 dist/
+/docker/networksimulator/docker-compose.yaml
+/docker/networksimulator/prometheus/prometheus.yml

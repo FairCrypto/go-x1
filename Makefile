@@ -60,3 +60,13 @@ fuzz:
 .PHONY: clean
 clean:
 	rm -fr ./build/*
+
+
+.PHONY: sfc
+sfc:
+	if [ ! -d ../x1-sfc ]; then \
+		echo "x1-sfc not found in the parent directory. Please git clone https://github.com/FairCrypto/x1-sfc "; \
+		exit 1; \
+	else \
+		go generate ./...; \
+	fi

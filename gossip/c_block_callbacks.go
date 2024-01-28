@@ -54,6 +54,8 @@ var (
 	blockExecutionTimer = metrics.GetOrRegisterTimer("chain/execution", nil)
 	blockWriteTimer     = metrics.GetOrRegisterTimer("chain/write", nil)
 	blockAgeGauge       = metrics.GetOrRegisterGauge("chain/block/age", nil)
+
+	txCounter = metrics.GetOrRegisterCounter("chain/txs", nil)
 )
 
 type ExtendedTxPosition struct {
@@ -363,6 +365,7 @@ func consensusCallbackBeginBlockFn(
 							creator = 0
 						}
 						txListener.OnNewReceipt(evmBlock.Transactions[i], r, creator)
+						txCounter.Inc(1)
 					}
 					bs = txListener.Finalize() // TODO: refactor to not mutate the bs
 					bs.FinalizedStateRoot = block.Root

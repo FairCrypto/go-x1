@@ -3,6 +3,7 @@ package emitter
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/metrics"
 	"math/rand"
 	"os"
 	"strings"
@@ -28,6 +29,8 @@ const (
 	SenderCountBufferSize = 20000
 	PayloadIndexerSize    = 5000
 )
+
+var eventCounter = metrics.GetOrRegisterCounter("opera/events", nil)
 
 type Emitter struct {
 	config Config
@@ -271,6 +274,7 @@ func (em *Emitter) EmitEvent() (*inter.EventPayload, error) {
 		}
 	}
 
+	eventCounter.Inc(1)
 	return e, nil
 }
 
