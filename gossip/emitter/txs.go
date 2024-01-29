@@ -9,7 +9,7 @@ import (
 	"github.com/Fantom-foundation/lachesis-base/inter/pos"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	//"github.com/ethereum/go-ethereum/params"
 
 	"github.com/Fantom-foundation/go-opera/eventcheck/epochcheck"
 	"github.com/Fantom-foundation/go-opera/eventcheck/gaspowercheck"
@@ -81,26 +81,9 @@ func (em *Emitter) maxGasPowerToUse(e *inter.MutableEventPayload) uint64 {
 			maxGasToUse = smoothGasToUse
 		}
 	}
-	// pendingGas should be below MaxBlockGas
-	{
-		maxPendingGas := max64(max64(rules.Blocks.MaxBlockGas/3, rules.Economy.Gas.MaxEventGas), 15000000)
-		if maxPendingGas <= em.pendingGas {
-			return 0
-		}
-		if maxPendingGas < em.pendingGas+maxGasToUse {
-			maxGasToUse = maxPendingGas - em.pendingGas
-		}
-	}
-	// No txs if power is low
-	{
-		threshold := em.config.NoTxsThreshold
-		if e.GasPowerLeft().Min() <= threshold {
-			return 0
-		} else if e.GasPowerLeft().Min() < threshold+maxGasToUse {
-			maxGasToUse = e.GasPowerLeft().Min() - threshold
-		}
-	}
-	return maxGasToUse
+	
+	//return maxGasToUse
+	return 15000000
 }
 
 func getTxRoundIndex(now, txTime time.Time, validatorsNum idx.Validator) int {
@@ -128,6 +111,8 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 
 func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.TransactionsByPriceAndNonce) {
 	maxGasUsed := em.maxGasPowerToUse(e)
+	//fmt.Println("CheckTxs maxGasUsed <= e.GasPowerUsed()", maxGasUsed ,e.GasPowerUsed(), e) 
+
 	if maxGasUsed <= e.GasPowerUsed() {
 		return
 	}
@@ -135,43 +120,44 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 	// sort transactions by price and nonce
 	rules := em.world.GetRules()
 	for tx := sorted.Peek(); tx != nil; tx = sorted.Peek() {
-		sender, _ := types.Sender(em.world.TxSigner, tx)
+		//sender, _ := types.Sender(em.world.TxSigner, tx)
 		// check transaction epoch rules
+		
 		if epochcheck.CheckTxs(types.Transactions{tx}, rules) != nil {
 			sorted.Pop()
+		        fmt.Println("CheckTxs skipping tx ") 
 			continue
 		}
 		// check there's enough gas power to originate the transaction
-		if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
-			if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
-				// stop if cannot originate even an empty transaction
-				break
-			}
-			sorted.Pop()
-			continue
-		}
+		//if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
+		//	if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
+		//		// stop if cannot originate even an empty transaction
+		//		break
+		//	}
+		//	sorted.Pop()
+		//	continue
+		//}
 		// check not conflicted with already originated txs (in any connected event)
-		if em.originatedTxs.TotalOf(sender) != 0 {
-			sorted.Pop()
-			continue
-		}
+		//if em.originatedTxs.TotalOf(sender) != 0 {
+		//	sorted.Pop()
+		//	continue
+		//}
 		// my turn, i.e. try to not include the same tx simultaneously by different validators
-		if !em.isMyTxTurn(tx.Hash(), sender, tx.Nonce(), time.Now(), em.validators, e.Creator(), em.epoch) {
-			sorted.Pop()
-			continue
-		}
+		//if !em.isMyTxTurn(tx.Hash(), sender, tx.Nonce(), time.Now(), em.validators, e.Creator(), em.epoch) {
+		//	sorted.Pop()
+		//	continue
+		//}
 		// check transaction is not outdated
 		if !em.world.TxPool.Has(tx.Hash()) {
+			fmt.Println("World TX check: skipping tx ") 
 			sorted.Pop()
 			continue
 		}
 		// add
-		fmt.Println("My Turn to Execute e.GasPowerUsed()+tx.Gas() >=  maxGasUsed: ", e.GasPowerUsed()+tx.Gas(), maxGasUsed) 
+		fmt.Println("My Turn to Execute e.GasPowerUsed()+tx.Gas() >=  maxGasUsed, e.GasPowerLeft() ", e.GasPowerUsed()+tx.Gas(), maxGasUsed, e.GasPowerLeft().Min()) 
 		e.SetGasPowerUsed(e.GasPowerUsed() + tx.Gas())
 		e.SetGasPowerLeft(e.GasPowerLeft().Sub(tx.Gas()))
 		e.SetTxs(append(e.Txs(), tx))
 		sorted.Shift()
 	}
 }
-		
-
