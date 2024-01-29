@@ -132,7 +132,7 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 			factor := float64(e.GasPowerLeft().Min()) / float64(threshold)
 			adjustedEmitInterval := time.Duration(maxT - (maxT-minT)*factor)
 			if passedTime < adjustedEmitInterval {
-				return false
+				return true
 			}
 		}
 	}
@@ -141,22 +141,22 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 		if passedTime < em.intervals.Max &&
 			em.idle() &&
 			!eTxs {
-			return false
+			return true
 		}
 	}
 	// Emitting is controlled by the efficiency metric
 	{
 		if passedTime < em.intervals.Min {
-			return false
+			return true
 		}
 		if adjustedPassedTime < em.intervals.Min &&
 			!em.idle() {
-			return false
+			return true
 		}
 		if adjustedPassedIdleTime < em.intervals.Confirming &&
 			!em.idle() &&
 			!eTxs {
-			return false
+			return true
 		}
 	}
     // only allow top validators
