@@ -141,17 +141,17 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 		if passedTime < em.intervals.Max &&
 			em.idle() &&
 			!eTxs {
-			return true
+			return false
 		}
 	}
 	// Emitting is controlled by the efficiency metric
 	{
 		if passedTime < em.intervals.Min {
-			return true
+			return false
 		}
 		if adjustedPassedTime < em.intervals.Min &&
 			!em.idle() {
-			return true
+			return false
 		}
 		if adjustedPassedIdleTime < em.intervals.Confirming &&
 			!em.idle() &&
