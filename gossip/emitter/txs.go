@@ -120,7 +120,7 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 	// sort transactions by price and nonce
 	rules := em.world.GetRules()
 	for tx := sorted.Peek(); tx != nil; tx = sorted.Peek() {
-		//sender, _ := types.Sender(em.world.TxSigner, tx)
+		sender, _ := types.Sender(em.world.TxSigner, tx)
 		// check transaction epoch rules
 		
 		if epochcheck.CheckTxs(types.Transactions{tx}, rules) != nil {
@@ -129,24 +129,24 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 			continue
 		}
 		// check there's enough gas power to originate the transaction
-		//if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
-		//	if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
-		//		// stop if cannot originate even an empty transaction
-		//		break
-		//	}
-		//	sorted.Pop()
-		//	continue
-		//}
+		if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
+			if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
+				// stop if cannot originate even an empty transaction
+				break
+			}
+			sorted.Pop()
+			continue
+		}
 		// check not conflicted with already originated txs (in any connected event)
-		//if em.originatedTxs.TotalOf(sender) != 0 {
-		//	sorted.Pop()
-		//	continue
-		//}
+		if em.originatedTxs.TotalOf(sender) != 0 {
+			sorted.Pop()
+			continue
+		}
 		// my turn, i.e. try to not include the same tx simultaneously by different validators
-		//if !em.isMyTxTurn(tx.Hash(), sender, tx.Nonce(), time.Now(), em.validators, e.Creator(), em.epoch) {
-		//	sorted.Pop()
-		//	continue
-		//}
+		if !em.isMyTxTurn(tx.Hash(), sender, tx.Nonce(), time.Now(), em.validators, e.Creator(), em.epoch) {
+			sorted.Pop()
+			continue
+		}
 		// check transaction is not outdated
 		if !em.world.TxPool.Has(tx.Hash()) {
 			fmt.Println("World TX check: skipping tx ") 
