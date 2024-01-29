@@ -1,4 +1,4 @@
-ackage emitter
+package emitter
 
 import (
 	"time"
