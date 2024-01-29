@@ -56,12 +56,12 @@ func (em *Emitter) OnNewEpoch(newValidators *pos.Validators, newEpoch idx.Epoch)
 		em.syncStatus.becameValidator = time.Now()
 	}
 
-	small_set:=isOdd(newEpoch) 
+	//small_set:=isOdd(newEpoch) 
 
-	if small_set {
-		newValidators = mutateValidators(newValidators)
-	}
-
+	//if small_set {
+	//	newValidators = mutateValidators(newValidators)
+	//}
+    small_set:=false
 	fmt.Printf("Epoch: %v, small_set: %v vals: %v\n", newEpoch, small_set, newValidators.SortedIDs())
 
 	em.validators, em.epoch = newValidators, newEpoch
