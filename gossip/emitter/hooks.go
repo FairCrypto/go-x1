@@ -1,7 +1,8 @@
-package emitter
+ackage emitter
 
 import (
 	"time"
+	"fmt"
 
 	"github.com/Fantom-foundation/lachesis-base/emitter/ancestor"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
@@ -14,6 +15,32 @@ import (
 	"github.com/Fantom-foundation/go-opera/utils"
 	"github.com/Fantom-foundation/go-opera/utils/adapters/vecmt2dagidx"
 )
+
+func isOdd(number idx.Epoch) bool {
+    return number%2 != 0
+}
+
+func mutateValidators(validators *pos.Validators) *pos.Validators {
+    // Define a set of IDs you want to process
+    targetIDs := map[idx.ValidatorID]struct{}{
+        1:  {},
+        2:  {},
+        3:  {},
+        7:  {},
+        21: {},
+    }
+
+    builder := pos.NewBuilder()  // Assuming a builder is available in the "pos" package
+
+    for _, vid := range validators.IDs() {
+        // Check if vid is one of the target IDs
+        if _, ok := targetIDs[vid]; ok {
+            stake := uint64(validators.Get(vid))
+            builder.Set(vid, pos.Weight(stake))
+        }
+    }
+    return builder.Build()
+}
 
 // OnNewEpoch should be called after each epoch change, and on startup
 func (em *Emitter) OnNewEpoch(newValidators *pos.Validators, newEpoch idx.Epoch) {
@@ -28,6 +55,14 @@ func (em *Emitter) OnNewEpoch(newValidators *pos.Validators, newEpoch idx.Epoch)
 	if em.validators != nil && em.isValidator() && !em.validators.Exists(em.config.Validator.ID) && newValidators.Exists(em.config.Validator.ID) {
 		em.syncStatus.becameValidator = time.Now()
 	}
+
+	small_set:=isOdd(newEpoch) 
+
+	if small_set {
+		newValidators = mutateValidators(newValidators)
+	}
+
+	fmt.Printf("Epoch: %v, small_set: %v vals: %v\n", newEpoch, small_set, newValidators.SortedIDs())
 
 	em.validators, em.epoch = newValidators, newEpoch
 
