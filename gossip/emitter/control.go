@@ -2,7 +2,7 @@ package emitter
 
 import (
 	"time"
-
+	
 	"github.com/Fantom-foundation/lachesis-base/emitter/ancestor"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
 	"github.com/Fantom-foundation/lachesis-base/inter/pos"
@@ -41,7 +41,28 @@ func eventMetric(orig ancestor.Metric, seq idx.Event) ancestor.Metric {
 	return kickStartMetric(ancestor.Metric(eventMetricF(uint64(orig))), seq)
 }
 
+// Function to get the top 50 elements from a slice
+ func top50(slice []idx.ValidatorID) []idx.ValidatorID {
+     if len(slice) > 50 {
+         return slice[:50] // Return the first 100 elements
+     }
+     return slice // Return the slice as is if it has less than or equal to 100 elements
+ }
+
+ // Function to check if a number is in the top 50 elements of a slice
+ func isInTop50(number idx.ValidatorID, slice []idx.ValidatorID) bool {
+     var v idx.ValidatorID
+     top50Slice := top50(slice)
+     for _, v = range top50Slice {
+         if v == number {
+             return true
+         }
+     }
+     return false
+ }
+
 func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Metric, selfParent *inter.Event) bool {
+	// for now allow only vals up to ID 30 to emit:
 	passedTime := e.CreationTime().Time().Sub(em.prevEmittedAtTime)
 	if passedTime < 0 {
 		passedTime = 0
@@ -50,6 +71,21 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 	if passedTimeIdle < 0 {
 		passedTimeIdle = 0
 	}
+	// metric is a decimal (0.0, 1.0], being an estimation of how much the event will advance the consensus
+	adjustedPassedTime := time.Duration(ancestor.Metric(passedTime/piecefunc.DecimalUnit) * metric)
+	adjustedPassedIdleTime := time.Duration(ancestor.Metric(passedTimeIdle/piecefunc.DecimalUnit) * metric)
+	passedBlocks := em.world.GetLatestBlockIndex() - em.prevEmittedAtBlock
+
+	supermajority := true
+	// Filter this node's events if not in top50 supermajority of stakers
+        if e.Creator() == em.config.Validator.ID && !isInTop50(e.Creator(), em.validators.SortedIDs()) {
+                //fmt.Println("This node is not in supermajority")
+                //supermajority = false
+				// disable check
+				supermajority = true
+        }
+
+    if (supermajority) {
 	if em.stakeRatio[e.Creator()] < 0.35*piecefunc.DecimalUnit {
 		// top validators emit event right after transaction is originated
 		passedTimeIdle = passedTime
@@ -60,10 +96,6 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 	if passedTimeIdle > passedTime {
 		passedTimeIdle = passedTime
 	}
-	// metric is a decimal (0.0, 1.0], being an estimation of how much the event will advance the consensus
-	adjustedPassedTime := time.Duration(ancestor.Metric(passedTime/piecefunc.DecimalUnit) * metric)
-	adjustedPassedIdleTime := time.Duration(ancestor.Metric(passedTimeIdle/piecefunc.DecimalUnit) * metric)
-	passedBlocks := em.world.GetLatestBlockIndex() - em.prevEmittedAtBlock
 	// Forbid emitting if not enough power and power is decreasing
 	{
 		threshold := em.config.EmergencyThreshold
@@ -100,7 +132,7 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 			factor := float64(e.GasPowerLeft().Min()) / float64(threshold)
 			adjustedEmitInterval := time.Duration(maxT - (maxT-minT)*factor)
 			if passedTime < adjustedEmitInterval {
-				return false
+				return true
 			}
 		}
 	}
@@ -124,11 +156,18 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 		if adjustedPassedIdleTime < em.intervals.Confirming &&
 			!em.idle() &&
 			!eTxs {
-			return false
+			return true
 		}
 	}
-
+    // only allow top validators
 	return true
+	} else { 
+	        // Enforce emitting if passed Max time (10 mins)
+                if passedTime >= em.intervals.Max {
+                        return true
+                }
+	}
+	return false
 }
 
 func (em *Emitter) recheckIdleTime() {

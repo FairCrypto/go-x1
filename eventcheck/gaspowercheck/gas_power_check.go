@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math/big"
 	"time"
+	//"fmt"
 
 	"github.com/Fantom-foundation/lachesis-base/eventcheck/epochcheck"
 	"github.com/Fantom-foundation/lachesis-base/hash"
@@ -127,46 +128,57 @@ func CalcValidatorGasPower(e inter.EventI, eTime, prevTime inter.Timestamp, prev
 	if gasPower > maxGasPower {
 		gasPower = maxGasPower
 	}
+	//fmt.Printf("e.Creator: %v, gasPower %v gasPowerAllocatedBn: %v\n", e.Creator(), gasPower, gasPowerAllocatedBn)
 
 	return gasPower
 }
 
 func CalcValidatorGasPowerPerSec(
-	validator idx.ValidatorID,
-	validators *pos.Validators,
-	config Config,
+        validator idx.ValidatorID,
+        validators *pos.Validators,
+        config Config,
 ) (
-	perSec uint64,
-	maxGasPower uint64,
-	startup uint64,
+        perSec uint64,
+        maxGasPower uint64,
+        startup uint64,
 ) {
-	stake := validators.Get(validator)
-	if stake == 0 {
-		return 0, 0, 0
-	}
+        stake := validators.Get(validator)
+        if stake == 0 {
+                return 0, 0, 0
+        }
 
-	gas := config
+        // don't calculate, keep the same for all
+        //maxGasPower = 1000 * 28000 * 60
+        //startup = 100 * 28000
+        //return
 
-	validatorGasPowerPerSecBn := new(big.Int).SetUint64(gas.AllocPerSec)
-	mul(validatorGasPowerPerSecBn, uint64(stake))
-	div(validatorGasPowerPerSecBn, uint64(validators.TotalWeight()))
-	perSec = validatorGasPowerPerSecBn.Uint64()
+        gas := config
 
-	maxGasPower = perSec * (uint64(gas.MaxAllocPeriod) / uint64(time.Second))
-	if maxGasPower < gas.MinEnsuredAlloc {
-		maxGasPower = gas.MinEnsuredAlloc
-	}
+        validatorGasPowerPerSecBn := new(big.Int).SetUint64(gas.AllocPerSec)
+        mul(validatorGasPowerPerSecBn, uint64(stake))
+        div(validatorGasPowerPerSecBn, uint64(validators.TotalWeight()))
+        perSec = validatorGasPowerPerSecBn.Uint64()
+	//if validator == 7 {
+        	perSec = 1000 * 28000
+	//}
 
-	startup = perSec * (uint64(gas.StartupAllocPeriod) / uint64(time.Second))
-	if startup < gas.MinStartupGas {
-		startup = gas.MinStartupGas
-	}
+        maxGasPower = perSec * (uint64(gas.MaxAllocPeriod) / uint64(time.Second))
+        if maxGasPower < gas.MinEnsuredAlloc {
+                maxGasPower = gas.MinEnsuredAlloc
+        }
 
-	return
+        startup = perSec * (uint64(gas.StartupAllocPeriod) / uint64(time.Second))
+        if startup < gas.MinStartupGas {
+                startup = gas.MinStartupGas
+        }
+	//fmt.Printf("validator:%v , GasPowerPerSec: Persec: %v, maxGasPower: %v, startup: %v gas.AllocPerSec %v stake %v validators.TotalWeight() %v\n",validator, perSec, maxGasPower, startup, gas.AllocPerSec, stake, validators.TotalWeight())
+
+        return
 }
 
 // Validate event
 func (v *Checker) Validate(e inter.EventI, selfParent inter.EventI) error {
+	return nil
 	gasPowers, err := v.CalcGasPower(e, selfParent)
 	if err != nil {
 		return err

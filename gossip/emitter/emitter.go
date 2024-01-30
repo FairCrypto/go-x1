@@ -214,12 +214,13 @@ func (em *Emitter) getSortedTxs() *types.TransactionsByPriceAndNonce {
 		em.Log.Error("Tx pool transactions fetching error", "err", err)
 		return nil
 	}
-	for from, txs := range pendingTxs {
+	//Do not block nodes from taking events from mempool
+	//for from, txs := range pendingTxs {
 		// Filter the excessive transactions from each sender
-		if len(txs) > em.config.MaxTxsPerAddress {
-			pendingTxs[from] = txs[:em.config.MaxTxsPerAddress]
-		}
-	}
+	//	if len(txs) > em.config.MaxTxsPerAddress {
+	//		pendingTxs[from] = txs[:em.config.MaxTxsPerAddress]
+	//	}
+	//}
 	sortedTxs := types.NewTransactionsByPriceAndNonce(em.world.TxSigner, pendingTxs, em.world.GetRules().Economy.MinGasPrice)
 	em.cache.sortedTxs = sortedTxs
 	em.cache.poolCount = poolCount

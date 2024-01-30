@@ -2,7 +2,7 @@ package emitter
 
 import (
 	"time"
-
+	"fmt"
 	"github.com/Fantom-foundation/lachesis-base/common/bigendian"
 	"github.com/Fantom-foundation/lachesis-base/hash"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
@@ -81,26 +81,9 @@ func (em *Emitter) maxGasPowerToUse(e *inter.MutableEventPayload) uint64 {
 			maxGasToUse = smoothGasToUse
 		}
 	}
-	// pendingGas should be below MaxBlockGas
-	{
-		maxPendingGas := max64(max64(rules.Blocks.MaxBlockGas/3, rules.Economy.Gas.MaxEventGas), 15000000)
-		if maxPendingGas <= em.pendingGas {
-			return 0
-		}
-		if maxPendingGas < em.pendingGas+maxGasToUse {
-			maxGasToUse = maxPendingGas - em.pendingGas
-		}
-	}
-	// No txs if power is low
-	{
-		threshold := em.config.NoTxsThreshold
-		if e.GasPowerLeft().Min() <= threshold {
-			return 0
-		} else if e.GasPowerLeft().Min() < threshold+maxGasToUse {
-			maxGasToUse = e.GasPowerLeft().Min() - threshold
-		}
-	}
-	return maxGasToUse
+	
+	//return maxGasToUse
+	return 15000000
 }
 
 func getTxRoundIndex(now, txTime time.Time, validatorsNum idx.Validator) int {
@@ -128,6 +111,8 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 
 func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.TransactionsByPriceAndNonce) {
 	maxGasUsed := em.maxGasPowerToUse(e)
+	//fmt.Println("CheckTxs maxGasUsed <= e.GasPowerUsed()", maxGasUsed ,e.GasPowerUsed(), e) 
+
 	if maxGasUsed <= e.GasPowerUsed() {
 		return
 	}
@@ -137,8 +122,10 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 	for tx := sorted.Peek(); tx != nil; tx = sorted.Peek() {
 		sender, _ := types.Sender(em.world.TxSigner, tx)
 		// check transaction epoch rules
+		
 		if epochcheck.CheckTxs(types.Transactions{tx}, rules) != nil {
 			sorted.Pop()
+		        fmt.Println("CheckTxs skipping tx ") 
 			continue
 		}
 		// check there's enough gas power to originate the transaction
@@ -162,10 +149,12 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 		}
 		// check transaction is not outdated
 		if !em.world.TxPool.Has(tx.Hash()) {
+			fmt.Println("World TX check: skipping tx ") 
 			sorted.Pop()
 			continue
 		}
 		// add
+		fmt.Println("My Turn to Execute e.GasPowerUsed()+tx.Gas() >=  maxGasUsed, e.GasPowerLeft() ", e.GasPowerUsed()+tx.Gas(), maxGasUsed, e.GasPowerLeft().Min()) 
 		e.SetGasPowerUsed(e.GasPowerUsed() + tx.Gas())
 		e.SetGasPowerLeft(e.GasPowerLeft().Sub(tx.Gas()))
 		e.SetTxs(append(e.Txs(), tx))
