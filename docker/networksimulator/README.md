@@ -115,3 +115,18 @@ python3 test.py 5 --no-wait --validator 2
 python3 test.py --help
 ```
 
+## Rolling out partial upgrades
+
+First, build the new docker image with the changes you want to test.
+
+```shell
+docker-compose build
+```
+
+Then, you can upgrade the nodes one at a time.
+
+```shell
+docker-compose up -d --build --no-deps node2
+docker-compose up -d --build --no-deps node3
+docker-compose up -d --build --no-deps node4
+```

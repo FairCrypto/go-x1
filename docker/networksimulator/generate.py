@@ -5,7 +5,7 @@ import argparse
 DEFAULT_IP_BASE = '172.16.239.0'
 DEFAULT_NUM_NODES = 3
 DEFAULT_STARTING_PORT = 7050
-DEFAULT_FLAGS = "--testnet --metrics --metrics.addr 0.0.0.0 --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts '*' --http.corsdomain '*' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --verbosity 3 "
+DEFAULT_FLAGS = "--testnet --syncmode full --gcmode archive --metrics --metrics.addr 0.0.0.0 --http --http.port 8545 --http.addr 0.0.0.0 --http.vhosts '*' --http.corsdomain '*' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --verbosity 3 "
 BOOT_NODE_KEY = "4b20a091f6389ca9ee1492187cc2d775511fa1e0801bf1f787b3a14f961530b1"
 BOOT_NODE_PUB_KEY = "d06482f636e5c68586215f9ab9dfda270d38bf468195fc2e767d5d74b5fc7ab4faffc46028aa360b723ce53ded022949a8a6b1c96013d8ec1771f4ed448518b4"
 
