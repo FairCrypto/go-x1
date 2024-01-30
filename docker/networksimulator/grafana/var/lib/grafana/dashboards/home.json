@@ -2378,7 +2378,7 @@
               }
             ]
           },
-          "unit": "short",
+          "unit": "reqps",
           "unitScale": true
         },
         "overrides": []
@@ -2410,14 +2410,14 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(increase(chain_txs[$interval]))\n",
+          "expr": "max(rate(chain_txs[$interval]))\n",
           "instant": false,
           "legendFormat": "TXs",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Transaction Receipt Count",
+      "title": "Transaction Recipt Rate",
       "type": "timeseries"
     },
     {
