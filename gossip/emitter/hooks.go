@@ -1,6 +1,7 @@
 package emitter
 
 import (
+	"github.com/ethereum/go-ethereum/metrics"
 	"time"
 
 	"github.com/Fantom-foundation/lachesis-base/emitter/ancestor"
@@ -14,6 +15,10 @@ import (
 	"github.com/Fantom-foundation/go-opera/utils"
 	"github.com/Fantom-foundation/go-opera/utils/adapters/vecmt2dagidx"
 )
+
+var eventConnectedCounter = metrics.GetOrRegisterCounter("opera/events/connected", nil)
+var eventConfirmedCounter = metrics.GetOrRegisterCounter("opera/events/confirmed", nil)
+var epochsGauge = metrics.GetOrRegisterGauge("opera/epochs", nil)
 
 // OnNewEpoch should be called after each epoch change, and on startup
 func (em *Emitter) OnNewEpoch(newValidators *pos.Validators, newEpoch idx.Epoch) {
@@ -83,6 +88,8 @@ func (em *Emitter) OnNewEpoch(newValidators *pos.Validators, newEpoch idx.Epoch)
 			return updMetric(median, current, update, validatorIdx, newValidators)
 		})
 	em.payloadIndexer = ancestor.NewPayloadIndexer(PayloadIndexerSize)
+
+	epochsGauge.Update(int64(newEpoch))
 }
 
 // OnEventConnected tracks new events
@@ -109,6 +116,8 @@ func (em *Emitter) OnEventConnected(e inter.EventPayloadI) {
 	delete(em.challenges, e.Creator())
 	// mark validator as online
 	delete(em.offlineValidators, e.Creator())
+
+	eventConnectedCounter.Inc(1)
 }
 
 func (em *Emitter) OnEventConfirmed(he inter.EventI) {
@@ -127,6 +136,8 @@ func (em *Emitter) OnEventConfirmed(he inter.EventI) {
 			em.originatedTxs.Dec(addr)
 		}
 	}
+
+	eventConfirmedCounter.Inc(1)
 }
 
 func minDuration(a, b time.Duration) time.Duration {

@@ -1,12 +1,18 @@
 # Simulate a Network
 
-> install deps
+## Install Dependencies
+
+First, install [Docker](https://docs.docker.com/engine/install/) and [Docker Compose V2](https://docs.docker.com/compose/install/linux/).
+
+> Install python Deps
 ```shell
 # be in the docker/networksimulator directory
 cd docker/networksimulator
 
 pip3 install -r requirements.txt
 ```
+
+## Run the Simulation
 
 > run the simulated network. Replace NUM_OF_NODES with the number of nodes you want to simulate.
 
@@ -22,6 +28,8 @@ docker-compose up
 # Example: build and run a network of 10 nodes
 python3 generate.py 10 && docker compose up --build
 ```
+
+## Interact with the Network
 
 Give it a few minutes for all the nodes to start up.
 
