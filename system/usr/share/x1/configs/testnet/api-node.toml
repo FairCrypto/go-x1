@@ -1,9 +1,6 @@
 [Node]
 Testnet = true
 
-[Node.P2P]
-ListenAddr = ":5050"
-
 # RPC server
 HTTPHost = "0.0.0.0"
 HTTPVirtualHosts = ["*"]
@@ -32,6 +29,9 @@ WSModules = [
     "net",
     "txpool",
 ]
+
+[Node.P2P]
+ListenAddr = ":5050"
 
 [Opera]
 AllowSnapsync = true
