@@ -3,6 +3,7 @@ package gossip
 import (
 	"errors"
 	"fmt"
+	"github.com/Fantom-foundation/go-opera/version"
 	"math"
 	"math/rand"
 	"strings"
@@ -787,9 +788,12 @@ func (h *handler) handle(p *peer) error {
 	if !useless && (!eligibleForSnap(p.Peer) || !strings.Contains(strings.ToLower(p.Name()), "x1")) {
 		useless = true
 		discfilter.Ban(p.ID())
-	} else if strings.Contains(strings.ToLower(p.Name()), "1.1.3") {
-		log.Warn("ignore v1.1.3 peer", "peer", p.ID(), "name", p.Name())
-		return p2p.DiscTooManyPeers
+	} else {
+		ver := version.ParseVersionStringIntoU64(p.Peer.Name())
+		if ver < 1000001000005 { // version 1.1.5
+			log.Warn("Ignoring old peer. Sorry buddy.", "peer", p.ID(), "name", p.Name())
+			return p2p.DiscTooManyPeers
+		}
 	}
 	if !p.Peer.Info().Network.Trusted && useless {
 		if h.peers.UselessNum() >= h.maxPeers/10 {
