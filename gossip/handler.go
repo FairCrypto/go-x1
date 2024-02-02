@@ -834,7 +834,7 @@ func (h *handler) handle(p *peer) error {
 		p.Log().Warn("Leecher peer registration failed", "err", err)
 		return err
 	}
-	if p.RunningCap(ProtocolName, []uint{FTM63}) {
+	if p.RunningCap(ProtocolName, []uint{FTM65}) {
 		if err := h.epLeecher.RegisterPeer(p.id); err != nil {
 			p.Log().Warn("Leecher peer registration failed", "err", err)
 			return err
