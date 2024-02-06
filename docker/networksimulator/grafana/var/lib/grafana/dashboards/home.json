@@ -2339,7 +2339,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "bars",
+            "drawStyle": "line",
             "fillOpacity": 14,
             "gradientMode": "none",
             "hideFrom": {
@@ -2417,7 +2417,7 @@
           "refId": "A"
         }
       ],
-      "title": "Transaction Recipt Rate",
+      "title": "Transaction Receipt Rate",
       "type": "timeseries"
     },
     {
@@ -2731,7 +2731,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "bars",
+            "drawStyle": "line",
             "fillOpacity": 14,
             "gradientMode": "none",
             "hideFrom": {
@@ -2927,7 +2927,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "bars",
+            "drawStyle": "line",
             "fillOpacity": 14,
             "gradientMode": "none",
             "hideFrom": {
