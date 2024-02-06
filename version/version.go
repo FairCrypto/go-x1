@@ -2,16 +2,18 @@ package version
 
 import (
 	"fmt"
-	"math/big"
-
 	"github.com/ethereum/go-ethereum/params"
+	"math/big"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 func init() {
 	params.VersionMajor = 1     // Major version component of the current release
 	params.VersionMinor = 1     // Minor version component of the current release
-	params.VersionPatch = 3     // Patch version component of the current release
-	params.VersionMeta = "rc.6" // Version metadata to append to the version string
+	params.VersionPatch = 5     // Patch version component of the current release
+	params.VersionMeta = "rc.1" // Version metadata to append to the version string
 }
 
 func BigToString(b *big.Int) string {
@@ -43,4 +45,27 @@ func ToString(major, minor, patch uint16) string {
 
 func U64ToString(v uint64) string {
 	return ToString(uint16((v/1e12)%1e6), uint16((v/1e6)%1e6), uint16(v%1e6))
+}
+
+func ParseVersionString(clientName string) (major, minor, patch uint16) {
+	re := regexp.MustCompile(`v([0-9]+)\.([0-9]+)\.([0-9]+)`)
+	groups := re.FindStringSubmatch(strings.ToLower(clientName))
+
+	if len(groups) < 4 {
+		return 0, 0, 0
+	}
+
+	value, _ := strconv.ParseUint(groups[1], 10, 16)
+	major = uint16(value)
+	value, _ = strconv.ParseUint(groups[2], 10, 16)
+	minor = uint16(value)
+	value, _ = strconv.ParseUint(groups[3], 10, 16)
+	patch = uint16(value)
+
+	return major, minor, patch
+}
+
+func ParseVersionStringIntoU64(version string) uint64 {
+	major, miner, patch := ParseVersionString(version)
+	return ToU64(major, miner, patch)
 }

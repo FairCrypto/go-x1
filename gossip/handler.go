@@ -3,6 +3,7 @@ package gossip
 import (
 	"errors"
 	"fmt"
+	"github.com/Fantom-foundation/go-opera/version"
 	"math"
 	"math/rand"
 	"strings"
@@ -787,6 +788,12 @@ func (h *handler) handle(p *peer) error {
 	if !useless && (!eligibleForSnap(p.Peer) || !strings.Contains(strings.ToLower(p.Name()), "x1")) {
 		useless = true
 		discfilter.Ban(p.ID())
+	} else {
+		ver := version.ParseVersionStringIntoU64(p.Peer.Name())
+		if ver < 1000001000005 { // version 1.1.5
+			log.Warn("Ignoring old peer. Sorry buddy.", "peer", p.ID(), "name", p.Name())
+			return p2p.DiscTooManyPeers
+		}
 	}
 	if !p.Peer.Info().Network.Trusted && useless {
 		if h.peers.UselessNum() >= h.maxPeers/10 {
@@ -827,7 +834,7 @@ func (h *handler) handle(p *peer) error {
 		p.Log().Warn("Leecher peer registration failed", "err", err)
 		return err
 	}
-	if p.RunningCap(ProtocolName, []uint{FTM63}) {
+	if p.RunningCap(ProtocolName, []uint{FTM65}) {
 		if err := h.epLeecher.RegisterPeer(p.id); err != nil {
 			p.Log().Warn("Leecher peer registration failed", "err", err)
 			return err

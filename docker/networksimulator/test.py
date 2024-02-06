@@ -435,6 +435,7 @@ argparser.add_argument('--validator', type=int, default=1, help="the validator i
 argparser.add_argument('--validators', type=int,
                        help="the number of concurrent validators to use for signing transactions")
 argparser.add_argument('--rpc', type=str, default=RPC_URL, help="The RPC URL to use")
+argparser.add_argument('--nonce', type=int, required=False, help="The nonce")
 
 args = argparser.parse_args()
 
@@ -459,8 +460,11 @@ def run_transactions(key):
         "from": acct1.address,
         "to": acct1.address,
         "value": Web3.to_wei(args.value, 'ether'),
-        'gas': args.gas
+        'gas': args.gas,
     }
+
+    if args.nonce:
+        tx_params["nonce"] = args.nonce
 
     if args.max_gas_fee and args.max_gas_priority_fee:
         tx_params["maxFeePerGas"] = Web3.to_wei(args.max_gas_fee, 'gwei')

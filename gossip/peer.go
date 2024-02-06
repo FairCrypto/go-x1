@@ -585,5 +585,5 @@ func (p *snapPeer) info() *snapPeerInfo {
 
 // eligibleForSnap checks eligibility of a peer for a snap protocol. A peer is eligible for a snap if it advertises `snap` sattelite protocol along with `opera` protocol.
 func eligibleForSnap(p *p2p.Peer) bool {
-	return p.RunningCap(ProtocolName, []uint{FTM63}) && p.RunningCap(snap.ProtocolName, snap.ProtocolVersions)
+	return p.RunningCap(ProtocolName, []uint{FTM65}) && p.RunningCap(snap.ProtocolName, snap.ProtocolVersions)
 }

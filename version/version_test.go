@@ -39,3 +39,63 @@ func TestAsBigInt(t *testing.T) {
 		prev = next
 	}
 }
+
+func TestParseVersion_WithValidVersion(t *testing.T) {
+	major, minor, patch := ParseVersionString("go-x1/v1.2.3-asdasadas")
+	require.Equal(t, uint16(1), major)
+	require.Equal(t, uint16(2), minor)
+	require.Equal(t, uint16(3), patch)
+}
+
+func TestParseVersion_WithInvalidVersion(t *testing.T) {
+	major, minor, patch := ParseVersionString("go-x1/v1.2.asdasadas")
+	require.Equal(t, uint16(0), major)
+	require.Equal(t, uint16(0), minor)
+	require.Equal(t, uint16(0), patch)
+}
+
+func TestParseVersion_WithNoVersion(t *testing.T) {
+	major, minor, patch := ParseVersionString("go-x1/asdasadas")
+	require.Equal(t, uint16(0), major)
+	require.Equal(t, uint16(0), minor)
+	require.Equal(t, uint16(0), patch)
+}
+
+func TestParseVersion_WithMaxUint16Version(t *testing.T) {
+	major, minor, patch := ParseVersionString("go-x1/v65535.65535.65535-asdasadas")
+	require.Equal(t, uint16(65535), major)
+	require.Equal(t, uint16(65535), minor)
+	require.Equal(t, uint16(65535), patch)
+}
+
+func TestParseVersion_WithAnotherInvalidVersion(t *testing.T) {
+	major, minor, patch := ParseVersionString("go-x1/v-1.2.0.asdasadas")
+	require.Equal(t, uint16(0), major)
+	require.Equal(t, uint16(0), minor)
+	require.Equal(t, uint16(0), patch)
+}
+
+func TestParseVersionStringIntoU64_WithValidVersion(t *testing.T) {
+	result := ParseVersionStringIntoU64("go-x1/v1.2.3-asdasadas")
+	require.Equal(t, uint64(1000002000003), result)
+}
+
+func TestParseVersionStringIntoU64_WithInvalidVersion(t *testing.T) {
+	result := ParseVersionStringIntoU64("go-x1/v1.2.asdasadas")
+	require.Equal(t, uint64(0), result)
+}
+
+func TestParseVersionStringIntoU64_WithNoVersion(t *testing.T) {
+	result := ParseVersionStringIntoU64("go-x1/asdasadas")
+	require.Equal(t, uint64(0), result)
+}
+
+func TestParseVersionStringIntoU64_WithMaxUint16Version(t *testing.T) {
+	result := ParseVersionStringIntoU64("go-x1/v65535.65535.65535-asdasadas")
+	require.Equal(t, uint64(65535065535065535), result)
+}
+
+func TestParseVersionStringIntoU64_WithMaxUint16Version2(t *testing.T) {
+	result := ParseVersionStringIntoU64("go-x1/v1.1.3-asdasadas")
+	require.Equal(t, uint64(1000001000003), result)
+}
