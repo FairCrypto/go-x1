@@ -15,12 +15,24 @@ func New(max int) Set {
 func (s Set) Put(i int) {
 	yi := i / 8
 	bi := i % 8
+
+	if yi >= len(s) {
+		log.Warn("Index out of range", "index", i, "max", len(s)*8)
+		return
+	}
+
 	s[yi] |= 1 << bi
 }
 
 func (s Set) Del(i int) {
 	yi := i / 8
 	bi := i % 8
+
+	if yi >= len(s) {
+		log.Warn("Index out of range", "index", i, "max", len(s)*8)
+		return
+	}
+
 	s[yi] &= ^(1 << bi)
 }
 
