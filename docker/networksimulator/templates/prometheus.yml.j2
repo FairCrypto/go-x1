@@ -13,5 +13,11 @@ scrape_configs:
   static_configs:
   - targets:
 {% for node in nodes %}
-    - node{{ node.id }}:6060
-{% endfor %}
+    - node{{ node.id }}:6060{% endfor %}
+
+- job_name: prometheus
+  honor_timestamps: true
+  scrape_interval:
+  static_configs:
+    - targets:
+        - node-exporter:9100
