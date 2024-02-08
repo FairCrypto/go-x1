@@ -1,5 +1,7 @@
 package bitmap
 
+import "github.com/ethereum/go-ethereum/log"
+
 type Set []byte
 
 func New(max int) Set {
@@ -25,5 +27,11 @@ func (s Set) Del(i int) {
 func (s Set) Has(i int) bool {
 	yi := i / 8
 	bi := i % 8
+
+	if yi >= len(s) {
+		log.Warn("Index out of range", "index", i, "max", len(s)*8)
+		return false
+	}
+
 	return (s[yi] & (1 << bi)) != 0
 }
