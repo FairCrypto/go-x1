@@ -33,14 +33,14 @@ make x1
 cp build/x1 /usr/local/bin
 
 # Run the node
-x1 --testnet --syncmode snap
+x1 --testnet
 ```
 
 ### Examples
 
 > Run with Xenblocks reporting enabled
 ```shell
-x1 --testnet --syncmode snap --xenblocks-endpoint ws://xenblocks.io:6668
+x1 --testnet --xenblocks-endpoint ws://xenblocks.io:6668
 ```
 
 ## Run an API Node (Testnet)
