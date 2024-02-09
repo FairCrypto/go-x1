@@ -26,7 +26,7 @@ python3 generate.py NUM_OF_NODES
 docker-compose up
 
 # Example: build and run a network of 10 nodes
-python3 generate.py 10 && docker compose up --build
+python3 generate.py 10 && docker compose up --remove-orphans --build
 ```
 
 ## Interact with the Network
@@ -59,7 +59,7 @@ echo "replace github.com/Fantom-foundation/lachesis-base => ./lachesis-base" >> 
 cd docker/networksimulator
 
 # Example: build and run a network of 10 nodes
-python3 generate.py 10 && docker compose up --build
+python3 generate.py 10 && docker compose up --remove-orphans --build
 ```
 
 ## Include a Custom SFC contract
@@ -89,7 +89,7 @@ go generate ./...
 cd docker/networksimulator
 
 # Example: build and run a network of 10 nodes
-python3 generate.py 10 && docker compose up --build
+python3 generate.py 10 && docker compose up --remove-orphans --build
 ```
 
 ## Metrics and Monitoring
@@ -101,26 +101,26 @@ Prometheus and Granfana are included in the docker-compose file.
 
 ## Test Script
 
-The test.py script is an example of how to interact with the simulated network. It uses the web3.py library to send transactions to the network.
+The txblaster.py script is an example of how to interact with the simulated network. It uses the web3.py library to send transactions to the network.
 
-> send 5 transactions to the network using validator 1's private key
+> send 5 transactions to the network
 ```shell
-python3 test.py 5
+python3 txblaster.py 5
 ```
 
-> send 100 transactions and don't wait for a receipt from validator 2
+> send 100 transactions and don't wait for a receipt
 ```shell
-python3 test.py 5 --no-wait --validator 2
+python3 txblaster.py 5 --no-wait
 ```
 
-> send 1000 transactions and don't wait for a receipt from 10 validators concurrently
+> send 1000 transactions from 10 workers (accounts)
 ```shell
-python3 test.py 5 --no-wait --validator 2
+python3 txblaster.py 1000 --workers 10
 ```
 
 > see all the options
 ```shell
-python3 test.py --help
+python3 txblaster.py--help
 ```
 
 ## Rolling out partial upgrades
@@ -134,7 +134,7 @@ docker-compose build
 Then, you can upgrade the nodes one at a time.
 
 ```shell
-docker-compose up -d --build --no-deps node2
-docker-compose up -d --build --no-deps node3
-docker-compose up -d --build --no-deps node4
+docker-compose up -d --no-deps node2
+docker-compose up -d --no-deps node3
+docker-compose up -d --no-deps node4
 ```

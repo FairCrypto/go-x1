@@ -16,19 +16,19 @@ import (
 
 // Constants to match up protocol versions and messages
 const (
-	FTM62           = 62
-	FTM63           = 63
-	ProtocolVersion = FTM63
+	FTM64           = 64
+	FTM65           = 65
+	ProtocolVersion = FTM65
 )
 
 // ProtocolName is the official short name of the protocol used during capability negotiation.
-const ProtocolName = "opera"
+const ProtocolName = "x1"
 
 // ProtocolVersions are the supported versions of the protocol (first is primary).
-var ProtocolVersions = []uint{FTM62, FTM63}
+var ProtocolVersions = []uint{FTM64, FTM65}
 
 // protocolLengths are the number of implemented message corresponding to different protocol versions.
-var protocolLengths = map[uint]uint64{FTM62: EventsStreamResponse + 1, FTM63: EPsStreamResponse + 1}
+var protocolLengths = map[uint]uint64{FTM64: EventsStreamResponse + 1, FTM65: EPsStreamResponse + 1}
 
 const protocolMaxMsgSize = inter.ProtocolMaxMsgSize // Maximum cap on the size of a protocol message
 

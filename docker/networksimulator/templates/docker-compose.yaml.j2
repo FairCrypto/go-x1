@@ -7,30 +7,30 @@ networks:
 
 services:
   node1:
-    image: x1-network-simulator
+    image: ghcr.io/faircrypto/go-x1:latest
     build:
         context: ../..
-        dockerfile: ./docker/networksimulator/Dockerfile
+        dockerfile: ./docker/Dockerfile.x1
     command: "{{ flags }} --fakenet 1/{{ num_nodes }} --maxpeers {{ num_nodes }} --nat 'extip:{{ nodes[0].ip }}' --nodekeyhex {{ bootnode_key }}"
     ports:
       - "{{ nodes[0].p2p_port }}:5050"
       - "{{ nodes[0].p2p_port }}:5050/udp"
       - "{{ nodes[0].metrics_port }}:6060"
-      - "8545:8545"
-      - "8546:8546"
+      - "{{ rpc_port }}:8545"
+      - "{{ ws_port }}:8546"
     networks:
       x1-simulator:
         ipv4_address: {{ nodes[0].ip }}
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://{{ nodes[0].ip }}:8545"]
+      test: ["CMD", "uptime"]
       interval: 1s
       timeout: 1s
       retries: 30
 
 {% for id in range(2, num_nodes + 1) %}
   node{{ id }}:
-    image: x1-network-simulator
+    image: ghcr.io/faircrypto/go-x1:latest
     command: "{{ flags }} --fakenet {{ id }}/{{ num_nodes }} --maxpeers {{ num_nodes }} --bootnodes 'enode://{{ bootnode_pub_key }}@{{ nodes[0].ip }}:5050'"
     ports:
       - "{{ nodes[id - 1].p2p_port }}:5050"
@@ -50,7 +50,6 @@ services:
         interval: 3s
         timeout: 3s
         retries: 60
-
 {% endfor %}
 
   prometheus:
@@ -59,19 +58,20 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
-      - 9090:9090
+      - {{ prometheus_port }}:9090
     restart: unless-stopped
     volumes:
       - ./prometheus:/etc/prometheus
       - prom_data:/prometheus
     networks:
       x1-simulator:
+        ipv4_address: {{ prometheus_ip }}
 
   grafana:
     image: grafana/grafana-oss:latest
     container_name: grafana
     ports:
-      - 3000:3000
+      - {{ grafana_port }}:3000
     restart: unless-stopped
     environment:
       GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
@@ -91,6 +91,25 @@ services:
 
     networks:
       x1-simulator:
+        ipv4_address: {{ grafana_ip }}
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      x1-simulator:
+        ipv4_address: {{ node_exporter_ip }}
+
 
 volumes:
   prom_data:
