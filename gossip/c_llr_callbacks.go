@@ -40,7 +40,7 @@ func (s *Service) processBlockVote(block idx.Block, epoch idx.Epoch, bv hash.Has
 				return s.store.GetLlrBlockResult(idx.Block(u)) != nil
 			}))
 		} else if *wonBr != bv {
-			s.Log.Error("LLR voting doublesign is met", "block", block)
+			s.Log.Debug("LLR voting doublesign is met", "block", block)
 		}
 	}
 }
@@ -181,7 +181,7 @@ func (s *Service) processRawEpochVote(epoch idx.Epoch, ev hash.Hash, val idx.Val
 				return s.store.GetLlrEpochResult(idx.Epoch(u)) != nil
 			}))
 		} else if *wonEr != ev {
-			s.Log.Error("LLR voting doublesign is met", "epoch", epoch)
+			s.Log.Debug("LLR voting doublesign is met", "epoch", epoch)
 		}
 	}
 }
