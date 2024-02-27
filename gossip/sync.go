@@ -237,7 +237,7 @@ func (h *handler) snapsyncStageTick() {
 		h.brLeecher.Pause()
 	} else {
 		h.dagLeecher.Pause()
-		h.brLeecher.Resume()
+		//h.brLeecher.Resume()
 	}
 }
 

@@ -685,7 +685,7 @@ func (h *handler) Start(maxPeers int) {
 
 	h.epProcessor.Start()
 	h.epSeeder.Start()
-	h.epLeecher.Start()
+	//h.epLeecher.Start()
 
 	h.dagProcessor.Start()
 	h.dagSeeder.Start()
@@ -693,11 +693,11 @@ func (h *handler) Start(maxPeers int) {
 
 	h.bvProcessor.Start()
 	h.bvSeeder.Start()
-	h.bvLeecher.Start()
+	//h.bvLeecher.Start()
 
 	h.brProcessor.Start()
 	h.brSeeder.Start()
-	h.brLeecher.Start()
+	//h.brLeecher.Start()
 	h.started.Done()
 }
 
