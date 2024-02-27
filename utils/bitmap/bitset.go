@@ -17,7 +17,7 @@ func (s Set) Put(i int) {
 	bi := i % 8
 
 	if yi >= len(s) {
-		log.Warn("Index out of range", "index", i, "max", len(s)*8)
+		log.Debug("Index out of range", "index", i, "max", len(s)*8)
 		return
 	}
 
@@ -29,7 +29,7 @@ func (s Set) Del(i int) {
 	bi := i % 8
 
 	if yi >= len(s) {
-		log.Warn("Index out of range", "index", i, "max", len(s)*8)
+		log.Debug("Index out of range", "index", i, "max", len(s)*8)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (s Set) Has(i int) bool {
 	bi := i % 8
 
 	if yi >= len(s) {
-		log.Warn("Index out of range", "index", i, "max", len(s)*8)
+		log.Debug("Index out of range", "index", i, "max", len(s)*8)
 		return false
 	}
 
