@@ -497,7 +497,7 @@ func FakeKey(n uint32) *ecdsa.PrivateKey {
 		"0x2f34c9b455462bb3a4ffb65ea87244e714c1f86ec497ea4f19927f71640a60e7",
 	}
 
-	if n == 0 || n > 100 {
+	if n == 0 || n > uint32(len(keys)) {
 		panic(errors.New("validator num is out of range"))
 	}
 
