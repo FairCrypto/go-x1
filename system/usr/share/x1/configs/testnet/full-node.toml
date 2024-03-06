@@ -4,9 +4,6 @@ Testnet = true
 [Node.P2P]
 ListenAddr = ":5050"
 
-[Opera]
-AllowSnapsync = true
-
 # Share you node info with the xenblocks.io explorer
 # (optional) comment out to disable
 [XenBlocks]

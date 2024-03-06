@@ -683,20 +683,20 @@ func (h *handler) Start(maxPeers int) {
 	h.txFetcher.Start()
 	h.checkers.Heavycheck.Start()
 
-	h.epProcessor.Start()
-	h.epSeeder.Start()
+	//h.epProcessor.Start()
+	//h.epSeeder.Start()
 	//h.epLeecher.Start()
 
 	h.dagProcessor.Start()
 	h.dagSeeder.Start()
 	h.dagLeecher.Start()
 
-	h.bvProcessor.Start()
-	h.bvSeeder.Start()
+	//h.bvProcessor.Start()
+	//h.bvSeeder.Start()
 	//h.bvLeecher.Start()
 
-	h.brProcessor.Start()
-	h.brSeeder.Start()
+	//h.brProcessor.Start()
+	//h.brSeeder.Start()
 	//h.brLeecher.Start()
 	h.started.Done()
 }
