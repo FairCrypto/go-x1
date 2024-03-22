@@ -55,6 +55,7 @@ type PeerProgress struct {
 type Backend interface {
 	// General Ethereum API
 	Progress() PeerProgress
+	PeerCount() int
 	SuggestGasTipCap(ctx context.Context, certainty uint64) *big.Int
 	EffectiveMinGasPrice(ctx context.Context) *big.Int
 	ChainDb() ethdb.Database

@@ -619,3 +619,7 @@ func (b *EthAPIBackend) SealedEpochTiming(ctx context.Context) (start inter.Time
 	es := b.svc.store.GetEpochState()
 	return es.PrevEpochStart, es.EpochStart
 }
+
+func (b *EthAPIBackend) PeerCount() int {
+	return b.svc.handler.peers.Len()
+}
