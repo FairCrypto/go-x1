@@ -65,7 +65,8 @@ const (
 )
 
 var (
-	noUncles = []evmcore.EvmHeader{}
+	noUncles  = []evmcore.EvmHeader{}
+	startTime = time.Now()
 )
 
 // PublicEthereumAPI provides an API to access Ethereum related information.
@@ -173,6 +174,34 @@ func (s *PublicEthereumAPI) Syncing() (interface{}, error) {
 		"pulledStates":     hexutil.Uint64(0), // back-compatibility
 		"knownStates":      hexutil.Uint64(0), // back-compatibility
 	}, nil
+}
+
+// Health returns true if node is healthy and synced
+func (s *PublicEthereumAPI) Health(blockTimeSecThreshold uint64, uptimeSecThreshold uint, peerCountThreshold uint) (interface{}, error) {
+	blockTime := time.Duration(blockTimeSecThreshold) * time.Second
+	uptimeThreshold := time.Duration(uptimeSecThreshold) * time.Second
+	uptime := time.Since(startTime)
+	progress := s.b.Progress()
+	peerCount := s.b.PeerCount()
+	log.Debug("Health check", "peerCount", peerCount, "peerCountThreshold", peerCountThreshold, "uptime", uptime, "uptimeThreshold", uptimeThreshold, "progress", progress, "currentBlockTime", time.Since(progress.CurrentBlockTime.Time()), "blockTime", blockTime)
+
+	if uptime < uptimeThreshold {
+		return false, errors.New(fmt.Sprintf("Uptime threshold not reached"))
+	}
+
+	if progress.CurrentBlock < progress.HighestBlock {
+		return false, errors.New(fmt.Sprintf("The current block is less than the highest block"))
+	}
+
+	if peerCount < int(peerCountThreshold) {
+		return false, errors.New(fmt.Sprintf("Peer count threshold not reached"))
+	}
+
+	if blockTime > 0 && time.Since(progress.CurrentBlockTime.Time()) > blockTime {
+		return false, errors.New("block time threshold exceeded")
+	}
+
+	return true, nil
 }
 
 // PublicTxPoolAPI offers and API for the transaction pool. It only operates on data that is non confidential.
@@ -812,10 +841,10 @@ func (s *PublicBlockChainAPI) calculateExtBlockApi(ctx context.Context, blkNumbe
 }
 
 // GetBlockByNumber returns the requested canonical block.
-// * When blockNr is -1 the chain head is returned.
-// * When blockNr is -2 the pending chain head is returned.
-// * When fullTx is true all transactions in the block are returned, otherwise
-//   only the transaction hash is returned.
+//   - When blockNr is -1 the chain head is returned.
+//   - When blockNr is -2 the pending chain head is returned.
+//   - When fullTx is true all transactions in the block are returned, otherwise
+//     only the transaction hash is returned.
 func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.BlockNumber, fullTx bool) (map[string]interface{}, error) {
 	block, err := s.b.BlockByNumber(ctx, number)
 	if block != nil && err == nil {
