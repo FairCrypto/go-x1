@@ -176,12 +176,20 @@ func (s *PublicEthereumAPI) Health(blockTimeSecThreshold uint64, uptimeSecThresh
 	peerCount := s.b.PeerCount()
 	log.Debug("Health check", "peerCount", peerCount, "peerCountThreshold", peerCountThreshold, "uptime", uptime, "uptimeThreshold", uptimeThreshold, "progress", progress, "currentBlockTime", time.Since(progress.CurrentBlockTime.Time()), "blockTime", blockTime)
 
-	if uptime < uptimeThreshold || progress.CurrentBlock < progress.HighestBlock || peerCount < int(peerCountThreshold) {
-		return false, nil
+	if uptime < uptimeThreshold {
+		return false, errors.New(fmt.Sprintf("Uptime threshold not reached"))
+	}
+
+	if progress.CurrentBlock < progress.HighestBlock {
+		return false, errors.New(fmt.Sprintf("The current block is less than the highest block"))
+	}
+
+	if peerCount < int(peerCountThreshold) {
+		return false, errors.New(fmt.Sprintf("Peer count threshold not reached"))
 	}
 
 	if blockTime > 0 && time.Since(progress.CurrentBlockTime.Time()) > blockTime {
-		return false, nil
+		return false, errors.New("block time threshold exceeded")
 	}
 
 	return true, nil
