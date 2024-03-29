@@ -32,6 +32,7 @@ var (
 	isMyTurnCounter             = metrics.GetOrRegisterCounter("opera/txs/isMyTurn", nil)
 	isNotMyTurnCounter          = metrics.GetOrRegisterCounter("opera/txs/isNotMyTurn", nil)
 	outdatedCounter             = metrics.GetOrRegisterCounter("opera/txs/outdated", nil)
+	invalidTxCounter            = metrics.GetOrRegisterCounter("opera/txs/invalidTxCounter", nil)
 
 	gasPowerUsedGauge      = metrics.GetOrRegisterGauge("opera/txs/gasPowerUsed", nil)
 	gasPowerLeftShortGauge = metrics.GetOrRegisterGauge("opera/txs/gasPowerLeftShort", nil)
@@ -156,6 +157,7 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 		sender, _ := types.Sender(em.world.TxSigner, tx)
 		// check transaction epoch rules
 		if epochcheck.CheckTxs(types.Transactions{tx}, rules) != nil {
+			invalidTxCounter.Inc(1)
 			sorted.Pop()
 			continue
 		}
