@@ -47,3 +47,10 @@ func SetLevel(l string) {
 			lvl,
 			log.Root().GetHandler()))
 }
+
+func SetLevelInt(l log.Lvl) {
+	log.Root().SetHandler(
+		log.LvlFilterHandler(
+			l,
+			log.Root().GetHandler()))
+}
