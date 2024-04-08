@@ -25,6 +25,7 @@ import (
 	"strings"
 	"sync"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/Fantom-foundation/lachesis-base/hash"
@@ -2436,6 +2437,12 @@ func (api *PrivateDebugAPI) ChaindbProperty(property string) (string, error) {
 		property = "stats"
 	}
 	return api.b.ChainDb().Stat(property)
+}
+
+// Verbosity sets the log level of the node.
+func (api *PrivateDebugAPI) Verbosity(level int) {
+	log.Info("Setting log level", "level", log.Lvl(level).String())
+	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(level), log.StreamHandler(os.Stdout, log.TerminalFormat(true))))
 }
 
 // ChaindbCompact flattens the entire key-value database into a single level,

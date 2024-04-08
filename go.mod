@@ -109,7 +109,11 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/ethereum/go-ethereum => github.com/faircrypto/go-ethereum v1.1.4-rc1-6
+require github.com/panjf2000/ants/v2 v2.4.5 // indirect
+
+replace github.com/ethereum/go-ethereum => github.com/faircrypto/go-ethereum v1.10.8-ftm-rc9.0.20240408233151-381ed183bc52
+
+//replace github.com/ethereum/go-ethereum => ./go-ethereum
 
 replace github.com/Fantom-foundation/lachesis-base => github.com/faircrypto/lachesis-base v0.0.0-20230817040848-1326ba9aa59b
 

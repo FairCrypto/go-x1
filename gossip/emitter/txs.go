@@ -1,6 +1,8 @@
 package emitter
 
 import (
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
 	"time"
 
 	"github.com/Fantom-foundation/lachesis-base/common/bigendian"
@@ -22,6 +24,19 @@ const (
 	TxTurnPeriod        = 8 * time.Second
 	TxTurnPeriodLatency = 1 * time.Second
 	TxTurnNonces        = 32
+)
+
+var (
+	outOfGasPowerCounter        = metrics.GetOrRegisterCounter("opera/txs/outOfGasPower", nil)
+	conflictedOriginatedCounter = metrics.GetOrRegisterCounter("opera/txs/conflictedOriginated", nil)
+	isMyTurnCounter             = metrics.GetOrRegisterCounter("opera/txs/isMyTurn", nil)
+	isNotMyTurnCounter          = metrics.GetOrRegisterCounter("opera/txs/isNotMyTurn", nil)
+	outdatedCounter             = metrics.GetOrRegisterCounter("opera/txs/outdated", nil)
+	invalidTxCounter            = metrics.GetOrRegisterCounter("opera/txs/invalidTxCounter", nil)
+
+	gasPowerUsedGauge      = metrics.GetOrRegisterGauge("opera/txs/gasPowerUsed", nil)
+	gasPowerLeftShortGauge = metrics.GetOrRegisterGauge("opera/txs/gasPowerLeftShort", nil)
+	gasPowerLeftLongGauge  = metrics.GetOrRegisterGauge("opera/txs/gasPowerLeftLong", nil)
 )
 
 func max64(a, b uint64) uint64 {
@@ -123,6 +138,10 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 
 	roundsHash := hash.Of(sender.Bytes(), bigendian.Uint64ToBytes(accountNonce/TxTurnNonces), epoch.Bytes())
 	rounds := utils.WeightedPermutation(roundIndex+1, validators.SortedWeights(), roundsHash)
+
+	chosen := validators.GetID(idx.Validator(rounds[roundIndex]))
+	log.Debug("tx turn", "roundIndex", roundIndex, "rounds", rounds, "chosen", chosen, "me", me, "txTime", txTime, "now", now, "txHash", txHash, "sender", sender, "accountNonce", accountNonce, "epoch", epoch)
+
 	return validators.GetID(idx.Validator(rounds[roundIndex])) == me
 }
 
@@ -138,11 +157,14 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 		sender, _ := types.Sender(em.world.TxSigner, tx)
 		// check transaction epoch rules
 		if epochcheck.CheckTxs(types.Transactions{tx}, rules) != nil {
+			invalidTxCounter.Inc(1)
 			sorted.Pop()
 			continue
 		}
 		// check there's enough gas power to originate the transaction
 		if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
+			log.Debug("not enough gas power to originate the transaction")
+			outOfGasPowerCounter.Inc(1)
 			if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
 				// stop if cannot originate even an empty transaction
 				break
@@ -152,22 +174,38 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 		}
 		// check not conflicted with already originated txs (in any connected event)
 		if em.originatedTxs.TotalOf(sender) != 0 {
+			conflictedOriginatedCounter.Inc(1)
+			log.Debug("conflicted with already originated txs")
 			sorted.Pop()
 			continue
 		}
 		// my turn, i.e. try to not include the same tx simultaneously by different validators
 		if !em.isMyTxTurn(tx.Hash(), sender, tx.Nonce(), time.Now(), em.validators, e.Creator(), em.epoch) {
 			sorted.Pop()
+			isNotMyTurnCounter.Inc(1)
 			continue
+		} else {
+			isMyTurnCounter.Inc(1)
 		}
+
 		// check transaction is not outdated
 		if !em.world.TxPool.Has(tx.Hash()) {
+			outdatedCounter.Inc(1)
 			sorted.Pop()
+			log.Debug("transaction is outdated")
 			continue
 		}
+		gasPowerUsed := e.GasPowerUsed() + tx.Gas()
+		gasPowerLeft := e.GasPowerLeft().Sub(tx.Gas())
+		log.Debug("gas power", "used", gasPowerUsed, "left", gasPowerLeft)
+
+		gasPowerUsedGauge.Update(int64(gasPowerUsed))
+		gasPowerLeftShortGauge.Update(int64(gasPowerLeft.Gas[inter.ShortTermGas]))
+		gasPowerLeftLongGauge.Update(int64(gasPowerLeft.Gas[inter.LongTermGas]))
+
 		// add
-		e.SetGasPowerUsed(e.GasPowerUsed() + tx.Gas())
-		e.SetGasPowerLeft(e.GasPowerLeft().Sub(tx.Gas()))
+		e.SetGasPowerUsed(gasPowerUsed)
+		e.SetGasPowerLeft(gasPowerLeft)
 		e.SetTxs(append(e.Txs(), tx))
 		sorted.Shift()
 	}

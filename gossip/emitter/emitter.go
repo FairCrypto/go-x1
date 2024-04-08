@@ -31,6 +31,9 @@ const (
 )
 
 var eventCounter = metrics.GetOrRegisterCounter("opera/events", nil)
+var callCreatedCounter = metrics.GetOrRegisterCounter("opera/events/callCreated", nil)
+var callEmitCounter = metrics.GetOrRegisterCounter("opera/events/callEmit", nil)
+var worldBusyGauge = metrics.GetOrRegisterGauge("opera/events/worldBusy", nil)
 
 type Emitter struct {
 	config Config
@@ -189,7 +192,10 @@ func (em *Emitter) tick() {
 		em.busyRate.Mark(1)
 	}
 	if em.world.IsBusy() {
+		worldBusyGauge.Update(1)
 		return
+	} else {
+		worldBusyGauge.Update(0)
 	}
 
 	em.recheckChallenges()
@@ -233,6 +239,8 @@ func (em *Emitter) EmitEvent() (*inter.EventPayload, error) {
 		// short circuit if not a validator
 		return nil, nil
 	}
+	callEmitCounter.Inc(1)
+
 	sortedTxs := em.getSortedTxs()
 
 	if em.world.IsBusy() {
@@ -295,6 +303,7 @@ func (em *Emitter) createEvent(sortedTxs *types.TransactionsByPriceAndNonce) (*i
 	if !em.isValidator() {
 		return nil, nil
 	}
+	callCreatedCounter.Inc(1)
 
 	if synced := em.logSyncStatus(em.isSyncedToEmit()); !synced {
 		// I'm reindexing my old events, so don't create events until connect all the existing self-events
@@ -361,8 +370,8 @@ func (em *Emitter) createEvent(sortedTxs *types.TransactionsByPriceAndNonce) (*i
 	mutEvent.SetCreationTime(inter.MaxTimestamp(inter.Timestamp(time.Now().UnixNano()), selfParentTime+1))
 
 	// add LLR votes
-	em.addLlrEpochVote(mutEvent)
-	em.addLlrBlockVotes(mutEvent)
+	//em.addLlrEpochVote(mutEvent)
+	//em.addLlrBlockVotes(mutEvent)
 
 	// node version
 	if mutEvent.Seq() <= 1 && len(em.config.VersionToPublish) > 0 {
