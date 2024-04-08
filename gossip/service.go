@@ -459,6 +459,7 @@ func (s *Service) Start() error {
 
 	// start p2p
 	StartENRUpdater(s, s.p2pServer.LocalNode())
+	StartENRFilter(s, s.p2pServer)
 	s.handler.Start(s.p2pServer.MaxPeers)
 
 	// start emitters
