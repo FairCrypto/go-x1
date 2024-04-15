@@ -12,7 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 
 	"github.com/Fantom-foundation/go-opera/eventcheck/epochcheck"
-	"github.com/Fantom-foundation/go-opera/eventcheck/gaspowercheck"
+	//"github.com/Fantom-foundation/go-opera/eventcheck/gaspowercheck"
 	"github.com/Fantom-foundation/go-opera/inter"
 	"github.com/Fantom-foundation/go-opera/utils"
 	"github.com/Fantom-foundation/go-opera/utils/txtime"
@@ -34,72 +34,6 @@ func max64(a, b uint64) uint64 {
 func (em *Emitter) maxGasPowerToUse(e *inter.MutableEventPayload) uint64 {
 	rules := em.world.GetRules()
 	maxGasToUse := rules.Economy.Gas.MaxEventGas
-	if maxGasToUse > e.GasPowerLeft().Min() {
-		maxGasToUse = e.GasPowerLeft().Min()
-	}
-	// Smooth TPS if power isn't big
-	if em.config.LimitedTpsThreshold > em.config.NoTxsThreshold {
-		upperThreshold := em.config.LimitedTpsThreshold
-		downThreshold := em.config.NoTxsThreshold
-
-		estimatedAlloc := gaspowercheck.CalcValidatorGasPower(e, e.CreationTime(), e.MedianTime(), 0, em.validators, gaspowercheck.Config{
-			Idx:                inter.LongTermGas,
-			AllocPerSec:        rules.Economy.LongGasPower.AllocPerSec * 4 / 5,
-			MaxAllocPeriod:     inter.Timestamp(time.Minute),
-			MinEnsuredAlloc:    0,
-			StartupAllocPeriod: 0,
-			MinStartupGas:      0,
-		})
-
-		gasPowerLeft := e.GasPowerLeft().Min() + estimatedAlloc
-		if gasPowerLeft < downThreshold {
-			return 0
-		}
-		newGasPowerLeft := uint64(0)
-		if gasPowerLeft > maxGasToUse {
-			newGasPowerLeft = gasPowerLeft - maxGasToUse
-		}
-
-		var x1, x2 = newGasPowerLeft, gasPowerLeft
-		if x1 < downThreshold {
-			x1 = downThreshold
-		}
-		if x2 > upperThreshold {
-			x2 = upperThreshold
-		}
-		trespassingPart := uint64(0)
-		if x2 > x1 {
-			trespassingPart = x2 - x1
-		}
-		healthyPart := uint64(0)
-		if gasPowerLeft > x2 {
-			healthyPart = gasPowerLeft - x2
-		}
-
-		smoothGasToUse := healthyPart + trespassingPart/2
-		if maxGasToUse > smoothGasToUse {
-			maxGasToUse = smoothGasToUse
-		}
-	}
-	// pendingGas should be below MaxBlockGas
-	{
-		maxPendingGas := max64(max64(rules.Blocks.MaxBlockGas/3, rules.Economy.Gas.MaxEventGas), 15000000)
-		if maxPendingGas <= em.pendingGas {
-			return 0
-		}
-		if maxPendingGas < em.pendingGas+maxGasToUse {
-			maxGasToUse = maxPendingGas - em.pendingGas
-		}
-	}
-	// No txs if power is low
-	{
-		threshold := em.config.NoTxsThreshold
-		if e.GasPowerLeft().Min() <= threshold {
-			return 0
-		} else if e.GasPowerLeft().Min() < threshold+maxGasToUse {
-			maxGasToUse = e.GasPowerLeft().Min() - threshold
-		}
-	}
 	return maxGasToUse
 }
 
