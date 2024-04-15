@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	TxTurnPeriod        = 8 * time.Second
+	TxTurnPeriod        = 2 * time.Second
 	TxTurnPeriodLatency = 1 * time.Second
 	TxTurnNonces        = 32
 )
