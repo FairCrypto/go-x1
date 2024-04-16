@@ -50,6 +50,7 @@ func getTxRoundIndex(now, txTime time.Time, validatorsNum idx.Validator) int {
 
 func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, accountNonce uint64, now time.Time, validators *pos.Validators, me idx.ValidatorID, epoch idx.Epoch) bool {
 	txTime := txtime.Of(txHash)
+	passed := now.Sub(txTime)
 
 	roundIndex := getTxRoundIndex(now, txTime, validators.Len())
 	if roundIndex != getTxRoundIndex(now.Add(TxTurnPeriodLatency), txTime, validators.Len()) {
@@ -63,11 +64,17 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 	// generate the validators sequence for the tx
 	rounds := utils.WeightedPermutation(int(validators.Len()), validators.SortedWeights(), roundsHash)
 
+	if passed > 2*time.Second {
+		fmt.Printf("Intercepted slow tx val: %v time, %v hash\n",  passed, txHash)
+		return true
+	}
+
+
 	// take a validator from the sequence, skip offline validators
 	for ; roundIndex < len(rounds); roundIndex++ {
 		chosenValidator := validators.GetID(idx.Validator(rounds[roundIndex]))
 		if chosenValidator == me {
-		        fmt.Printf("Validator chosen: %v after %v rounds\n", chosenValidator, roundIndex)
+		        fmt.Printf("Validator chosen: %v after %v rounds %v time, %v hash\n", chosenValidator, roundIndex, passed, txHash)
 			return true // current validator is the chosen - emit
 		}
 		if !em.offlineValidators[chosenValidator] {
