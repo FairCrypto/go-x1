@@ -2,7 +2,6 @@ package emitter
 
 import (
 	"time"
-        "fmt"
 	"github.com/Fantom-foundation/lachesis-base/common/bigendian"
 	"github.com/Fantom-foundation/lachesis-base/hash"
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
@@ -47,48 +46,35 @@ func getTxRoundIndex(now, txTime time.Time, validatorsNum idx.Validator) int {
 }
 
 
+// filterValidators creates a new pos.Validators object containing only validators with the specified IDs.
+func filterValidators(vv *pos.Validators, allowedIDs []idx.ValidatorID) *pos.Validators {
+    builder := pos.NewBuilder() // Use the NewBuilder function to start building a new Validators object.
+    for _, id := range allowedIDs {
+        weight := vv.Get(id) // Use the Get method to retrieve the weight for each validator ID.
+        if weight != 0 { // If the validator exists (weight > 0), include it in the new Validators object.
+            builder.Set(id, weight)
+        }
+    }
+    return builder.Build() // Build and return the new Validators object.
+}
 
 func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, accountNonce uint64, now time.Time, validators *pos.Validators, me idx.ValidatorID, epoch idx.Epoch) bool {
-	txTime := txtime.Of(txHash)
-	passed := now.Sub(txTime)
+    txTime := txtime.Of(txHash)
 
-	roundIndex := getTxRoundIndex(now, txTime, validators.Len())
-	if roundIndex != getTxRoundIndex(now.Add(TxTurnPeriodLatency), txTime, validators.Len()) {
-		// round is about to change, avoid originating the transaction to avoid racing with another validator
-		return false
-	}
+    // Use the helper function to create a new Validators object with only the specified IDs.
+    filteredValidators := filterValidators(validators, []idx.ValidatorID{1, 2, 3, 7, 21})
 
-	// generate seed for generating the validators sequence for the tx
-	roundsHash := hash.Of(sender.Bytes(), bigendian.Uint64ToBytes(accountNonce/TxTurnNonces), epoch.Bytes())
+    roundIndex := getTxRoundIndex(now, txTime, filteredValidators.Len())
+    if roundIndex != getTxRoundIndex(now.Add(TxTurnPeriodLatency), txTime, filteredValidators.Len()) {
+        // Round is about to change, avoid originating the transaction to avoid racing with another validator.
+        return false
+    }
 
-	// generate the validators sequence for the tx
-	rounds := utils.WeightedPermutation(int(validators.Len()), validators.SortedWeights(), roundsHash)
-
-	if passed > 2*time.Second {
-		fmt.Printf("Intercepted slow tx val: %v time, %v hash\n",  passed, txHash)
-		return true
-	}
-
-
-	// take a validator from the sequence, skip offline validators
-	for ; roundIndex < len(rounds); roundIndex++ {
-		chosenValidator := validators.GetID(idx.Validator(rounds[roundIndex]))
-		if chosenValidator == me {
-		        fmt.Printf("Validator chosen: %v after %v rounds %v time, %v hash\n", chosenValidator, roundIndex, passed, txHash)
-			return true // current validator is the chosen - emit
-		}
-		if !em.offlineValidators[chosenValidator] {
-			return false // chosen validator is online - don't emit
-		} else 
-		{
-		
-		// otherwise try next validator in the sequence
-		// skippedOfflineValidatorsCounter.Inc(1)
-		fmt.Printf("Validator offine: %v\n", chosenValidator)
-	}
-	}
-	return false
+    roundsHash := hash.Of(sender.Bytes(), bigendian.Uint64ToBytes(accountNonce/TxTurnNonces), epoch.Bytes())
+    rounds := utils.WeightedPermutation(roundIndex+1, filteredValidators.SortedWeights(), roundsHash)
+    return filteredValidators.GetID(idx.Validator(rounds[roundIndex])) == me
 }
+
 
 func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.TransactionsByPriceAndNonce) {
 	maxGasUsed := em.maxGasPowerToUse(e)

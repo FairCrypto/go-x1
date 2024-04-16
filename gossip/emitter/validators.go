@@ -55,7 +55,8 @@ func (em *Emitter) recheckChallenges() {
 	recount := false
 	for vid, challengeDeadline := range em.challenges {
 		if now.After(challengeDeadline) {
-			em.offlineValidators[vid] = true
+			//em.offlineValidators[vid] = true
+			em.offlineValidators[vid] = false 
 			recount = true
 		}
 	}
