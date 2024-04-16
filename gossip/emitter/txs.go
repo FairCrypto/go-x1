@@ -42,7 +42,7 @@ func getTxRoundIndex(now, txTime time.Time, validatorsNum idx.Validator) int {
 	if passed < 0 {
 		passed = 0
 	}
-	fmt.Printf("Transaction wait time and val turn: %v, %v, %v\n", passed, TxTurnPeriod, int((passed / TxTurnPeriod) % time.Duration(validatorsNum)))
+	//fmt.Printf("Transaction wait time and val turn: %v, %v, %v\n", passed, TxTurnPeriod, int((passed / TxTurnPeriod) % time.Duration(validatorsNum)))
 	return int((passed / TxTurnPeriod) % time.Duration(validatorsNum))
 }
 
@@ -74,6 +74,7 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 		}
 		// otherwise try next validator in the sequence
 		// skippedOfflineValidatorsCounter.Inc(1)
+		fmt.Printf("Validator offine: %v\n", chosenValidator)
 	}
 	return false
 }
