@@ -65,7 +65,7 @@ func DefaultConfig() Config {
 			Min:                        150 * time.Millisecond,
 			Max:                        10 * time.Minute,
 			Confirming:                 170 * time.Millisecond,
-			DoublesignProtection:       5 * time.Minute, // should be greater than MaxEmitInterval
+			DoublesignProtection:       15 * time.Second, // should be greater than MaxEmitInterval
 			ParallelInstanceProtection: 1 * time.Minute,
 		},
 

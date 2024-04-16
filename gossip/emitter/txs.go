@@ -71,10 +71,13 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 		}
 		if !em.offlineValidators[chosenValidator] {
 			return false // chosen validator is online - don't emit
-		}
+		} else 
+		{
+		
 		// otherwise try next validator in the sequence
 		// skippedOfflineValidatorsCounter.Inc(1)
 		fmt.Printf("Validator offine: %v\n", chosenValidator)
+	}
 	}
 	return false
 }
