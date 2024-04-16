@@ -67,6 +67,7 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 	for ; roundIndex < len(rounds); roundIndex++ {
 		chosenValidator := validators.GetID(idx.Validator(rounds[roundIndex]))
 		if chosenValidator == me {
+		        fmt.Printf("Validator chosen: %v after %v rounds\n", chosenValidator, roundIndex)
 			return true // current validator is the chosen - emit
 		}
 		if !em.offlineValidators[chosenValidator] {
