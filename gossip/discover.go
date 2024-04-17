@@ -19,6 +19,7 @@ package gossip
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/forkid"
+	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/rlp"
 
@@ -57,6 +58,15 @@ func StartENRUpdater(svc *Service, ln *enode.LocalNode) {
 			}
 		}
 	}()
+}
+
+func StartENRFilter(svc *Service, p2p *p2p.Server) {
+	chainConfig := svc.store.GetEvmChainConfig()
+	gh := common.Hash(*svc.store.GetGenesisID())
+	forkFilter := forkid.NewOperaFilter(chainConfig, gh, func() uint64 {
+		return uint64(svc.store.GetLatestBlockIndex())
+	})
+	p2p.SetFilter(forkFilter)
 }
 
 // currentENREntry constructs an `eth` ENR entry based on the current state of the chain.
