@@ -118,6 +118,8 @@ var (
 	underpricedMinAcceptedPriceTxCounter          = metrics.GetOrRegisterMeter("txpool/underpriced/minaccepted", nil)
 	underpricedRecommendedTipTxCounter            = metrics.GetOrRegisterMeter("txpool/underpriced/recommendedtip", nil)
 	underpricedRecommendedTipAndMinPriceTxCounter = metrics.GetOrRegisterMeter("txpool/underpriced/recommendedtipandminprice", nil)
+	minPriceGauge                                 = metrics.GetOrRegisterGauge("txpool/minprice", nil)
+	recommendedTipGauge                           = metrics.GetOrRegisterGauge("txpool/recommendedtip", nil)
 
 	pendingGauge = metrics.GetOrRegisterGauge("txpool/pending", nil)
 	queuedGauge  = metrics.GetOrRegisterGauge("txpool/queued", nil)
@@ -632,6 +634,8 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	}
 	// Ensure Opera-specific hard bounds
 	if recommendedGasTip, minPrice := pool.chain.EffectiveMinTip(), pool.chain.MinGasPrice(); recommendedGasTip != nil && minPrice != nil {
+		minPriceGauge.Update(minPrice.Int64())
+		recommendedTipGauge.Update(recommendedGasTip.Int64())
 		if tx.GasTipCapIntCmp(recommendedGasTip) < 0 {
 			underpricedRecommendedTipTxCounter.Mark(1)
 			return ErrUnderpriced
