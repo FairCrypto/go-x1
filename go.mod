@@ -111,7 +111,7 @@ require (
 
 require github.com/panjf2000/ants/v2 v2.4.5 // indirect
 
-replace github.com/ethereum/go-ethereum => github.com/faircrypto/go-ethereum v1.10.8-ftm-rc9.0.20240408233151-381ed183bc52
+replace github.com/ethereum/go-ethereum => github.com/faircrypto/go-ethereum v1.10.8-ftm-rc9.0.20240418223559-d7de1d82f458
 
 //replace github.com/ethereum/go-ethereum => ./go-ethereum
 
