@@ -1,0 +1,49 @@
+[Node]
+Testnet = true
+
+[Node.P2P]
+ListenAddr = ":5050"
+
+[Emitter.Validator]
+
+# update with your validator ID
+ID = 0
+
+# update with your validator public key
+PubKeyString = ""
+
+# update with your validator password file path
+PasswordFilePath = ""
+
+# Share you node info with the xenblocks.io explorer
+# (optional) comment out to disable
+[XenBlocks]
+Endpoint = "ws://xenblocks.io:6668"
+
+# Alphanet genesis configuration (do not change)
+[CustomGenesis]
+Enabled = true
+StartValBalance = 1000000
+StartStake = 1000000
+NetworkID = 204020
+NetworkName = "x1-alphanet"
+GenesisTime = 1713472498
+SfcOwnerAddress = "0xf740351b9ca2305730dc81631839c1e1d5bab563"
+TreasuryAddress = "0xf7b314774b5e87b6fce8777d6a5555a1949648f9"
+StartTreasuryBalance = 966000000
+
+[[CustomGenesis.GenesisValidators]]
+AccountAddress = "0xe6f05883342a08587c08c5d11d3d38743f2aa692"
+ValidatorPubKey = "0xc004df619d0ff7b97fcead7abd97adf97dd200c48c1dc40fc6ac8e2d60980cd4a5896460604d305e9a158deedb36634a364ab782288d4ebfe35c97198650fe4bd7ce"
+
+[[CustomGenesis.GenesisValidators]]
+AccountAddress = "0x74710f2820448b0a533af225487aabae05034b5a"
+ValidatorPubKey = "0xc00400abed77a36a9a4bde92fee67c536ebdc3316219f30e2135e78f5a20313aaa73d9949100bdf7a39d79fd9654dc2da5bc7ccea5e25f03f5fe8235b0e3160d4242"
+
+[[CustomGenesis.GenesisValidators]]
+AccountAddress = "0xce2ae3256a626b20dddae719850f1f888fe6a11d"
+ValidatorPubKey = "0xc004112a4d7167d1fb2ceaed43a98b6e1c3ce17acabeca90ee2f064e4bb91cdc7138ea5bb3bcfec04cb86632a70a924dc2b92ab11f10743c167a8e53c31f0d6a5336"
+
+[[CustomGenesis.GenesisValidators]]
+AccountAddress = "0xeee424a369aa1c7df81662427dbe6a9afeb4e137"
+ValidatorPubKey = "0xc0049d59aa6277613cf6268bc56e890b8db825f0c78cb8fd4bcf3fd38925acf4105541b2907ea2723317f428f9319527ad68702a0581afd4e4bf42cc15b4aa65fad4"

@@ -206,6 +206,25 @@ func TestNetRules() Rules {
 	}
 }
 
+func CustomNetRules(networkName string, networkId uint64) Rules {
+	return Rules{
+		Name:      networkName,
+		NetworkID: networkId,
+		Dag:       DefaultDagRules(),
+		Epochs:    DefaultEpochsRules(),
+		Economy:   DefaultEconomyRules(),
+		Blocks: BlocksRules{
+			MaxBlockGas:             20500000,
+			MaxEmptyBlockSkipPeriod: inter.Timestamp(1 * time.Minute),
+		},
+		Upgrades: Upgrades{
+			Berlin: true,
+			London: true,
+			Llr:    true,
+		},
+	}
+}
+
 func FakeNetRules() Rules {
 	return Rules{
 		Name:      "fake",

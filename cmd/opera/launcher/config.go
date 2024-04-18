@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/Fantom-foundation/go-opera/integration/makecustomgenesis"
 	"github.com/Fantom-foundation/go-opera/integration/makeoriginaltestnetgenesis"
 	"github.com/Fantom-foundation/go-opera/integration/maketestnetgenesis"
 	"github.com/Fantom-foundation/go-opera/integration/xenblocks/reporter"
@@ -176,6 +177,7 @@ type config struct {
 	VectorClock   vecmt.IndexConfig
 	DBs           integration.DBsConfig
 	XenBlocks     reporter.Config
+	CustomGenesis makecustomgenesis.Config
 }
 
 func (c *config) AppConfigs() integration.Configs {
@@ -221,6 +223,16 @@ func mayGetGenesisStore(ctx *cli.Context, cfg *config) *genesisstore.Store {
 		return maketestnetgenesis.TestnetGenesisStoreWithValidators(validators)
 	case cfg.Node.Testnet || ctx.GlobalIsSet(TestnetFlag.Name):
 		return makeoriginaltestnetgenesis.TestnetGenesisStore()
+	case ctx.GlobalIsSet(FakeNetFlag.Name) && cfg.CustomGenesis.Enabled:
+		log.Info("Using custom genesis to create a fake network")
+		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
+		if err != nil {
+			log.Crit("Invalid flag", "flag", FakeNetFlag.Name, "err", err)
+		}
+		validators := makefakegenesis.GetFakeValidators(num)
+		return makecustomgenesis.GenesisStoreWithValidators(cfg.CustomGenesis, validators)
+	case cfg.CustomGenesis.Enabled:
+		return makecustomgenesis.GenesisStore(cfg.CustomGenesis)
 	case ctx.GlobalIsSet(FakeNetFlag.Name):
 		_, num, err := parseFakeGen(ctx.GlobalString(FakeNetFlag.Name))
 		if err != nil {
@@ -518,6 +530,7 @@ func mayMakeAllConfigs(ctx *cli.Context) (*config, error) {
 		LachesisStore: abft.DefaultStoreConfig(cacheRatio),
 		VectorClock:   vecmt.DefaultConfig(cacheRatio),
 		XenBlocks:     reporter.DefaultConfig(),
+		CustomGenesis: makecustomgenesis.DefaultConfig(),
 	}
 
 	if ctx.GlobalIsSet(FakeNetFlag.Name) {
