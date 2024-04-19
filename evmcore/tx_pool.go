@@ -115,6 +115,12 @@ var (
 	underpricedTxMeter = metrics.GetOrRegisterMeter("txpool/underpriced", nil)
 	overflowedTxMeter  = metrics.GetOrRegisterMeter("txpool/overflowed", nil)
 
+	underpricedMinAcceptedPriceTxCounter          = metrics.GetOrRegisterMeter("txpool/underpriced/minaccepted", nil)
+	underpricedRecommendedTipTxCounter            = metrics.GetOrRegisterMeter("txpool/underpriced/recommendedtip", nil)
+	underpricedRecommendedTipAndMinPriceTxCounter = metrics.GetOrRegisterMeter("txpool/underpriced/recommendedtipandminprice", nil)
+	minPriceGauge                                 = metrics.GetOrRegisterGauge("txpool/minprice", nil)
+	recommendedTipGauge                           = metrics.GetOrRegisterGauge("txpool/recommendedtip", nil)
+
 	pendingGauge = metrics.GetOrRegisterGauge("txpool/pending", nil)
 	queuedGauge  = metrics.GetOrRegisterGauge("txpool/queued", nil)
 	localGauge   = metrics.GetOrRegisterGauge("txpool/local", nil)
@@ -623,14 +629,19 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	// Drop non-local transactions under our own minimal accepted gas price or tip
 	local = local || pool.locals.contains(from) // account may be local even if the transaction arrived from the network
 	if !local && tx.GasTipCapIntCmp(pool.gasPrice) < 0 {
+		underpricedMinAcceptedPriceTxCounter.Mark(1)
 		return ErrUnderpriced
 	}
 	// Ensure Opera-specific hard bounds
 	if recommendedGasTip, minPrice := pool.chain.EffectiveMinTip(), pool.chain.MinGasPrice(); recommendedGasTip != nil && minPrice != nil {
+		minPriceGauge.Update(minPrice.Int64())
+		recommendedTipGauge.Update(recommendedGasTip.Int64())
 		if tx.GasTipCapIntCmp(recommendedGasTip) < 0 {
+			underpricedRecommendedTipTxCounter.Mark(1)
 			return ErrUnderpriced
 		}
 		if tx.GasFeeCapIntCmp(new(big.Int).Add(recommendedGasTip, minPrice)) < 0 {
+			underpricedRecommendedTipAndMinPriceTxCounter.Mark(1)
 			return ErrUnderpriced
 		}
 	}

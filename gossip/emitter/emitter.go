@@ -361,8 +361,8 @@ func (em *Emitter) createEvent(sortedTxs *types.TransactionsByPriceAndNonce) (*i
 	mutEvent.SetCreationTime(inter.MaxTimestamp(inter.Timestamp(time.Now().UnixNano()), selfParentTime+1))
 
 	// add LLR votes
-	em.addLlrEpochVote(mutEvent)
-	em.addLlrBlockVotes(mutEvent)
+	//em.addLlrEpochVote(mutEvent)
+	//em.addLlrBlockVotes(mutEvent)
 
 	// node version
 	if mutEvent.Seq() <= 1 && len(em.config.VersionToPublish) > 0 {

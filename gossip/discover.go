@@ -19,6 +19,7 @@ package gossip
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/forkid"
+	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/rlp"
 
@@ -31,11 +32,13 @@ type enrEntry struct {
 
 	// Ignore additional fields (for forward compatibility).
 	Rest []rlp.RawValue `rlp:"tail"`
+
+	enrKey string
 }
 
 // ENRKey implements enr.Entry.
 func (e enrEntry) ENRKey() string {
-	return "opera"
+	return e.enrKey
 }
 
 // StartENRUpdater starts the `opera` ENR updater loop, which listens for chain
@@ -59,10 +62,20 @@ func StartENRUpdater(svc *Service, ln *enode.LocalNode) {
 	}()
 }
 
+func StartENRFilter(svc *Service, p2p *p2p.Server) {
+	chainConfig := svc.store.GetEvmChainConfig()
+	gh := common.Hash(*svc.store.GetGenesisID())
+	forkFilter := forkid.NewOperaFilter(chainConfig, gh, func() uint64 {
+		return uint64(svc.store.GetLatestBlockIndex())
+	})
+	p2p.SetFilter(forkFilter)
+}
+
 // currentENREntry constructs an `eth` ENR entry based on the current state of the chain.
 func currentENREntry(svc *Service) *enrEntry {
 	genesisHash := *svc.store.GetGenesisID()
 	return &enrEntry{
 		ForkID: forkid.NewID(svc.store.GetEvmChainConfig(), common.Hash(genesisHash), uint64(svc.store.GetLatestBlockIndex())),
+		enrKey: svc.p2pServer.Config.EnrEntry,
 	}
 }
