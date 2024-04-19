@@ -64,3 +64,4 @@ testnet.g
 dist/
 /docker/networksimulator/docker-compose.yaml
 /docker/networksimulator/prometheus/prometheus.yml
+/docker/networksimulator/.env

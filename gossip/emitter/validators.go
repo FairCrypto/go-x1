@@ -1,6 +1,8 @@
 package emitter
 
 import (
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
 	"time"
 
 	"github.com/Fantom-foundation/lachesis-base/inter/idx"
@@ -10,6 +12,10 @@ import (
 
 const (
 	validatorChallenge = 4 * time.Second
+)
+
+var (
+	offlineValidatorsGauge = metrics.GetOrRegisterGauge("opera/validators/offline", nil)
 )
 
 func (em *Emitter) recountConfirmingIntervals(validators *pos.Validators) {
@@ -55,6 +61,7 @@ func (em *Emitter) recheckChallenges() {
 	recount := false
 	for vid, challengeDeadline := range em.challenges {
 		if now.After(challengeDeadline) {
+			log.Debug("validator is offline", "validator", vid)
 			em.offlineValidators[vid] = true
 			recount = true
 		}
@@ -63,4 +70,8 @@ func (em *Emitter) recheckChallenges() {
 		em.recountConfirmingIntervals(em.validators)
 	}
 	em.prevRecheckedChallenges = now
+
+	numOfOfflineVals := int64(len(em.offlineValidators))
+	log.Debug("offline validators", "num", numOfOfflineVals)
+	offlineValidatorsGauge.Update(numOfOfflineVals)
 }
