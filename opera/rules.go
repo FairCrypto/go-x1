@@ -212,7 +212,7 @@ func CustomNetRules(networkName string, networkId uint64) Rules {
 		NetworkID: networkId,
 		Dag:       DefaultDagRules(),
 		Epochs:    DefaultEpochsRules(),
-		Economy:   DefaultEconomyRules(),
+		Economy:   FakeEconomyRules(),
 		Blocks: BlocksRules{
 			MaxBlockGas:             20500000,
 			MaxEmptyBlockSkipPeriod: inter.Timestamp(1 * time.Minute),
@@ -329,7 +329,7 @@ func FakeLongGasPowerRules() GasPowerRules {
 func DefaultShortGasPowerRules() GasPowerRules {
 	// 2x faster allocation rate, 6x lower max accumulated gas power
 	cfg := DefaulLongGasPowerRules()
-	cfg.AllocPerSec *= 2
+	cfg.AllocPerSec *= 5
 	cfg.StartupAllocPeriod /= 2
 	cfg.MaxAllocPeriod /= 2 * 6
 	return cfg
