@@ -18,6 +18,7 @@ package gasprice
 
 import (
 	"fmt"
+	"github.com/ethereum/go-ethereum/metrics"
 	"math/big"
 	"sync"
 	"time"
@@ -39,6 +40,13 @@ var (
 	DefaultMaxGasPrice = big.NewInt(10000000 * params.GWei)
 	DecimalUnitBn      = big.NewInt(DecimalUnit)
 	secondBn           = new(big.Int).SetUint64(uint64(time.Second))
+
+	suggestTipGauge  = metrics.GetOrRegisterGauge("opera/gasprice/suggest_tip", nil)
+	reactiveTipGauge = metrics.GetOrRegisterGauge("opera/gasprice/reactive_tip", nil)
+
+	minPriceGauge            = metrics.GetOrRegisterGauge("opera/gasprice/min_price", nil)
+	pendingMinPriceGauge     = metrics.GetOrRegisterGauge("opera/gasprice/pending_min_price", nil)
+	adjustedMinGasPriceGauge = metrics.GetOrRegisterGauge("opera/gasprice/adjusted_min_gas_price", nil)
 )
 
 const (
@@ -153,6 +161,13 @@ func (gpo *Oracle) suggestTip(certainty uint64) *big.Int {
 	if tip.Cmp(gpo.cfg.MinGasTip) < 0 {
 		return new(big.Int).Set(gpo.cfg.MinGasTip)
 	}
+
+	minPriceGauge.Update(minPrice.Int64())
+	pendingMinPriceGauge.Update(pendingMinPrice.Int64())
+	adjustedMinGasPriceGauge.Update(adjustedMinGasPrice.Int64())
+	suggestTipGauge.Update(tip.Int64())
+	reactiveTipGauge.Update(reactive.Int64())
+
 	return tip
 }
 

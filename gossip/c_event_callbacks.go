@@ -70,6 +70,7 @@ func (s *Service) buildEvent(e *inter.MutableEventPayload, onIndexed func()) err
 		return emitter.ErrNotEnoughGasPower
 	}
 	e.SetGasPowerLeft(availableGasPower.Sub(e.GasPowerUsed()))
+
 	return s.engine.Build(e)
 }
 

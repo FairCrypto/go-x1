@@ -19,7 +19,7 @@ var (
 	// ErrWrongGasPowerLeft indicates that event's GasPowerLeft is miscalculated.
 	ErrWrongGasPowerLeft = errors.New("event has wrong GasPowerLeft")
 
-	notEnoughGasPowerCounter = metrics.GetOrRegisterCounter("events/validate/wrong_gas_power", nil)
+	notEnoughGasPowerCounter = metrics.GetOrRegisterCounter("opera/events/validate/wrong_gas_power", nil)
 )
 
 type ValidatorState struct {
