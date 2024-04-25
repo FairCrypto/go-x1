@@ -32,11 +32,13 @@ type enrEntry struct {
 
 	// Ignore additional fields (for forward compatibility).
 	Rest []rlp.RawValue `rlp:"tail"`
+
+	enrKey string
 }
 
 // ENRKey implements enr.Entry.
 func (e enrEntry) ENRKey() string {
-	return "opera"
+	return e.enrKey
 }
 
 // StartENRUpdater starts the `opera` ENR updater loop, which listens for chain
@@ -74,5 +76,6 @@ func currentENREntry(svc *Service) *enrEntry {
 	genesisHash := *svc.store.GetGenesisID()
 	return &enrEntry{
 		ForkID: forkid.NewID(svc.store.GetEvmChainConfig(), common.Hash(genesisHash), uint64(svc.store.GetLatestBlockIndex())),
+		enrKey: svc.p2pServer.Config.EnrEntry,
 	}
 }

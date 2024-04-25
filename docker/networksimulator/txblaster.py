@@ -65,7 +65,7 @@ class TxBlaster:
                 tx_hashes.append(tx_hash)
             accounts.append(acc)
         for tx_hash in tx_hashes:
-            self.web3.eth.wait_for_transaction_receipt(tx_hash)
+            self.web3.eth.wait_for_transaction_receipt(tx_hash, timeout=60000)
         return accounts
 
     def run_transactions(self, private_key, args):
@@ -104,7 +104,7 @@ class TxBlaster:
                 continue
 
             start_time = time()
-            self.web3.eth.wait_for_transaction_receipt(tx_hash)
+            self.web3.eth.wait_for_transaction_receipt(tx_hash, timeout=60000)
             logging.info("tx confirmed tx_receipt=%s time=%f", tx_hash.hex(), time() - start_time)
 
     def sig_int(self, signum, frame):

@@ -1,6 +1,8 @@
 package emitter
 
 import (
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
 	"time"
 
 	"github.com/Fantom-foundation/lachesis-base/common/bigendian"
@@ -12,7 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 
 	"github.com/Fantom-foundation/go-opera/eventcheck/epochcheck"
-	"github.com/Fantom-foundation/go-opera/eventcheck/gaspowercheck"
 	"github.com/Fantom-foundation/go-opera/inter"
 	"github.com/Fantom-foundation/go-opera/utils"
 	"github.com/Fantom-foundation/go-opera/utils/txtime"
@@ -21,7 +22,24 @@ import (
 const (
 	TxTurnPeriod        = 8 * time.Second
 	TxTurnPeriodLatency = 1 * time.Second
-	TxTurnNonces        = 32
+	TxTurnNonces        = 4096
+)
+
+var (
+	outOfGasPowerCounter        = metrics.GetOrRegisterCounter("opera/txs/outOfGasPower", nil)
+	conflictedOriginatedCounter = metrics.GetOrRegisterCounter("opera/txs/conflictedOriginated", nil)
+	isMyTurnCounter             = metrics.GetOrRegisterCounter("opera/txs/isMyTurn", nil)
+	isNotMyTurnCounter          = metrics.GetOrRegisterCounter("opera/txs/isNotMyTurn", nil)
+	outdatedCounter             = metrics.GetOrRegisterCounter("opera/txs/outdated", nil)
+	invalidTxCounter            = metrics.GetOrRegisterCounter("opera/txs/invalidTxCounter", nil)
+
+	gasPowerUsedCounter           = metrics.GetOrRegisterCounter("opera/txs/gasPowerUsed", nil)
+	gasPowerLeftShortGauge        = metrics.GetOrRegisterGauge("opera/txs/gasPowerLeftShort", nil)
+	gasPowerLeftLongGauge         = metrics.GetOrRegisterGauge("opera/txs/gasPowerLeftLong", nil)
+	addingTransactionCounter      = metrics.GetOrRegisterCounter("opera/tx/add", nil)
+	addingTransactionsCounter     = metrics.GetOrRegisterCounter("opera/txs/add", nil)
+	notEnoughGasPowerCounter      = metrics.GetOrRegisterCounter("opera/txs/notEnoughGasPower", nil)
+	notEnoughGasPowerAtAllCounter = metrics.GetOrRegisterCounter("opera/txs/notEnoughGasPowerAtAll", nil)
 )
 
 func max64(a, b uint64) uint64 {
@@ -37,69 +55,69 @@ func (em *Emitter) maxGasPowerToUse(e *inter.MutableEventPayload) uint64 {
 	if maxGasToUse > e.GasPowerLeft().Min() {
 		maxGasToUse = e.GasPowerLeft().Min()
 	}
-	// Smooth TPS if power isn't big
-	if em.config.LimitedTpsThreshold > em.config.NoTxsThreshold {
-		upperThreshold := em.config.LimitedTpsThreshold
-		downThreshold := em.config.NoTxsThreshold
-
-		estimatedAlloc := gaspowercheck.CalcValidatorGasPower(e, e.CreationTime(), e.MedianTime(), 0, em.validators, gaspowercheck.Config{
-			Idx:                inter.LongTermGas,
-			AllocPerSec:        rules.Economy.LongGasPower.AllocPerSec * 4 / 5,
-			MaxAllocPeriod:     inter.Timestamp(time.Minute),
-			MinEnsuredAlloc:    0,
-			StartupAllocPeriod: 0,
-			MinStartupGas:      0,
-		})
-
-		gasPowerLeft := e.GasPowerLeft().Min() + estimatedAlloc
-		if gasPowerLeft < downThreshold {
-			return 0
-		}
-		newGasPowerLeft := uint64(0)
-		if gasPowerLeft > maxGasToUse {
-			newGasPowerLeft = gasPowerLeft - maxGasToUse
-		}
-
-		var x1, x2 = newGasPowerLeft, gasPowerLeft
-		if x1 < downThreshold {
-			x1 = downThreshold
-		}
-		if x2 > upperThreshold {
-			x2 = upperThreshold
-		}
-		trespassingPart := uint64(0)
-		if x2 > x1 {
-			trespassingPart = x2 - x1
-		}
-		healthyPart := uint64(0)
-		if gasPowerLeft > x2 {
-			healthyPart = gasPowerLeft - x2
-		}
-
-		smoothGasToUse := healthyPart + trespassingPart/2
-		if maxGasToUse > smoothGasToUse {
-			maxGasToUse = smoothGasToUse
-		}
-	}
-	// pendingGas should be below MaxBlockGas
-	{
-		maxPendingGas := max64(max64(rules.Blocks.MaxBlockGas/3, rules.Economy.Gas.MaxEventGas), 15000000)
-		if maxPendingGas <= em.pendingGas {
-			return 0
-		}
-		if maxPendingGas < em.pendingGas+maxGasToUse {
-			maxGasToUse = maxPendingGas - em.pendingGas
-		}
-	}
-	// No txs if power is low
-	{
-		threshold := em.config.NoTxsThreshold
-		if e.GasPowerLeft().Min() <= threshold {
-			return 0
-		} else if e.GasPowerLeft().Min() < threshold+maxGasToUse {
-			maxGasToUse = e.GasPowerLeft().Min() - threshold
-		}
-	}
+	//// Smooth TPS if power isn't big
+	//if em.config.LimitedTpsThreshold > em.config.NoTxsThreshold {
+	//	upperThreshold := em.config.LimitedTpsThreshold
+	//	downThreshold := em.config.NoTxsThreshold
+	//
+	//	estimatedAlloc := gaspowercheck.CalcValidatorGasPower(e, e.CreationTime(), e.MedianTime(), 0, em.validators, gaspowercheck.Config{
+	//		Idx:                inter.LongTermGas,
+	//		AllocPerSec:        rules.Economy.LongGasPower.AllocPerSec * 4 / 5,
+	//		MaxAllocPeriod:     inter.Timestamp(time.Minute),
+	//		MinEnsuredAlloc:    0,
+	//		StartupAllocPeriod: 0,
+	//		MinStartupGas:      0,
+	//	})
+	//
+	//	gasPowerLeft := e.GasPowerLeft().Min() + estimatedAlloc
+	//	if gasPowerLeft < downThreshold {
+	//		return 0
+	//	}
+	//	newGasPowerLeft := uint64(0)
+	//	if gasPowerLeft > maxGasToUse {
+	//		newGasPowerLeft = gasPowerLeft - maxGasToUse
+	//	}
+	//
+	//	var x1, x2 = newGasPowerLeft, gasPowerLeft
+	//	if x1 < downThreshold {
+	//		x1 = downThreshold
+	//	}
+	//	if x2 > upperThreshold {
+	//		x2 = upperThreshold
+	//	}
+	//	trespassingPart := uint64(0)
+	//	if x2 > x1 {
+	//		trespassingPart = x2 - x1
+	//	}
+	//	healthyPart := uint64(0)
+	//	if gasPowerLeft > x2 {
+	//		healthyPart = gasPowerLeft - x2
+	//	}
+	//
+	//	smoothGasToUse := healthyPart + trespassingPart/2
+	//	if maxGasToUse > smoothGasToUse {
+	//		maxGasToUse = smoothGasToUse
+	//	}
+	//}
+	//// pendingGas should be below MaxBlockGas
+	//{
+	//	maxPendingGas := max64(max64(rules.Blocks.MaxBlockGas/3, rules.Economy.Gas.MaxEventGas), 15000000)
+	//	if maxPendingGas <= em.pendingGas {
+	//		return 0
+	//	}
+	//	if maxPendingGas < em.pendingGas+maxGasToUse {
+	//		maxGasToUse = maxPendingGas - em.pendingGas
+	//	}
+	//}
+	//// No txs if power is low
+	//{
+	//	threshold := em.config.NoTxsThreshold
+	//	if e.GasPowerLeft().Min() <= threshold {
+	//		return 0
+	//	} else if e.GasPowerLeft().Min() < threshold+maxGasToUse {
+	//		maxGasToUse = e.GasPowerLeft().Min() - threshold
+	//	}
+	//}
 	return maxGasToUse
 }
 
@@ -123,28 +141,42 @@ func (em *Emitter) isMyTxTurn(txHash common.Hash, sender common.Address, account
 
 	roundsHash := hash.Of(sender.Bytes(), bigendian.Uint64ToBytes(accountNonce/TxTurnNonces), epoch.Bytes())
 	rounds := utils.WeightedPermutation(roundIndex+1, validators.SortedWeights(), roundsHash)
+
+	chosen := validators.GetID(idx.Validator(rounds[roundIndex]))
+	log.Debug("tx turn", "roundIndex", roundIndex, "rounds", rounds, "chosen", chosen, "me", me, "txTime", txTime, "now", now, "txHash", txHash, "sender", sender, "accountNonce", accountNonce, "epoch", epoch)
+
 	return validators.GetID(idx.Validator(rounds[roundIndex])) == me
 }
 
 func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.TransactionsByPriceAndNonce) {
+	addingTransactionsCounter.Inc(1)
+
 	maxGasUsed := em.maxGasPowerToUse(e)
 	if maxGasUsed <= e.GasPowerUsed() {
+		notEnoughGasPowerCounter.Inc(1)
 		return
 	}
 
 	// sort transactions by price and nonce
 	rules := em.world.GetRules()
 	for tx := sorted.Peek(); tx != nil; tx = sorted.Peek() {
+		addingTransactionCounter.Inc(1)
+
 		sender, _ := types.Sender(em.world.TxSigner, tx)
 		// check transaction epoch rules
 		if epochcheck.CheckTxs(types.Transactions{tx}, rules) != nil {
+			invalidTxCounter.Inc(1)
 			sorted.Pop()
 			continue
 		}
 		// check there's enough gas power to originate the transaction
 		if tx.Gas() >= e.GasPowerLeft().Min() || e.GasPowerUsed()+tx.Gas() >= maxGasUsed {
+			log.Debug("not enough gas power to originate the transaction")
+			outOfGasPowerCounter.Inc(1)
 			if params.TxGas >= e.GasPowerLeft().Min() || e.GasPowerUsed()+params.TxGas >= maxGasUsed {
 				// stop if cannot originate even an empty transaction
+				log.Info("not enough gas power to originate even an empty transaction", "tx.Gas()", tx.Gas(), "e.GasPowerLeft().Min()", e.GasPowerLeft().Min(), "e.GasPowerUsed()", e.GasPowerUsed(), "maxGasUsed", maxGasUsed)
+				notEnoughGasPowerAtAllCounter.Inc(1)
 				break
 			}
 			sorted.Pop()
@@ -152,22 +184,38 @@ func (em *Emitter) addTxs(e *inter.MutableEventPayload, sorted *types.Transactio
 		}
 		// check not conflicted with already originated txs (in any connected event)
 		if em.originatedTxs.TotalOf(sender) != 0 {
+			conflictedOriginatedCounter.Inc(1)
+			log.Debug("conflicted with already originated txs")
 			sorted.Pop()
 			continue
 		}
 		// my turn, i.e. try to not include the same tx simultaneously by different validators
 		if !em.isMyTxTurn(tx.Hash(), sender, tx.Nonce(), time.Now(), em.validators, e.Creator(), em.epoch) {
 			sorted.Pop()
+			isNotMyTurnCounter.Inc(1)
 			continue
+		} else {
+			isMyTurnCounter.Inc(1)
 		}
+
 		// check transaction is not outdated
 		if !em.world.TxPool.Has(tx.Hash()) {
+			outdatedCounter.Inc(1)
 			sorted.Pop()
+			log.Debug("transaction is outdated")
 			continue
 		}
+		gasPowerUsed := e.GasPowerUsed() + tx.Gas()
+		gasPowerLeft := e.GasPowerLeft().Sub(tx.Gas())
+		log.Debug("gas power", "used", gasPowerUsed, "left", gasPowerLeft)
+
+		gasPowerUsedCounter.Inc(int64(gasPowerUsed))
+		gasPowerLeftShortGauge.Update(int64(gasPowerLeft.Gas[inter.ShortTermGas]))
+		gasPowerLeftLongGauge.Update(int64(gasPowerLeft.Gas[inter.LongTermGas]))
+
 		// add
-		e.SetGasPowerUsed(e.GasPowerUsed() + tx.Gas())
-		e.SetGasPowerLeft(e.GasPowerLeft().Sub(tx.Gas()))
+		e.SetGasPowerUsed(gasPowerUsed)
+		e.SetGasPowerLeft(gasPowerLeft)
 		e.SetTxs(append(e.Txs(), tx))
 		sorted.Shift()
 	}

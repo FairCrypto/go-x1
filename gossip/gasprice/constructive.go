@@ -1,15 +1,22 @@
 package gasprice
 
 import (
+	"github.com/ethereum/go-ethereum/metrics"
 	"math/big"
 
 	"github.com/Fantom-foundation/lachesis-base/utils/piecefunc"
 )
 
+var (
+	maxTotalGasPowerGauge  = metrics.GetOrRegisterGauge("opera/gasprice/constructive/max_total_gas_power", nil)
+	totalGasPowerLeftGauge = metrics.GetOrRegisterGauge("opera/gasprice/constructive/total_gas_power_left", nil)
+	gasPriceGauge          = metrics.GetOrRegisterGauge("opera/gasprice/constructive/gas_price", nil)
+)
+
 func (gpo *Oracle) maxTotalGasPower() *big.Int {
 	rules := gpo.backend.GetRules()
 
-	allocBn := new(big.Int).SetUint64(rules.Economy.LongGasPower.AllocPerSec)
+	allocBn := new(big.Int).SetUint64(rules.Economy.LongGasPower.AllocPerSec / 8)
 	periodBn := new(big.Int).SetUint64(uint64(rules.Economy.LongGasPower.MaxAllocPeriod))
 	maxTotalGasPowerBn := new(big.Int).Mul(allocBn, periodBn)
 	maxTotalGasPowerBn.Div(maxTotalGasPowerBn, secondBn)
@@ -43,6 +50,11 @@ func (gpo *Oracle) constructiveGasPrice(gasOffestAbs uint64, gasOffestRatio uint
 		freeRatio = DecimalUnit
 	}
 	v := gpo.constructiveGasPriceOf(freeRatio, adjustedMinPrice)
+
+	maxTotalGasPowerGauge.Update(max.Int64())
+	totalGasPowerLeftGauge.Update(current.Int64())
+	gasPriceGauge.Update(v.Int64())
+
 	return v
 }
 

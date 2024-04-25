@@ -2,6 +2,7 @@ package gossip
 
 import (
 	"errors"
+	"github.com/ethereum/go-ethereum/metrics"
 	"math/big"
 	"sync/atomic"
 
@@ -27,6 +28,8 @@ var (
 	errNonExistingEpoch = errors.New("epoch doesn't exist")
 	errSameEpoch        = errors.New("epoch hasn't changed")
 	errDirtyEvmSnap     = errors.New("EVM snapshot is dirty")
+
+	notEnoughGasPowerCounter = metrics.GetOrRegisterCounter("events/build/not_enough_gas_power", nil)
 )
 
 func (s *Service) buildEvent(e *inter.MutableEventPayload, onIndexed func()) error {
@@ -63,9 +66,11 @@ func (s *Service) buildEvent(e *inter.MutableEventPayload, onIndexed func()) err
 		return err
 	}
 	if e.GasPowerUsed() > availableGasPower.Min() {
+		notEnoughGasPowerCounter.Inc(1)
 		return emitter.ErrNotEnoughGasPower
 	}
 	e.SetGasPowerLeft(availableGasPower.Sub(e.GasPowerUsed()))
+
 	return s.engine.Build(e)
 }
 

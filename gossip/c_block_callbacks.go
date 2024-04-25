@@ -55,7 +55,8 @@ var (
 	blockWriteTimer     = metrics.GetOrRegisterTimer("chain/write", nil)
 	blockAgeGauge       = metrics.GetOrRegisterGauge("chain/block/age", nil)
 
-	txCounter = metrics.GetOrRegisterCounter("chain/txs", nil)
+	txCounter      = metrics.GetOrRegisterCounter("chain/txs", nil)
+	gasUsedCounter = metrics.GetOrRegisterCounter("chain/gas", nil)
 )
 
 type ExtendedTxPosition struct {
@@ -423,6 +424,8 @@ func consensusCallbackBeginBlockFn(
 					headHeaderGauge.Update(int64(blockCtx.Idx))
 					headFastBlockGauge.Update(int64(blockCtx.Idx))
 
+					gasUsedCounter.Inc(int64(block.GasUsed))
+
 					// Notify about new block
 					if feed != nil {
 						feed.newBlock.Send(evmcore.ChainHeadNotify{Block: evmBlock})
@@ -543,6 +546,7 @@ func spillBlockEvents(store *Store, block *inter.Block, network opera.Rules) (*i
 		gasPowerUsedSum += e.GasPowerUsed()
 		// stop if limit is exceeded, erase [:i] events
 		if gasPowerUsedSum > network.Blocks.MaxBlockGas {
+			log.Info("Block gas limit exceeded", "block", block.Atropos.String(), "gas_used", gasPowerUsedSum, "limit", network.Blocks.MaxBlockGas, "events", len(block.Events)-i)
 			// spill
 			block.Events = block.Events[i+1:]
 			fullEvents = fullEvents[i+1:]

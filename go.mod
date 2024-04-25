@@ -111,11 +111,13 @@ require (
 
 require github.com/panjf2000/ants/v2 v2.4.5 // indirect
 
-replace github.com/ethereum/go-ethereum => github.com/faircrypto/go-ethereum v1.10.8-ftm-rc9.0.20240408233151-381ed183bc52
+replace github.com/ethereum/go-ethereum => github.com/faircrypto/go-ethereum v1.10.8-ftm-rc9.0.20240418223559-d7de1d82f458
 
 //replace github.com/ethereum/go-ethereum => ./go-ethereum
 
 replace github.com/Fantom-foundation/lachesis-base => github.com/faircrypto/lachesis-base v0.0.0-20230817040848-1326ba9aa59b
+
+//replace github.com/Fantom-foundation/lachesis-base => ./lachesis-base
 
 replace github.com/dvyukov/go-fuzz => github.com/guzenok/go-fuzz v0.0.0-20210201043429-a8e90a2a4f88
 

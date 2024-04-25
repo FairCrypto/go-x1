@@ -218,6 +218,7 @@ func (p *DriverTxListener) OnNewLog(l *types.Log) {
 			log.Warn("Network rules update error", "err", err)
 			return
 		}
+		log.Info("Network rules updated", "diff", string(diff))
 		p.bs.DirtyRules = &updated
 	}
 	// Advance epochs

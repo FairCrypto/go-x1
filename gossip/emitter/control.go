@@ -1,6 +1,7 @@
 package emitter
 
 import (
+	"github.com/ethereum/go-ethereum/metrics"
 	"time"
 
 	"github.com/Fantom-foundation/lachesis-base/emitter/ancestor"
@@ -9,6 +10,11 @@ import (
 	"github.com/Fantom-foundation/lachesis-base/utils/piecefunc"
 
 	"github.com/Fantom-foundation/go-opera/inter"
+)
+
+var (
+	allowedToEmitCount    = metrics.GetOrRegisterGauge("opera/control/allowedToEmit", nil)
+	notAllowedToEmitCount = metrics.GetOrRegisterGauge("opera/control/notAllowedToEmit", nil)
 )
 
 func scalarUpdMetric(diff idx.Event, weight pos.Weight, totalWeight pos.Weight) ancestor.Metric {
@@ -73,6 +79,7 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 					"power", e.GasPowerLeft().String(),
 					"selfParentPower", selfParent.GasPowerLeft().String(),
 					"stake%", 100*float64(em.validators.Get(e.Creator()))/float64(em.validators.TotalWeight()))
+				notAllowedToEmitCount.Inc(1)
 				return false
 			}
 		}
@@ -87,6 +94,7 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 		if passedTime >= em.intervals.Max ||
 			passedBlocks >= maxBlocks*4/5 && metric >= piecefunc.DecimalUnit/2 ||
 			passedBlocks >= maxBlocks {
+			allowedToEmitCount.Inc(1)
 			return true
 		}
 	}
@@ -109,6 +117,7 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 		if passedTime < em.intervals.Max &&
 			em.idle() &&
 			!eTxs {
+			notAllowedToEmitCount.Inc(1)
 			return false
 		}
 	}
@@ -119,15 +128,18 @@ func (em *Emitter) isAllowedToEmit(e inter.EventI, eTxs bool, metric ancestor.Me
 		}
 		if adjustedPassedTime < em.intervals.Min &&
 			!em.idle() {
+			notAllowedToEmitCount.Inc(1)
 			return false
 		}
 		if adjustedPassedIdleTime < em.intervals.Confirming &&
 			!em.idle() &&
 			!eTxs {
+			notAllowedToEmitCount.Inc(1)
 			return false
 		}
 	}
 
+	allowedToEmitCount.Inc(1)
 	return true
 }
 
